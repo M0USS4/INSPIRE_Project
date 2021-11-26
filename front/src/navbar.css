@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;1,300&display=swap');
+
+.input-noborder{
+	border: none;
+	background: none;
+	padding-bottom:5px;
+}
+.typical_button{
+	background:none;
+	border:solid;
+	border-radius:0.5em;
+	border-width:2px;
+	margin-right:5px;
+}
+
+.typical_button:hover{
+	color:white;
+	background:none;
+	background:#595959;
+	border:solid;
+	border-radius:0.5em;
+	border-width:2px;
+}
+
+.fix-right div{
+	display:inline-block;
+}
+	
+.div-input-group{
+	border:solid;
+	border-width:2px;
+	border-radius: 0.5em;
+	background: white;
+	width:7em;
+}
+.connexion-small-arrow{
+	width:1,5em;
+	height:1em;
+	margin-top:5px;
+}
+.small-top-logo{
+	width:3.5em;
+	height:3.4em;
+}
+.line-display{
+	box-sizing: border-box;
+	list-style-type: none;
+	background:white;
+	border:solid;
+	border-width:2px;
+	width:100%;
+}
+
+.line-display li{
+	display:inline-block;
+}
+.line-display li.spaced-elements{
+	margin-left: 3%;
+}
+.line-display > li:last-child
+{
+    float:right;
+	margin-top:1em;
+	margin-right:1em;
+}
+
+.line-display > li:first-child
+{
+    float:left;
+}
+html{
+	margin:none;
+	padding:none;
+}
+.textButton{
+    background: none;
+    border: none;
+	padding:1em;
+	z-index:6;
+	text-decoration:none;
+    pointer-events:none;
+	color:white;
+}
+
+.main-hidden-square{
+	background:#595959;
+	display: flex;
+	position:relative;
+    flex-direction: column;
+	z-index:6;
+	color:white;
+}
+
+.top-hidden-triangle{
+	position:absolute;
+	width:1.5em;
+	height:1em;
+	z-index:2;
+	margin-left:4.5em;
+	margin-top:-1em;
+}
+.float-menu{
+	float:right;
+	margin-right:2em;
+	margin-top:0;
+}
+.div-input-group:hover>#connexion-nav-button{
+	color:white;
+}
+.div-input-group:hover{
+	background:#595959;
+}
+.div-input-group:focus>#float-menu-toShow{
+	visibility: visible;
+}
+.link-no-link{
+	background:none;
+	border:none;
+	text-decoration:none;
+    pointer-events:none;
+	color:black;
+}
+
+.hover-link:hover{
+	color:#007cff;
+}
+
+@media only screen and (min-width: 200px) and (max-width: 800px) {
+	ul.line-display{
+		padding-left: 0em;
+		margin-left: 0em;
+	}
+	.fix-right div{
+		display:flex;
+		flex-direction: column;
+		margin-top: -0.6em;
+		padding: 0;
+	}
+	div.div-input-group{
+		display: inline-block;
+		margin-top: 3px;
+	}
+	.connexion-small-arrow{
+		width:1em;
+		height:0.5em;
+		margin-top:3px;
+	}
+}
