@@ -1,0 +1,83 @@
+:root{
+    --primary: #009BA4;
+}
+  
+
+.user-login{
+    margin: auto;
+}
+
+.login-hero{
+    padding: 15px;
+    padding-right: 0px;
+}
+.login-content{
+    padding: 15px;
+}
+
+.login-hero img{
+    width: 50%;
+    display: none;
+}
+
+.welcome{
+    text-align: center;
+}
+
+.welcome-title{
+    margin-bottom: 0px;
+}
+
+.welcome-sub-title{
+    display: flex;
+    justify-content: center;
+}
+.welcome-sub-title img{
+    width:3.5em;
+	height:3.4em;
+}
+
+
+
+.login-fields input{
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+.buttons{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+
+.forgotten-password{
+    color: black;
+}
+
+@media (min-width: 684px){
+    .user-login{
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 2fr);
+    }
+    
+    .login-hero img{
+        width: 100%;
+        display: inline-flex;
+    }
+}
+
+@media (min-width: 900px){
+    .user-login{
+        width: 80%;
+        margin: auto;
+        justify-content: center;
+    }
+}
