@@ -1,0 +1,39 @@
+.modal-container {
+  max-width: 600px;
+  display: flex;
+}
+.modal-title {
+  text-align: center;
+}
+
+.modal-banner img,
+.modal-content-container {
+  height: 200px;
+  width: 200px;
+}
+
+.modal-content-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 10px;
+}
+
+.modal-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-content h3 {
+  font-weight: 400;
+  margin: 0px;
+}
+
+.modal-content .css-julti5-MuiSwitch-root {
+  margin-top: 5px;
+}
+
+.modal-button {
+  text-align: center;
+}

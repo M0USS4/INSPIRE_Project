@@ -12,8 +12,12 @@ body {
   width: 100%;
 }
 
-p{
-  font-size: 1.3em;
+.info p{
+  margin: 1px;
+}
+
+button{
+  font-family: 'Poppins', sans-serif;
 }
 
 .button1{
@@ -28,78 +32,108 @@ p{
 .button2{
   text-decoration: none;
   color: var(--primary);
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   padding: 10px;
   border-radius: 5px;
   border: 2px solid var(--primary);
 }
 
-
+.home{
+  width: 100%;
+}
 .hero{
-  background: url(./images/background-Home.PNG);
+  background: url(./images/Untitled\ design\ \(3\).png);
   background-repeat: no-repeat ;
   background-size: cover;
-  height: 250px;
-  position: relative;
+  height: 450px;
   padding: 15px;
-
 }
 
 .hero-search{
-  /* width: 100%; */
-  position: absolute;
-  bottom: 20%;
-  padding-left: 10%;
-
+width: 100%;
+  height: 100%;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  bottom: 40%;
+  margin: auto;
 }
 
-.hero input, .hero a{
+
+.hero-title{
+  color:white;
+  font-size: 23px;
+  font-weight: 700;
+  width: 80%;
+  text-align: center;
+  margin: 5px auto;
+  max-width: 800px;
+}
+
+.hero-field{
+  width: 80%;
+  max-width: 800px;
+  margin: 5px auto;
+  display: flex;
+}
+
+.hero-search input, .hero-search button{
   height: 50px;
+  max-height: 50px;
 }
 
-.hero input {
+.hero-search input {
+  padding: 0px 20px;
   padding-left: 20px;
   border: none;
+  width: 100%;
 }
 
-.hero input::placeholder{
+.hero-search input::placeholder{
   font-size: 1.2em;
   font-weight: 700;
   font-family: 'Poppins', sans-serif;
 }
 
-.hero-practitian{
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
-  border-right: 1px solid red;
-  width: 70%;
+.input-container {
+  position: absolute;
 }
-.hero-location{
-  width: 30%;
-  display: none;
+
+input.hero-location {
+  background: white url(./images/map.png) left no-repeat;
+  background-size: 18px;
+  padding-left: 25px;
 }
+
+input.invalid {
+  background: white url(./images/exclamation-mark.png) right no-repeat;
+  background-size: 18px;
+  padding-right: 25px;
+  border: 1px solid red;
+}
+
 .hero-button{
   height: 50px;
   background-color: var(--primary);
   text-decoration: none;
+  text-align: center;
   color: white;
-  padding: 15px;
   border-radius: 0px 5px 5px 0px;
-  box-shadow:0px 0px 0px 2px white inset;
-  display: none;
+  border: 1px solid white;
 }
 
 .hero-button-mobile{
   background-color: var(--primary);
   text-decoration: none;
-  color: white;
+  color: rgb(63, 61, 61);
   border: 1px solid white;
   padding-left: 15px;
   padding-right: 15px;
   padding-bottom: 15px;
   padding-top: 15px;
   text-align: center;
-  /* display: block; */
+  display: none;
 }
 
 .hero-button-mobile img{
@@ -107,43 +141,32 @@ p{
   color: white;
 }
 
-.hero-title{
-  color: white;
-  font-size: 23px;
-  font-weight: 500;
-}
+
 
 
 .info{
-  background-image: url(./images/Image1CORRECT.png);
   background-repeat: no-repeat ;
   background-size: cover;
   padding: 15px;
 }
 
 .info-content1{
-  background-color: rgba(206, 245, 247, 0.53);
-  padding: 10px;
+  background-color: #f0fafe;
+  padding: 20px;
   border-radius: 3px;
   margin-bottom: 15px;
 }
 
 .idea{
-  width: 130px;
-  height: 78px;
+  width: 250px;
+  height: 258px;
   margin-right: 5px;
 }
 
 .professional{
   display: flex;
-  margin-bottom: 15px;
 }
 
-.professional-content p{
-  margin-top: 0px;
-  margin-top: 50px;
-
-}
 
 .professional-content a{
   text-decoration: none;
@@ -152,9 +175,12 @@ p{
   padding: 10px;
   border-radius: 5px;
 }
+.professional-content p{
+  margin-bottom: 20px ;
+}
 
 .info-services{
-  background:rgba(206, 245, 247, 0.53);
+  background:#f0fafe;
   padding: 10px;
   border-radius: 3px;
 }
@@ -166,6 +192,12 @@ p{
   display: flex;
 }
 
+.service-items{
+  /* display: flex;
+  justify-content: center; */
+  margin: 15px auto;
+}
+
 .service-types{
   list-style-type: none;
   padding: 0px 10%;
@@ -174,6 +206,12 @@ p{
 
 .service{
   text-align: center;
+  padding: 5px;
+}
+
+.service img{
+  border-radius: 5px;
+
 }
 
 .service p{
@@ -250,15 +288,14 @@ p{
 }
 
 @media (min-width:769px) {
-  p{
+  /* p{
     font-size: 1.3em;
-  }
+  } */
   .hero{
-    height: 360px;
+    height: 450px;
   }
   .hero-title{
-    font-size: 33px;
-    font-weight: 500;
+    font-size: 30px;
   }
   .hero-button-mobile{
     display: none;
@@ -287,24 +324,27 @@ p{
 @media (min-width:793px) {
   .info-content1{
     display: grid;
-    grid-template-columns: 2.5fr 1.5fr;    
-    grid-gap: 15px;
+    /* grid-template-columns: 1fr 2.5fr ;    
+    grid-gap: 15px; */
+    display: flex;
+    justify-content: center;
+  }
+  .professional-content{
+    width: 50%;
   }
 }
 
 
 @media (min-width:1024px) {
-  /* body{
-    width: 90%;
-    margin: auto;  } */
     .hero-search{
-      width: 90%;
-      margin: auto;
-      padding-left: 5%;
+      height: 450;
+      width: 70%;
+      margin: 0px;
     }
-  .hero-title, .hero-field{
-    width: 90%;
-    margin: auto;
+
+
+  .hero-title{
+    font-size: 32px;
   }
   
   .info-content1{
@@ -316,16 +356,21 @@ p{
     width: 90%;
     margin: auto;
     margin-bottom: 15px;
+    display: flex;
+  }
+
+  .service-items{
+    width: 70%
   }
 }
 
 @media (min-width:1200px) {
   .hero-search{
-    width: 80%;
+    /* width: 80%; */
   }
   .hero-title, .hero-field{
-    width: 80%;
-    margin: auto;
+    /* width: 80%;
+    margin: auto; */
   }
 
   .info-content1{
@@ -344,10 +389,10 @@ p{
 @media (min-width:1400px) {
 
   .hero-search{
-    width: 80%;
+    /* width: 80%; */
   }
   .hero-title{
-    font-size: 40px;
+    /* font-size: 40px; */
   }
   
 
