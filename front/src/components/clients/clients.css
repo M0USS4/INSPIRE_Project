@@ -1,0 +1,90 @@
+.card {
+  display: flex;
+  /* justify-content: center; */
+  align-content: center;
+  margin: auto;
+  margin-bottom: 20px;
+  width: 350px;
+  height: 150px;
+  padding: 10px;
+}
+
+.card-content {
+  font-family: "Poppins", sans-serif;
+  display: block;
+  margin: 0px 20px;
+}
+
+.search {
+  height: 100%;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  background: url(../../images/Untitled\ design.png);
+}
+
+.css-bhp9pd-MuiPaper-root-MuiCard-root {
+  padding-top: 20px;
+}
+
+.search-card {
+  margin: 10px auto;
+}
+
+.rdv {
+  width: 70%;
+}
+
+.rdv-info {
+  padding: 10px;
+  text-align: center;
+}
+
+.rdv-image {
+  margin: auto;
+}
+.rdv-info-details {
+  padding-left: 20px;
+  width: 100%;
+  margin: auto;
+}
+.rdv-info-details h3 {
+  margin: 0px;
+}
+.rdv-info-address {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.rdv-button {
+  text-align: center;
+}
+
+@media (min-width: 574px) {
+  .search-card {
+    width: 95%;
+  }
+}
+
+@media (min-width: 766px) {
+  .search-card {
+    width: 85%;
+    display: flex;
+    justify-content: space-around;
+    margin: 10px auto;
+  }
+}
+
+@media (min-width: 990px) {
+  .search-card {
+    width: 80%;
+  }
+}
+
+@media (min-width: 1198px) {
+  .search-card {
+    width: 70%;
+  }
+}
