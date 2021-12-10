@@ -1,0 +1,48 @@
+.file-uploader {
+  height: 100px;
+  max-width: 500px;
+  display: flex;
+  border: 1px solid black;
+  justify-content: space-between;
+  align-content: center;
+  padding: 10px;
+  margin: 15px auto;
+}
+.image-preview {
+  max-height: 90px;
+  object-fit: fill;
+}
+
+.choose-file {
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  padding: 10px;
+  /* z-index: -1; */
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+}
+
+.choose-file + label {
+  font-size: 1em;
+  color: white;
+  background-color: black;
+  display: inline-block;
+  padding: 10px;
+  border-radius: 3px;
+  margin: auto;
+}
+
+.choose-file + label,
+.ichoose-file + label:hover {
+  background-color: black;
+}
+
+label {
+  cursor: pointer;
+}
+
+.upload-button {
+  height: 30px;
+  text-align: center;
+}
