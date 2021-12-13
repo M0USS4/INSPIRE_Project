@@ -1,83 +1,122 @@
-:root{
-    --primary: #009BA4;
-}
-  
-
-.user-login{
-    margin: auto;
+:root {
+  --primary: #009ba4;
 }
 
-.login-hero{
-    padding: 15px;
-    padding-right: 0px;
-}
-.login-content{
-    padding: 15px;
-}
-
-.login-hero img{
-    width: 50%;
-    display: none;
-}
-
-.welcome{
-    text-align: center;
-}
-
-.welcome-title{
-    margin-bottom: 0px;
-}
-
-.welcome-sub-title{
-    display: flex;
+.user-login {
+  height: 100%;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  background: url(../../images/Untitled\ design.png);
+  /* display: flex;
     justify-content: center;
-}
-.welcome-sub-title img{
-    width:3.5em;
-	height:3.4em;
+    align-items: center; */
 }
 
+.login-hero {
+  border: 1px solid var(--primary);
+  border-width: 1px 0px 1px 1px;
+}
+.login-content {
+  padding: 0px 15px;
+  /* border: 1px solid var(--primary); */
+  box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.3);
+  opacity: 0.8;
+  display: inline-block;
+  vertical-align: middle;
+}
 
+.login-fields {
+  position: relative;
+  z-index: 2;
+  color: black;
+}
 
-.login-fields input{
+.login-hero img {
+  display: none;
+}
+
+.welcome {
+  text-align: center;
+}
+
+.welcome-title {
+  margin-bottom: 0px;
+}
+
+.welcome-sub-title {
+  display: flex;
+  justify-content: center;
+}
+.welcome-sub-title img {
+  width: 3.5em;
+  height: 3.4em;
+}
+
+.login-fields input {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  margin: 20px auto;
+  padding-bottom: 20px;
+}
+
+.invalid input {
+  border: 1px solid red;
+}
+
+.invalid input::placeholder {
+  color: red;
+}
+
+.invalid label {
+  /* color: red; */
+}
+
+.forgotten-password {
+  color: black;
+}
+
+@media (min-width: 684px) {
+  .login {
     width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    border-radius: 5px;
-}
-
-.buttons{
     display: flex;
-    flex-direction: column;
     justify-content: center;
-    text-align: center;
+    margin: auto;
+  }
+  .login-hero,
+  .login-content {
+    width: 450px;
+  }
+
+  .login-hero img {
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+  }
 }
 
-
-.forgotten-password{
-    color: black;
+@media (min-width: 900px) {
+  .login {
+    margin-top: 50px;
+  }
 }
 
-@media (min-width: 684px){
-    .user-login{
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(2, 2fr);
-    }
-    
-    .login-hero img{
-        width: 100%;
-        display: inline-flex;
-    }
-}
-
-@media (min-width: 900px){
-    .user-login{
-        width: 80%;
-        margin: auto;
-        justify-content: center;
-    }
+@media (min-width: 1050px) {
+  .login {
+    margin-top: 100px;
+  }
 }
