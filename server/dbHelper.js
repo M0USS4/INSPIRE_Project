@@ -2,24 +2,6 @@ const mysql = require("mysql")
 
 module.exports = {
 
-    getApptForClient:function (idUser){
-        db.getConnection( async (err, connection) => { 
-            if (err) {
-              return 500;
-            }
-              const sqlSearch = "SELECT id_pro, id_type, date, note_client FROM rdv where id_client = ?"
-              const search_query = mysql.format(sqlSearch,[idUser])
-      
-              const idPro = 0;
-              const idType = 0;
-      
-              await connection.query (search_query, async (err, result) => {  
-                if (err) {
-                  return 500;
-                }
-            })
-        })
-    },
     getPro:function (idPro, db, callback){
         db.getConnection( (err, connection) => { 
             if (err) {
@@ -160,6 +142,44 @@ module.exports = {
                     return callback(null, result[0].mail);
                 }
                 else{}
+            })
+        })
+    },
+    getClient:function (idAdmin, db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Searching for admin id: "+idAdmin)
+              const sqlSearch = "SELECT * FROM administrator where id_login = ?"
+              const search_query = mysql.format(sqlSearch,[idClient])
+      
+              connection.query (search_query, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    console.log("client found")
+                    //console.log(result[0].nom)
+                    let user = {
+                        "idlogin":result[0].id_login,
+                        "found":true
+                    }
+                    console.log(user)
+                    return callback(null, user);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("admin not found")
+                        let user = {
+                            "found":false
+                        }
+                        console.log(user)
+                        return callback(null, user);
+                    }
+                }
             })
         })
     }
