@@ -9,10 +9,12 @@ import ProfessionalRegister from './components/register/register-pros';
 import UserRegistration from './components/register/register-users';
 import Appointment from './components/pros/appointment';
 import Scheduler from './components/pros/Scheduler';
-import MyClients from './components/pros/my-clients';
+import MyClients from './components/pros/MyClients';
 import Picker from './components/shared/Picker';
 import Clients from './components/clients/clients';
 import Search from './components/clients/search';
+import ProfileSettings from './components/pros/ProfileSettings';
+import Customization from './components/pros/Customization';
 
 function App() {
   const [data, setData] = useState(null);
@@ -46,8 +48,14 @@ function App() {
               <Route  path="appointments"
                 element={<Scheduler className="u-expanded-width u-image u-image-default u-image-2"/>}
               />
+              <Route  path="customization"
+                element={<Customization className="u-expanded-width u-image u-image-default u-image-2"/>}
+              />
               <Route path="clients"
                 element={<MyClients className="u-expanded-width u-image u-image-default u-image-2"/>}
+              />
+              <Route path="profile-settings"
+                element={<ProfileSettings className="u-expanded-width u-image u-image-default u-image-2"/>}
               />
             </Route>
 
