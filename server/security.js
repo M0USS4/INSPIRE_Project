@@ -12,19 +12,20 @@ exports.checkJWT = async (req, res, next) => {
             if (err) {
                 return res.status(401).json('token_not_valid');
             } else {
-                req.decoded = decoded;
+                    req.decoded = decoded;
 
-                const expiresIn = 24 * 60 * 60;
-                const newToken  = jwt.sign({
-                    infos : decoded.infos
-                },
-                SECRET_KEY,
-                {
-                    expiresIn: expiresIn
-                });
+                    const expiresIn = 24 * 60 * 60;
+                    const newToken  = jwt.sign({
+                        infos : decoded.infos
+                    },
+                    SECRET_KEY,
+                    {
+                        expiresIn: expiresIn
+                    });
 
-                res.header('Authorization', 'Bearer ' + newToken);
-                next();
+                    res.header('Authorization', 'Bearer ' + newToken);
+                    next();
+                
             }
         });
     } else {

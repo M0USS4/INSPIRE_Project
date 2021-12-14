@@ -20,6 +20,7 @@ const bcrypt = require("bcrypt")
 
 const dbHelper = require('./dbHelper');
 const security = require('./security');
+const searchManager = require('./searchManager');
 
 const DB_HOST = process.env.DB_HOST
 const DB_USER = process.env.DB_USER
@@ -40,36 +41,29 @@ db.getConnection( (err, connection)=> {   if (err) throw (err)
   console.log ("DB connected successful: " + connection.threadId)})
 
 app.get('/test' , async (req,res) => {
-
-  let user={
-    "mail":"mail",
-    "name":"userdb.name",
-    "surname":"userdb.surname",
-    "phone":"userdb.phone",
-    "birth":"userdb.birth",
-    "adress":"adress"
-}
-console.log("Login success")
-console.log(user)
-
-let secret = process.env.JWT_SECRET_KEY;
-
-const expireIn = 24 * 60 * 60;
-  const token    = jwt.sign({
-      infos: {
-        "type" :0,
-        "user":user
-      }
-  },
-  secret,
-  {
-      expiresIn: expireIn
-  });
-
-  res.header('Authorization', 'Bearer ' + token);
-
-return res.status(200).json('auth_ok');
-
+  let search = "arrêter de fumer d'habitude"
+  search.toLowerCase()
+  search = search.replaceAll('é','e').replaceAll('ê','e').replaceAll('è','e').replaceAll('ë','e').replaceAll('à','a').replaceAll('ù','u')
+  search = search.replaceAll('_',' ').replaceAll('-',' ').replaceAll('\'',' ')
+  let sSplit = search.split(" ")
+  let sRes=[]
+  sSplit.forEach(s=>{
+    console.log(s+" "+s.length)
+    if (s.length>2){
+      sRes.push(s)
+    }
+  })
+  console.log(sSplit)
+  console.log(sRes)
+  dbHelper.getAllTopics(db, function(err, topics){
+    if(!err){
+      topics.forEach(topic=>console.log(topic.title))
+      return res.status(200).json(topics)
+    }else{
+      console.log(err)
+    }
+  })
+  searchManager.wordAccuracy("fumer", "fumer");
 });
 
 app.get("/tokenTest", async (req, res) => {
@@ -79,6 +73,71 @@ app.get("/tokenTest", async (req, res) => {
 app.listen(PORT, () => {
   console.log("Serveur à l'écoute")
 })
+
+app.get("/pro/appt/all", security.checkJWT, async (req, res) => {
+
+  let idPro = req.decoded.infos.user.idUser
+  let completedAppts=[];
+  dbHelper.getApptForPro(idPro, db, function(err, appts){
+    if(!err){
+      if(appts.length>0){
+        for(let i =0; i<appts.length;i++){
+          dbHelper.getRdvType(appts[i].id_type, db, function(err, rdv_type){
+            if(!err){
+                  dbHelper.getClient(id_user, db, function(err, userdb){
+                    if(!err){
+                      if(userdb.found){
+                      let adress = dbHelper.getAdress(userdb.idadress, db, function(err, adress){
+                        if(!err){let mail = dbHelper.getMail(userdb.idlogin, db, function(err, mail){
+                          if(!err){let user={
+                              "idUser":userdb.idUser,
+                              "mail":mail,
+                              "name":userdb.name,
+                              "surname":userdb.surname,
+                              "phone":userdb.phone,
+                              "birth":userdb.birth,
+                              "adress":adress
+                          }
+                          completedAppts.push({
+                            "date":result[apptNb].appt_date,
+                            "note_pro":result[apptNb].note_pro,
+                            "client":user,
+                            "type":rdv_type
+                          })
+                        }else{
+                          console.log("Error getting the mail of the client")
+                          return res.status(500).json("error server")
+                        }
+                      })
+                    }else{
+                      console.log("error getting the adress of the client")
+                      return res.status(500).json("error server")
+                    }
+                  })
+                }else{
+                  console.log("Client not found")
+                  return res.status(404).json("client of the appointment not found")
+                }
+              }else{
+                console.log("error getting the client")
+                return res.status(500).json("error server")
+              }
+            })
+            }else{
+              console.log("error getting the rdv type")
+              return res.status(500).json("error server")
+            }
+          })
+        }
+        console.log("finished fetching appts")
+        console.log(completedAppts)
+        return res.status(200).json(completedAppts)
+      }else{
+        console.log("no appt to fetch")
+        return res.status(204).json("no appointments for said pro")
+      }
+    }})
+});
 
 app.post("/register/post", async (req,res) => {
 
@@ -104,13 +163,16 @@ app.post("/register/post", async (req,res) => {
   }
 
   let user;
+  let dBirth = new Date(req.body.user.birth)
+  dBirth.setHours(14)
+  console.log("birth: "+dBirth)
 
   if(type==0){
     user={
       "name":req.body.user.name,
       "surname":req.body.user.surname,
       "phone":req.body.user.phone,
-      "birth":req.body.user.birth,
+      "birth":dBirth,
       "adress":adress,
     }
   }else if(type==1){
@@ -118,7 +180,7 @@ app.post("/register/post", async (req,res) => {
       "name":req.body.user.name,
       "surname":req.body.user.surname,
       "phone":req.body.user.phone,
-      "birth":req.body.user.birth,
+      "birth":dBirth,
       "adress":adress,
       "img":req.body.user.img,
       "cv":req.body.user.cv,
@@ -343,6 +405,7 @@ app.post("/login/post", (req, res)=> {
             let adress = dbHelper.getAdress(userdb.idadress, db, function(err, adress){
               if(!err){let mail = dbHelper.getMail(userdb.idlogin, db, function(err, mail){
                 if(!err){let user={
+                    "idUser":userdb.idUser,
                     "mail":mail,
                     "name":userdb.name,
                     "surname":userdb.surname,
@@ -384,6 +447,7 @@ app.post("/login/post", (req, res)=> {
                     let adress = dbHelper.getAdress(userdb.idadress, db, function(err, adress){
                       if(!err){let mail = dbHelper.getMail(userdb.idlogin, db, function(err, mail){
                         if(!err){let user={
+                            "idUser":userdb.idUser,
                             "mail":mail,
                             "name":userdb.name,
                             "surname":userdb.surname,
@@ -419,7 +483,7 @@ app.post("/login/post", (req, res)=> {
                       }
                     });
                   }else{
-                    dbHelper.getPro(id_user, db, function(err, userdb){
+                    dbHelper.getAdmin(id_user, db, function(err, userdb){
                       if(!err){
                         if(userdb.found){
                           let secret = process.env.JWT_SECRET_KEY;
