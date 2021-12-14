@@ -291,7 +291,8 @@ module.exports = {
                                 "id_type":result[apptNb].id_type,
                                 "id_client":result[apptNb].id_client,
                                 "date":result[apptNb].appt_date,
-                                "note_client":result[apptNb].note_client
+                                "note_client":result[apptNb].note_client,
+                                "status":result[apptNb].status==1
                             }
                         )
                     }
