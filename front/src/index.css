@@ -3,7 +3,12 @@
 :root{
   --primary: #009BA4;
 }
-
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
 body {
   margin: 0;
   font-family: 'Poppins',sans-serif;
