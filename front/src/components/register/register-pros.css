@@ -1,34 +1,22 @@
-.register-uploader{
-    /* width: 100%; */
-    /* margin: 50px; */
-}
-
-/* .register-uploader-content{
+/* .register-uploader{
     width: 100%;
-    margin: auto;
+    margin: 50px;
 } */
 
-@media (min-width: 1198px) {
-    .register-uploader{
-        /* width: 70%; */
-    }
+
+
+/* @media (min-width: 1198px) {
+
 }
 
 @media (min-width: 990px) {
-    .register-uploader{
-        /* width: 70%; */
-    }
+
 }
 
 @media (min-width: 766px) {
-    .register-uploader{
-        /* width: 80%; */
-    }
+
 }
 
 @media (min-width: 574px) {
-    .register-uploader-content{
-        width: 100%;
-        margin: auto;
-    }
-}
+
+} */
