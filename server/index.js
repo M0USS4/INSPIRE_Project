@@ -114,17 +114,19 @@ app.post("/pro/appt/create", async (req, res) => {
   })
 })
 
-app.get("/pro/appt/all", security.checkJWT, async (req, res) => {
+app.get("/pro/appt/all", async (req, res) => {
 
-  let idPro = req.decoded.infos.user.idUser
+  //let idPro = req.decoded.infos.user.idUser
+  let idPro = 1;
   let completedAppts=[];
   dbHelper.getApptForPro(idPro, db, function(err, appts){
     if(!err){
       if(appts.length>0){
         for(let i =0; i<appts.length;i++){
+          console.log("for i "+i)
           dbHelper.getRdvType(appts[i].id_type, db, function(err, rdv_type){
             if(!err){
-                  dbHelper.getClient(id_user, db, function(err, userdb){
+                  dbHelper.getClient(appts[i].id_client, db, function(err, userdb){
                     if(!err){
                       if(userdb.found){
                       let adress = dbHelper.getAdress(userdb.idadress, db, function(err, adress){
@@ -139,11 +141,18 @@ app.get("/pro/appt/all", security.checkJWT, async (req, res) => {
                               "adress":adress
                           }
                           completedAppts.push({
-                            "date":result[apptNb].appt_date,
-                            "note_pro":result[apptNb].note_pro,
+                            "date_start":appts[i].date_start,
+                            "date_end":appts[i].date_end,
+                            "note_pro":appts[i].note_pro,
                             "client":user,
                             "type":rdv_type
                           })
+                          console.log("pushed to appts")
+                          if(completedAppts.length===appts.length){
+                            console.log("finished fetching appts")
+                            console.log(completedAppts)
+                            return res.status(200).json(completedAppts)
+                          }
                         }else{
                           console.log("Error getting the mail of the client")
                           return res.status(500).json("error server")
@@ -169,14 +178,17 @@ app.get("/pro/appt/all", security.checkJWT, async (req, res) => {
             }
           })
         }
-        console.log("finished fetching appts")
-        console.log(completedAppts)
-        return res.status(200).json(completedAppts)
       }else{
         console.log("no appt to fetch")
         return res.status(204).json("no appointments for said pro")
       }
-    }})
+    }else{
+      console.log(err)
+      return res.status(500).json("error fetching appt")
+    }
+    console.log("made it to the end")
+  })
+  
 });
 
 app.post("/register/post", async (req,res) => {

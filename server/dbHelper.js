@@ -22,7 +22,7 @@ module.exports = {
                     console.log("pro found "+result[0].name)
                     //console.log(result[0].nom)
                     let dBirth = new Date(result[0].birth);
-                    let dBirthM = fix.fixStringDateFromSQL(dBirth)
+                    let dBirthM = fix.fixStringDateFromSQL(result[0].birth)
                     let user = {
                         "idUser":result[0].id,
                         "idlogin":result[0].id_login,
@@ -72,7 +72,7 @@ module.exports = {
                     //console.log(result[0].nom)
                     let dBirth = new Date(result[0].birth);
                     console.log(dBirth);
-                    let dBirthM = fix.fixStringDateFromSQL(dBirth)
+                    let dBirthM = fix.fixStringDateFromSQL(result[0].birth)
                     let user = {
                         "idUser":result[0].id,
                         "idlogin":result[0].id_login,
@@ -246,12 +246,14 @@ module.exports = {
                     let appts=[];
                     
                     for(let apptNb=0;apptNb<result.length;apptNb++){
-                        let apptDate = fix.fixStringDateFromSQL(result[apptNb].appt_date)
+                        let start = fix.fixStringDateTimeFromSQL(result[apptNb].appt_dateStart)
+                        let end = fix.fixStringDateTimeFromSQL(result[apptNb].appt_dateEnd)
                         appts.push(
                             {
                                 "id_type":result[apptNb].id_type,
                                 "id_client":result[apptNb].id_client,
-                                "date":apptDate,
+                                "date_start":start,
+                                "date_end":end,
                                 "note_pro":result[apptNb].note_pro
                             }
                         )
@@ -286,12 +288,14 @@ module.exports = {
                 if (result.length != 0) {
                     let appts=[];
                     for(let apptNb=0;apptNb<result.length;apptNb++){
-                        let apptDate = fix.fixStringDateFromSQL(result[apptNb].appt_date)
+                        let start = fix.fixStringDateTimeFromSQL(result[apptNb].appt_dateStart)
+                        let end = fix.fixStringDateTimeFromSQL(result[apptNb].appt_dateEnd)
                         appts.push(
                             {
                                 "id_type":result[apptNb].id_type,
                                 "id_client":result[apptNb].id_client,
-                                "date":apptDate,
+                                "date_start":start,
+                                "date_end":end,
                                 "note_client":result[apptNb].note_client,
                                 "status":result[apptNb].status==1
                             }
@@ -316,7 +320,7 @@ module.exports = {
             }
               console.log("Searching rdv type id: "+idType)
               const sqlSearch = "SELECT * FROM type_rdv where id = ?"
-              const search_query = mysql.format(sqlSearch,[idClient])
+              const search_query = mysql.format(sqlSearch,[idType])
       
               connection.query (search_query, (err, result) => {  
                 if (err) {
@@ -325,8 +329,17 @@ module.exports = {
                 }
                 console.log(result);
                 if (result.length != 0) {
-                    let sDate = fix.fixStringDateFromSQL(result[0].startDate)
-                    let eDate = fix.fixStringDateFromSQL(result[0].endDate)
+                    console.log("RDV TYPE")
+                    console.log(result[0].startDate)
+                    console.log(result[0].endDate)
+                    let sDate, eDate;
+                    try
+                    { sDate = fix.fixStringDateFromSQL(result[0].startDate)
+                     eDate = fix.fixStringDateFromSQL(result[0].endDate)}
+                    catch(err){
+                         sDate = result[0].startDate;
+                         eDate = result[0].endDate;
+                    }
                     let rdv_type={
                         "name":result[0].nom,
                         "duration":result[0].duration,
