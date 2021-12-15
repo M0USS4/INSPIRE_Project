@@ -1,4 +1,5 @@
 const mysql = require("mysql")
+const fix = require('./generalHelper');
 
 module.exports = {
 
@@ -21,15 +22,14 @@ module.exports = {
                     console.log("pro found "+result[0].name)
                     //console.log(result[0].nom)
                     let dBirth = new Date(result[0].birth);
-                    dBirth.setTime(dBirth*60*60*1000+2*60*60*1000)
-                    let dBirthM = new Date(dBirth.getTime()+2*60*60*1000)
+                    let dBirthM = fix.fixStringDateFromSQL(dBirth)
                     let user = {
                         "idUser":result[0].id,
                         "idlogin":result[0].id_login,
                         "name":result[0].nom,
                         "surname":result[0].prenom,
                         "phone":result[0].tel,
-                        "birth":dBirthM.toISOString().slice(0,10),
+                        "birth":dBirthM,
                         "idadress":result[0].id_adress,
                         "img":result[0].img,
                         "cv":result[0].cv,
@@ -72,16 +72,14 @@ module.exports = {
                     //console.log(result[0].nom)
                     let dBirth = new Date(result[0].birth);
                     console.log(dBirth);
-                    let dBirthM = new Date(dBirth.getTime()+2*60*60*1000)
-                    console.log(dBirthM)
-                    console.log(dBirthM.toISOString().slice(0,10))
+                    let dBirthM = fix.fixStringDateFromSQL(dBirth)
                     let user = {
                         "idUser":result[0].id,
                         "idlogin":result[0].id_login,
                         "name":result[0].nom,
                         "surname":result[0].prenom,
                         "phone":result[0].tel,
-                        "birth":dBirthM.toISOString().slice(0,10),
+                        "birth":dBirthM,
                         "idadress":result[0].id_adress,
                         "found":true
                     }
@@ -246,12 +244,14 @@ module.exports = {
                 console.log(result);
                 if (result.length != 0) {
                     let appts=[];
+                    
                     for(let apptNb=0;apptNb<result.length;apptNb++){
+                        let apptDate = fix.fixStringDateFromSQL(result[apptNb].appt_date)
                         appts.push(
                             {
                                 "id_type":result[apptNb].id_type,
                                 "id_client":result[apptNb].id_client,
-                                "date":result[apptNb].appt_date,
+                                "date":apptDate,
                                 "note_pro":result[apptNb].note_pro
                             }
                         )
@@ -286,11 +286,12 @@ module.exports = {
                 if (result.length != 0) {
                     let appts=[];
                     for(let apptNb=0;apptNb<result.length;apptNb++){
+                        let apptDate = fix.fixStringDateFromSQL(result[apptNb].appt_date)
                         appts.push(
                             {
                                 "id_type":result[apptNb].id_type,
                                 "id_client":result[apptNb].id_client,
-                                "date":result[apptNb].appt_date,
+                                "date":apptDate,
                                 "note_client":result[apptNb].note_client,
                                 "status":result[apptNb].status==1
                             }
@@ -324,9 +325,13 @@ module.exports = {
                 }
                 console.log(result);
                 if (result.length != 0) {
+                    let sDate = fix.fixStringDateFromSQL(result[0].startDate)
+                    let eDate = fix.fixStringDateFromSQL(result[0].endDate)
                     let rdv_type={
                         "name":result[0].nom,
                         "duration":result[0].duration,
+                        "startDate":sDate,
+                        "endDate":eDate,
                         "price":result[0].price,
                         "public":result[0].public==1
                     }
@@ -360,9 +365,13 @@ module.exports = {
                 if (result.length != 0) {
                     let types = []
                     for(let typeNb=0;typeNb<result.length;typeNb++){
+                        let sDate = fix.fixStringDateFromSQL(result[0].startDate)
+                        let eDate = fix.fixStringDateFromSQL(result[0].endDate)
                         let rdv_type={
                             "name":result[typeNb].nom,
                             "duration":result[typeNb].duration,
+                            "startDate":sDate,
+                            "endDate":eDate,
                             "price":result[typeNb].price,
                             "public":result[typeNb].public==1
                         }
@@ -378,6 +387,42 @@ module.exports = {
                         console.log("no rdv_type found")
                         return callback(null, null);
                     }
+                }
+            })
+        })
+    },
+    addApptType:function (apptType, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Adding appt type: "+apptType)
+              const sqlInsert = "INSERT INTO type_rdv (nom, duration, price, startDate, endDate, public) VALUES (?,?,?,?,?,?)"
+              const insert_query = mysql.format(sqlInsert,[apptType.name, apptType.duration, apptType.price, apptType.startDate, apptType.endDate, apptType.public])
+      
+              connection.query (insert_query,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    return callback(null, true)
+                }
+            })
+        })
+    },
+    addAppt:function (appt, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Adding appt: "+appt)
+              const sqlInsert = "INSERT INTO rdv (id_client, id_pro, id_type, appt_dateStart, appt_dateEnd) VALUES (?,?,?,?,?)"
+              const insert_query = mysql.format(sqlInsert,[appt.idClient, appt.idPro, appt.idType, appt.apptDateStart,appt.apptDateEnd])
+      
+              connection.query (insert_query,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    return callback(null, true)
                 }
             })
         })

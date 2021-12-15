@@ -74,6 +74,46 @@ app.listen(PORT, () => {
   console.log("Serveur à l'écoute")
 })
 
+app.post("/pro/appt/create", async (req, res) => {
+  console.log("Creating appt ")
+  //appt.idClient, appt.idPro, appt.idType, appt.apptDateStart,appt.apptDateEnd
+
+  let rdv_type, client;
+
+  if(req.body.appointmentType===0)
+  {
+    console.log("cas O")
+    rdv_type = process.env.BLOCK_TYPE_ID;
+    client = process.env.BLOCK_CLIENT_ID;
+    console.log(rdv_type+" et "+client)
+  }else{
+    console.log("cas autre")
+    rdv_type = req.body.appointmentType;
+    client = req.body.clientId;
+    console.log(rdv_type+" et "+client)
+  }
+  let appt = {
+    "idClient":client,
+    "idPro":req.body.proId,
+    "idType":rdv_type,
+    "apptDateStart":req.body.start,
+    "apptDateEnd":req.body.end
+  }
+  console.log(appt)
+  dbHelper.addAppt(appt, db, function(err, added){
+    if(!err){
+      if(added){
+        return res.status(201).json("appt added")
+      }else{
+        return res.status(500).json("Could not add the appt")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+})
+
 app.get("/pro/appt/all", security.checkJWT, async (req, res) => {
 
   let idPro = req.decoded.infos.user.idUser
