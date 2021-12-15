@@ -362,9 +362,14 @@ app.post("/login/post", (req, res)=> {
     "password":req.body.login.password
   }
 
+  console.log("user "+login.mail+" trying to login")
+
+  if(!login.mail.localeCompare("block")){
+    return res.status(401).json("Unauthorized")
+  }
+
   let id_user;
   try{
-    console.log("user "+login.mail+" trying to login")
 
     console.log(login)
 
@@ -388,12 +393,15 @@ app.post("/login/post", (req, res)=> {
        else {
          console.log(result)
           const hashedPassword = result[0].mdp
+          const canConnect = await bcrypt.compare(login.password, hashedPassword);
 
           console.log(login.password+"  et   "+hashedPassword)
+        
+          console.log("VERIF: "+canConnect)
 
           //const passwd = bcrypt.hash(login.password,10)
             
-          if (bcrypt.compare(login.password, hashedPassword)) {
+          if (canConnect) {
          console.log("---------> Login Successful")
          id_user = result[0].id
          console.log("id login: "+id_user)
