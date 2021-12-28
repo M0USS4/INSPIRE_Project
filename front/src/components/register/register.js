@@ -43,6 +43,7 @@ const Register = () => {
     axios.post('http://localhost:2021/register/post', registerData)
       .then(response => {
         console.log(response);
+        setsuccess(true);
         navigate('/',      { state: {
           success: success,
         }});
