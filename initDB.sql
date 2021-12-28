@@ -37,6 +37,8 @@ CREATE TABLE Inspire.`type_rdv`
  nom      varchar(45) NOT NULL ,
  duration float NOT NULL ,
  price    float NOT NULL ,
+ startDate date NOT NULL,
+ endDate date NOT NULL,
  `public`   bit NOT NULL ,
 
 PRIMARY KEY (id)
@@ -139,7 +141,8 @@ CREATE TABLE Inspire.`rdv`
  id_client   int NOT NULL ,
  id_pro      int NOT NULL ,
  id_type     int NOT NULL ,
- appt_date        datetime NOT NULL ,
+ appt_dateStart        datetime NOT NULL ,
+ appt_dateEnd        datetime NOT NULL ,
  note_pro    text NOT NULL ,
  note_client text NOT NULL ,
  status      bit NOT NULL ,
@@ -233,4 +236,8 @@ KEY FK_115 (id_article),
 CONSTRAINT `article_cmd-article` FOREIGN KEY FK_115 (id_article) REFERENCES article (id)
 );
 
+INSERT INTO Inspire.`login` (mail, mdp) VALUES ("block","");
+INSERT INTO Inspire.`adress` (pays, num, rue, codeP, ville, supp) VALUES ("","","",0,"","");
+INSERT INTO Inspire.`client` (nom, prenom, id_login, tel, birth, id_adress) VALUES ("","",1,"","",1);
+INSERT INTO Inspire.`type_rdv` (nom, duration, price, startDate, endDate, `public`) VALUES ("Blocked",30,0,"","",false);
 

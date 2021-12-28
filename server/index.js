@@ -76,17 +76,59 @@ app.listen(PORT, () => {
   console.log("Serveur à l'écoute")
 })
 
-app.get("/pro/appt/all", security.checkJWT, async (req, res) => {
+app.post("/pro/appt/create", async (req, res) => {
+  console.log("Creating appt ")
+  //appt.idClient, appt.idPro, appt.idType, appt.apptDateStart,appt.apptDateEnd
 
-  let idPro = req.decoded.infos.user.idUser
+  let rdv_type, client;
+
+  if(req.body.appointmentType===0)
+  {
+    console.log("cas O")
+    rdv_type = process.env.BLOCK_TYPE_ID;
+    client = process.env.BLOCK_CLIENT_ID;
+    console.log(rdv_type+" et "+client)
+  }else{
+    console.log("cas autre")
+    rdv_type = req.body.appointmentType;
+    client = req.body.clientId;
+    console.log(rdv_type+" et "+client)
+  }
+  let appt = {
+    "idClient":client,
+    "idPro":req.body.proId,
+    "idType":rdv_type,
+    "apptDateStart":req.body.start,
+    "apptDateEnd":req.body.end
+  }
+  console.log(appt)
+  dbHelper.addAppt(appt, db, function(err, added){
+    if(!err){
+      if(added){
+        return res.status(201).json("appt added")
+      }else{
+        return res.status(500).json("Could not add the appt")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+})
+
+app.get("/pro/appt/all", async (req, res) => {
+
+  //let idPro = req.decoded.infos.user.idUser
+  let idPro = 1;
   let completedAppts=[];
   dbHelper.getApptForPro(idPro, db, function(err, appts){
     if(!err){
       if(appts.length>0){
         for(let i =0; i<appts.length;i++){
+          console.log("for i "+i)
           dbHelper.getRdvType(appts[i].id_type, db, function(err, rdv_type){
             if(!err){
-                  dbHelper.getClient(id_user, db, function(err, userdb){
+                  dbHelper.getClient(appts[i].id_client, db, function(err, userdb){
                     if(!err){
                       if(userdb.found){
                       let adress = dbHelper.getAdress(userdb.idadress, db, function(err, adress){
@@ -101,11 +143,18 @@ app.get("/pro/appt/all", security.checkJWT, async (req, res) => {
                               "adress":adress
                           }
                           completedAppts.push({
-                            "date":result[apptNb].appt_date,
-                            "note_pro":result[apptNb].note_pro,
+                            "date_start":appts[i].date_start,
+                            "date_end":appts[i].date_end,
+                            "note_pro":appts[i].note_pro,
                             "client":user,
                             "type":rdv_type
                           })
+                          console.log("pushed to appts")
+                          if(completedAppts.length===appts.length){
+                            console.log("finished fetching appts")
+                            console.log(completedAppts)
+                            return res.status(200).json(completedAppts)
+                          }
                         }else{
                           console.log("Error getting the mail of the client")
                           return res.status(500).json("error server")
@@ -131,14 +180,17 @@ app.get("/pro/appt/all", security.checkJWT, async (req, res) => {
             }
           })
         }
-        console.log("finished fetching appts")
-        console.log(completedAppts)
-        return res.status(200).json(completedAppts)
       }else{
         console.log("no appt to fetch")
         return res.status(204).json("no appointments for said pro")
       }
-    }})
+    }else{
+      console.log(err)
+      return res.status(500).json("error fetching appt")
+    }
+    console.log("made it to the end")
+  })
+  
 });
 
 app.post("/register/post", async (req,res) => {
@@ -364,9 +416,14 @@ app.post("/login/post", (req, res)=> {
     "password":req.body.login.password
   }
 
+  console.log("user "+login.mail+" trying to login")
+
+  if(!login.mail.localeCompare("block")){
+    return res.status(401).json("Unauthorized")
+  }
+
   let id_user;
   try{
-    console.log("user "+login.mail+" trying to login")
 
     console.log(login)
 
@@ -390,12 +447,15 @@ app.post("/login/post", (req, res)=> {
        else {
          console.log(result)
           const hashedPassword = result[0].mdp
+          const canConnect = await bcrypt.compare(login.password, hashedPassword);
 
           console.log(login.password+"  et   "+hashedPassword)
+        
+          console.log("VERIF: "+canConnect)
 
           //const passwd = bcrypt.hash(login.password,10)
             
-          if (bcrypt.compare(login.password, hashedPassword)) {
+          if (canConnect) {
          console.log("---------> Login Successful")
          id_user = result[0].id
          console.log("id login: "+id_user)
