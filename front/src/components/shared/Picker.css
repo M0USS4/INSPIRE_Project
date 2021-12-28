@@ -59,7 +59,7 @@
   /* margin: 10px; */
   border-radius: 5px;
   border: none;
-  background-color: #e9ffff;
+  background-color: #bee2e2;
   color: black;
 }
 
@@ -77,18 +77,23 @@
 .k-timer {
   display: flex;
   justify-content: center;
-  margin-top: -40px;
+  align-items: stretch;
+  /* margin-top: -40px; */
 }
-.k-picker-button {
+/* .k-picker-button {
   display: flex;
   justify-content: space-between;
   max-width: 600px;
   margin: 10px auto;
+} */
+.MuiButtonBase-root.k-picker-button{
+  align-items: flex-start;
 }
 
 .k-picker-content {
   text-align: center;
   margin: 5px;
+  flex: 1;
 }
 .k-picker-content h3 {
   padding-bottom: 0px;

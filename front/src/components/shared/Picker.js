@@ -1,5 +1,5 @@
 import {React, useState, useEffect} from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import data from '../../data/data';
@@ -8,15 +8,27 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { IconButton } from '@mui/material';
 
-const Picker = ({filter, handleRdv, id}) => {
+const Picker = ({filter, practicianData, columns, handleRdv}) => {
   const [dates, setdates] = useState([]);
   const [displayNumber, setdisplayNumber] = useState(0);
   const [responsiveNumber, setresponsiveNumber] = useState(7);
+  // const [proData, setProData] = useState({});
 
   useEffect(() => {
     getDates(7);
-    setresponsiveNumber(7);
+    const number = columns? columns : 7;
+    setresponsiveNumber(number);
   }, [displayNumber, responsiveNumber]);
+
+  // const handleRdv = (id,day, date, time) => {
+  //   setProData({
+  //     id: id,
+  //     day: day,
+  //     date: date,
+  //     time: time
+  //   });
+  //   console.log(proData);
+  // };
 
   const checkReserved = (time) => {
 
@@ -28,14 +40,14 @@ const Picker = ({filter, handleRdv, id}) => {
 
   const nextDate = () => {
     setdisplayNumber(displayNumber + responsiveNumber);
-    getDates();
+    // getDates();
   };
 
   const prevDate = () => {
     if(displayNumber > 0){
       setdisplayNumber(displayNumber - responsiveNumber);
     }
-    getDates();
+    // getDates();
   };
 
   const getDates = () => {
@@ -73,7 +85,7 @@ const Picker = ({filter, handleRdv, id}) => {
     case 4:
       for (let i = 0; i <= 3; i++) {
         let times = [];
-        current = moment(today).add(i, 'days');
+        current = moment(today).add((displayNumber + i), 'days');
         const month = current.format('M');
         const day   = current.format('d');
         const year  = current.format('YYYY');
@@ -96,7 +108,7 @@ const Picker = ({filter, handleRdv, id}) => {
     case 3:
       for (let i = -1; i <= 1; i++) {
         let times = [];
-        current = moment(today).add(i, 'days');
+        current = moment(today).add((displayNumber + i), 'days');
         const month = current.format('M');
         const day   = current.format('d');
         const year  = current.format('YYYY');
@@ -146,15 +158,18 @@ const Picker = ({filter, handleRdv, id}) => {
 
   return (
     <div className="k-timer-container">
-      <div className="k-picker-button">
+      {/* <div className="k-picker-button">
         <IconButton onClick={prevDate} size="large" className="picker-button">
           <ArrowBackIosIcon fontSize="inherit"/>
         </IconButton>
         <IconButton onClick={nextDate} size="large">
           <ArrowForwardIosIcon fontSize="inherit"/>
         </IconButton>
-      </div>
+      </div> */}
       <div className="k-timer">
+        <IconButton onClick={prevDate} size="large" className="k-picker-button">
+          <ArrowBackIosIcon fontSize="inherit"/>
+        </IconButton>
         {dates.map(day => (
           <div key={day.format} className="k-picker-content">
             <h3 >{day.day.slice(0, 3)}</h3>
@@ -165,30 +180,33 @@ const Picker = ({filter, handleRdv, id}) => {
                   !time.disabled &&
                       <button key={time.raw}
                         disabled={time.disabled}
-                        onClick={() => handleRdv(id, day.day, day.format, time.raw)}>{time.raw}</button>
+                        onClick={() => handleRdv(practicianData, day.day, day.format, time.raw)}>{time.raw}</button>
                 ))
               }
               {
                 (day.timeslots.length < filter) &&
-                  // eslint-disable-next-line max-len
                   Array(filter - day.timeslots.length ).fill().map((item, index) =>
                     (<span className="blocked" key={index}> - </span>))
               }
             </div>
           </div>
         ))}
+        <IconButton onClick={nextDate} size="large" className="k-picker-button">
+          <ArrowForwardIosIcon fontSize="inherit"/>
+        </IconButton>
       </div>
       <div className="picker-more">
-        <button className="picker-more-btn">See More</button>
+        <button className="picker-more-btn">See More Times</button>
       </div>
     </div>
   );
 };
 
 Picker.propTypes = {
-  filter: propTypes.number,
-  handleRdv: propTypes.func,
-  id: propTypes.object
+  filter: PropTypes.number,
+  handleRdv: PropTypes.func,
+  practicianData: PropTypes.object,
+  columns: PropTypes.number
 };
 
 export default Picker;

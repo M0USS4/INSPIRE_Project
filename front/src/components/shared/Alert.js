@@ -6,11 +6,11 @@ import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import CloseIcon from '@mui/icons-material/Close';
 
-const CollapseAlert = ({message, setopen, open}) => {
+const CollapseAlert = ({message, setopen, open, severity}) => {
   return (
     <Collapse in={open}>
       <Alert
-        severity="error"
+        severity={severity || 'error'}
         action={
           <IconButton
             aria-label="close"
@@ -34,6 +34,7 @@ const CollapseAlert = ({message, setopen, open}) => {
 CollapseAlert.propTypes = {
   message: PropTypes.string.isRequired,
   setopen: PropTypes.func.isRequired,
-  open: PropTypes.bool
+  open: PropTypes.bool,
+  severity: PropTypes.string
 };
 export default CollapseAlert;
