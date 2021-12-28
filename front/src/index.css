@@ -8,6 +8,7 @@ html {
 }
 *, *:before, *:after {
   box-sizing: inherit;
+  font-family: 'Poppins', sans-serif;
 }
 body {
   margin: 0;
@@ -41,6 +42,11 @@ button{
   padding: 10px;
   border-radius: 5px;
   border: 2px solid var(--primary);
+}
+
+
+.App{
+background-color: #f8f9fa;
 }
 
 .home{
