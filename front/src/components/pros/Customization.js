@@ -56,7 +56,7 @@ const Customization = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(() => {
-    const mot = ['Stop Smoking', 'Massage', 'Eat Healthy'];
+    const mot = ['Ostéopathie du sport', 'Ostéopathie de la femme enceinte', 'Ostéopathie biodynamique'];
     setmotifs(mot);
     handleDays();
   }, [experiences]);
@@ -228,7 +228,7 @@ const Customization = () => {
       </Item>
 
       <Item>
-          Motifs
+          Appointment Types
         <div className="tags">
           {motifs.map((motif, index) => (
             <span className="tag" key={index}>
