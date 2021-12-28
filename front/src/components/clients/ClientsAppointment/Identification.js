@@ -64,7 +64,7 @@ const Identification = ({practicianData}) => {
       >
         <Grid item xs={12} sm={10} md={7} lg={6}>
           <Item>
-            <p>J&apos;ai déjà un compte Doctolib</p>
+            <p>J&apos;ai déjà un compte Inspire ?</p>
             {!expanded.login &&
             <button
               className='button1 identity-button'
@@ -76,7 +76,7 @@ const Identification = ({practicianData}) => {
             </Collapse>
           </Item>
           <Item>
-            <p>Nouveau sur Doctolib ?</p>
+            <p>Nouveau sur Inspire ?</p>
             {!expanded.register &&
             <button
               className='button2 identity-button'
