@@ -35,6 +35,11 @@ const Clients = () => {
                       <Link to="appointments">Booking</Link>
                     </li>
                     <li>
+                      <div className="u-list-icon u-list-icon-3">
+                      </div>
+                      <Link to="pro-profile/:id">Pro profile **remove later</Link>
+                    </li>
+                    <li>
                       <div className="u-list-icon u-list-icon-2">
                       </div>
                       <Link to="clients">Previous Appointment</Link>
@@ -44,7 +49,6 @@ const Clients = () => {
                       <div className="u-list-icon u-list-icon-3">
                       </div>
                       <Link to="reviews">Reviews</Link>
-
                     </li>
                     <li>
                       <div className="u-list-icon u-list-icon-1">
