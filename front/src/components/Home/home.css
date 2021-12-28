@@ -1,5 +1,5 @@
 .modal-container {
-  max-width: 600px;
+  /* max-width: 600px; */
   display: flex;
 }
 .modal-title {
@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-left: 10px;
+  /* padding-left: 10px; */
 }
 
 .modal-content {
