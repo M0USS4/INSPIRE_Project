@@ -6,29 +6,19 @@ import data from '../../data/data';
 import './Picker.css';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { IconButton } from '@mui/material';
+import { IconButton, Typography } from '@mui/material';
 
-const Picker = ({filter, practicianData, columns, handleRdv}) => {
+const Picker = ({ practicianData, columns, handleRdv}) => {
   const [dates, setdates] = useState([]);
   const [displayNumber, setdisplayNumber] = useState(0);
   const [responsiveNumber, setresponsiveNumber] = useState(7);
-  // const [proData, setProData] = useState({});
+  const [filter, setfilter] = useState(4);
 
   useEffect(() => {
     getDates(7);
     const number = columns? columns : 7;
     setresponsiveNumber(number);
   }, [displayNumber, responsiveNumber]);
-
-  // const handleRdv = (id,day, date, time) => {
-  //   setProData({
-  //     id: id,
-  //     day: day,
-  //     date: date,
-  //     time: time
-  //   });
-  //   console.log(proData);
-  // };
 
   const checkReserved = (time) => {
 
@@ -50,6 +40,40 @@ const Picker = ({filter, practicianData, columns, handleRdv}) => {
     // getDates();
   };
 
+  const handleMoreTimes = () => {
+    console.log(dates);
+    const maxTimeSlot = Math.max(...dates.map(date => date.timeslots.length));
+    console.log(maxTimeSlot);
+    setfilter(maxTimeSlot);
+  };
+
+  const handleAvailability = (current) => {
+    let date;
+    let times = [];
+
+    const month = current.format('M');
+    const day   = current.format('D');
+    const dayOfweek = current.format('dddd').toLowerCase();
+    const year  = current.format('YYYY');
+    console.log(dayOfweek);
+    practicianData.availability.find(available => available.id === dayOfweek).availability.map(available => {
+      for(let k = available.start; k <= available.end; k++){
+        times.push({
+          raw: k+':00',
+          date: new Date(year, month - 1  , day, k, 0, 0),
+          disabled: checkReserved({date: new Date(year, month - 1  , day  , k, 0, 0)})
+        } );
+      }
+    });
+
+    date ={
+      format: current.format('DD MMM'),
+      day: current.format('dddd'),
+      date: current.format('dddd'),
+      timeslots: times.filter(time => time.disabled === false)
+    };
+    return date;
+  };
   const getDates = () => {
     const currentDate = moment();
     const today = moment();
@@ -60,99 +84,33 @@ const Picker = ({filter, practicianData, columns, handleRdv}) => {
     switch(responsiveNumber){
     case 7:
       for (let i = 0; i <= 6; i++) {
-
-        let times = [];
         current = moment(weekStart).add(i, 'days');
-        const month = current.format('M');
-        const day   = current.format('D');
-        const year  = current.format('YYYY');
-
-        for(let j = 9; j <= 17; j++){
-          times.push({
-            raw: j+':00',
-            date: new Date(year, month - 1  , day, j, 0, 0),
-            disabled: checkReserved({date: new Date(year, month - 1  , day  , j, 0, 0)})
-          } );
-        }
-        days.push({
-          format: current.format('Do MMM'),
-          day: current.format('dddd'),
-          date: current.format('dddd'),
-          timeslots: times.filter(time => time.disabled === false)
-        });
+        const date = handleAvailability(current);
+        days.push(date);
       }
       break;
     case 4:
       for (let i = 0; i <= 3; i++) {
-        let times = [];
         current = moment(today).add((displayNumber + i), 'days');
-        const month = current.format('M');
-        const day   = current.format('d');
-        const year  = current.format('YYYY');
-
-        for(let j = 9; j <= 17; j++){
-          times.push({
-            raw: j+':00',
-            date: new Date(year, month - 1 , i, j, 0, 0),
-            disabled: checkReserved({date: new Date(year, month - 1 , day, j, 0, 0)})
-          } );
-        }
-        days.push({
-          format: current.format('Do MMM'),
-          day: current.format('dddd'),
-          date: current.format('dddd'),
-          timeslots: times.filter(time => time.disabled === false)
-        });
+        const date = handleAvailability(current);
+        days.push(date);
       }
       break;
     case 3:
       for (let i = -1; i <= 1; i++) {
-        let times = [];
         current = moment(today).add((displayNumber + i), 'days');
-        const month = current.format('M');
-        const day   = current.format('d');
-        const year  = current.format('YYYY');
-
-        for(let j = 9; j <= 17; j++){
-          times.push({
-            raw: j+':00',
-            date: new Date(year, month - 1 , i, j, 0, 0),
-            disabled: checkReserved({date: new Date(year, month - 1 , day, j, 0, 0)})
-          } );
-        }
-        days.push({
-          format: current.format('Do MMM'),
-          day: current.format('dddd'),
-          date: current.format('dddd'),
-          timeslots: times.filter(time => time.disabled === false)
-        });
+        const date = handleAvailability(current);
+        days.push(date);
       }
       break;
     case 2:
       for (let i = 0; i <= 1; i++) {
-        let times = [];
         current = moment(today).add(i, 'days');
-        const month = current.format('M');
-        const day   = current.format('d');
-        const year  = current.format('YYYY');
-
-        for(let j = 9; j <= 17; j++){
-          times.push({
-            raw: j+':00',
-            date: new Date(year, month - 1 , i, j, 0, 0),
-            disabled: checkReserved({date: new Date(year, month - 1 , day, j, 0, 0)})
-          } );
-        }
-        days.push({
-          format: current.format('Do MMM'),
-          day: current.format('dddd'),
-          date: current.format('dddd'),
-          timeslots: times.filter(time => time.disabled === false)
-        });
+        const date = handleAvailability(current);
+        days.push(date);
       }
       break;
     }
-    console.log(days);
     setdates(days);
   };
 
@@ -172,8 +130,15 @@ const Picker = ({filter, practicianData, columns, handleRdv}) => {
         </IconButton>
         {dates.map(day => (
           <div key={day.format} className="k-picker-content">
-            <h3 >{day.day.slice(0, 3)}</h3>
-            <span >{day.format}</span>
+            {/* <h3 >{day.day.slice(0, 3)}</h3>
+            <span >{day.format}</span> */}
+
+            <Typography variant="subtitle1" >
+              {day.day.slice(0, 3)}
+            </Typography>
+            <Typography variant="subtitle2" >
+              {day.format}
+            </Typography>
             <div className="k-timeslots">
               {
                 day.timeslots.slice(0,filter).map(time => (
@@ -196,7 +161,7 @@ const Picker = ({filter, practicianData, columns, handleRdv}) => {
         </IconButton>
       </div>
       <div className="picker-more">
-        <button className="picker-more-btn">See More Times</button>
+        {filter <= 4 && <button className="picker-more-btn" onClick={handleMoreTimes}>See More Times</button>}
       </div>
     </div>
   );
