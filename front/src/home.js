@@ -1,9 +1,9 @@
-import {React, useState} from 'react';
-import { useNavigate } from 'react-router';
+import {React, useEffect, useState} from 'react';
+// import { useNavigate } from 'react-router';
 import lost from './images/on-the-way-animate.svg';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
-import { useForm } from 'react-hook-form';
+// import { useForm } from 'react-hook-form';
 import osteopathy from './images/osteopath.jpg';
 import hypnosis from './images/hypnose.jpg';
 import aroma from './images/aromath.jpg';
@@ -11,22 +11,86 @@ import aroma from './images/aromath.jpg';
 // import schedule from './images/schedule.png';
 // import communication from './images/promotion.png';
 // import easyUse from './images/click.png';
-import search from './images/search.png';
+// import search from './images/search.png';
 import HomePopup from './components/Home/HomePopup';
+import authService from './auth.service';
+import SearchBar from './components/shared/SearchBar';
+import { styled } from '@mui/material/styles';
+import { makeStyles } from '@material-ui/styles';
+import background from './images/Untitled design (3).png';
 
+const useStyles  = makeStyles({
+  heroTitle : {
+    color:'white',
+    fontSize: '1.8rem',
+    fontWeight: 700,
+    textAlign: 'center',
+    // margin: '5px auto',
+    maxWidth: '700px',
+  },
+});
+const Root = styled('div')(({ theme }) => ({
+  padding: theme.spacing(1),
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent:'center',
+  bottom: '40%',
+  margin: 'auto',
+  height: '100%',
+  [theme.breakpoints.up('xs')]: {
+    width: '100%',
+  },
+  [theme.breakpoints.up('md')]: {
+    width: '90%',
+  },
+  [theme.breakpoints.up('lg')]: {
+    width: '70%',
+  },
+}));
+
+const Hero = styled('div')(({ theme }) => ({
+  background: `url(${background})`,
+  backgroundRepeat: 'no-repeat' ,
+  backgroundSize: 'cover',
+  height: 450,
+  padding: '15px',
+  [theme.breakpoints.up('xs')]: {
+    // width: '100%',
+    backgroundSize: 'fill',
+  },
+  [theme.breakpoints.down('md')]: {
+    // width: '90%',
+    backgroundSize: 'fill',
+  },
+  [theme.breakpoints.up('lg')]: {
+    // width: '70%',
+  },
+}));
 const Home = () => {
-  let navigate = useNavigate();
-  const [open, setopen] = useState(true);
+  // let navigate = useNavigate();
+  const classes = useStyles();
+
+  const [open, setopen] = useState(false);
   const handleOpen = () => setopen(true);
   const handleClose = () => setopen(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const onSubmit = (data) =>{
-    console.log(data);
-    const location = new String(data.location);
-    const practice = new String(data.practice);
-    navigate(`/search/${practice.toLowerCase()}/${location.toLowerCase()}`);
-  };
+  // const { register, handleSubmit, formState: { errors } } = useForm();
+
+  useEffect(() => {
+    const user = authService.getCurrentUser();
+    if(!user){
+      setopen(true);
+    }
+  }, []);
+  // const onSubmit = (data) =>{
+  //   console.log(data);
+  //   const location = new String(data.location).toLowerCase();
+  //   const practice = new String(data.practice).toLowerCase();
+  //   navigate( {
+  //     pathname: '/search',
+  //     search: `?practice=${practice}&location=${location}`,
+  //   });
+  // };
   const responsive = {
     0: {
       items: 1
@@ -41,7 +105,7 @@ const Home = () => {
   return (
     <section className="home">
       {open && <HomePopup open={open} handleClose={handleClose} handleOpen={handleOpen}/>}
-      <div className="hero">
+      {/* <div className="hero">
         <div className="hero-search">
           <h1 className="hero-title">Prenez rendez-vous avec un professionnel en medicine douce</h1>
           <form className="hero-field">
@@ -66,7 +130,13 @@ const Home = () => {
             </a>
           </form>
         </div>
-      </div>
+      </div> */}
+      <Hero className="hero1">
+        <Root >
+          <h1 className={classes.heroTitle}>Prenez rendez-vous avec un professionnel en medicine douce</h1>
+          <SearchBar/>
+        </Root>
+      </Hero>
 
       <section className="info">
         <div className="info-content1">
@@ -95,8 +165,6 @@ const Home = () => {
             <AliceCarousel
               dotsDisabled={true}
               buttonsDisabled={true}
-              // disableDotsControls={true}
-              // disableButtonsControls
               responsive={responsive}
             >
               <div className="service">
