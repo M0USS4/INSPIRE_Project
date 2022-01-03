@@ -26,6 +26,11 @@ const THEME = createMuiTheme({
     'fontWeightLight': 300,
     'fontWeightRegular': 400,
     'fontWeightMedium': 500
+  },
+  palette: {
+    primary: {
+      main: '#009BA4'
+    }
   }
 });
 
@@ -54,7 +59,7 @@ function App() {
             <Route path="/login-pro" element={<LoginProfessionals />}/>
             <Route path="/register" element={<UserRegistration />} />
             <Route path="/register-pro" element={<ProfessionalRegister />} />
-            <Route path="/search/:practice/:location" element={<Search />} />
+            <Route path="/search" element={<Search />} />
 
             <Route path="/pro-profile" element={<Appointment />} >
               <Route exact path="/pro-profile"
