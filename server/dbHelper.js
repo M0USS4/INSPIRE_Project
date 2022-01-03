@@ -439,5 +439,85 @@ module.exports = {
                 }
             })
         })
+    },
+    addPagePro:function (id_pro, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Adding page pro for: "+id_pro)
+              const sqlInsert = "INSERT INTO pro_page (id_pro,text1) VALUES (?,?)"
+              const insert_query = mysql.format(sqlInsert,[id_pro,""])
+      
+              connection.query (insert_query,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    return callback(null, true)
+                }
+            })
+        })
+    },
+    addTopic:function (title, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Adding topic: "+title)
+              const sqlInsert = "INSERT INTO topic (text1) VALUES (?)"
+              const insert_query = mysql.format(sqlInsert,[title])
+      
+              connection.query (insert_query,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    console.log("added topic "+result.insertId)
+                    return callback(null, result.insertId)
+                }
+            })
+        })
+    },
+    linkTopicPro:function (id_topic, id_page, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Adding link btw topic: "+id_topic+" and pro page: "+id_page)
+              const sqlInsert = "INSERT INTO `page-topic` (id_page, id_topic) VALUES (?,?)"
+              const insert_query = mysql.format(sqlInsert,[id_page, id_topic])
+      
+              connection.query (insert_query,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    console.log("Linked")
+                    return callback(null, true)
+                }
+            })
+        })
+    },
+    getPagePro:function (id_pro, db, callback){
+        db.getConnection( async (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Searching page pro for pro "+id_pro)
+              const sqlSearch = "SELECT * FROM pro_page where id_pro = ?"
+              const search_query = mysql.format(sqlSearch,[id_pro])
+      
+              connection.query (search_query,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    console.log("page pro found")
+                    let page = {
+                        "id":result[0].id,
+                        "desc":result[0].text1,
+                        "id_pro":id_pro
+                    }
+                    return callback(null, page)
+                }
+            })
+        })
     }
 }

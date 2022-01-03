@@ -40,7 +40,7 @@ const db = mysql.createPool({
 db.getConnection( (err, connection)=> {   if (err) throw (err)
   console.log ("DB connected successful: " + connection.threadId)})
 
-app.get('/test' , async (req,res) => {
+app.get('/testSearch' , async (req,res) => {
   let search = "arrêter de fumer d'habitude"
   search.toLowerCase()
   search = search.replaceAll('é','e').replaceAll('ê','e').replaceAll('è','e').replaceAll('ë','e').replaceAll('à','a').replaceAll('ù','u')
@@ -63,15 +63,74 @@ app.get('/test' , async (req,res) => {
       console.log(err)
     }
   })
-  searchManager.wordAccuracy("fumer", "fumer");
+  searchManager.getAccPageProToSearch(["arreter","fumer"], ["fumer","stress","sophrologie"]);
+  searchManager.getAccPageProToSearch(["stress","fumer"], ["fumer","stress","sophrologie"]);
 });
 
-app.get("/tokenTest", async (req, res) => {
+app.get("/test", async (req, res) => {
   
 });
 
 app.listen(PORT, () => {
   console.log("Serveur à l'écoute")
+})
+
+app.post("/pro/topic/create", async (req, res) => {
+  let title = req.body.title;
+  //let id_pro = req.decoded.infos.user.idUser
+  console.log("trying to add "+title)
+  let id_pro = 2
+  let id_topic = 0;
+  dbHelper.getPagePro(db, function(err, page){
+    if(!err){
+    dbHelper.getAllTopics(db, function(err, topics){
+    if(!err){
+      let exists = false;
+      for (let topic of topics){
+        if(!topic.title.localeCompare(title)){
+          console.log("Topic already exist")
+          exists=true;
+          id_topic = topic.id;
+        }
+      }
+      if(exists){
+        dbHelper.linkTopicPro(id_topic, page.id, db, function(err, linked){
+          if(!err){
+            if(linked){
+              console.log("successfuly linked")
+            }else{
+              console.log("could not link")
+            }
+          }else{
+            console.log(err)
+          }
+        })
+      }else{
+        dbHelper.addTopic(title, db, function(err, new_topic_id){
+          if(!err){
+            dbHelper.linkTopicPro(new_topic_id, page.id, db, function(err, linked){
+              if(!err){
+                if(linked){
+                  console.log("successfuly linked")
+                }else{
+                  console.log("could not link")
+                }
+              }else{
+                console.log(err)
+              }
+            })
+          }else{
+            console.log(err)
+          }
+        })
+      }
+    }
+  })
+  }
+  else{
+    console.log(err)
+  }
+})
 })
 
 app.post("/pro/appt/create", async (req, res) => {
@@ -327,6 +386,7 @@ app.post("/register/post", async (req,res) => {
                         let secret = process.env.JWT_SECRET_KEY;
 
                         user["mail"]=login.mail
+                        user["idUser"]=result.insertId
 
                         const expireIn = 24 * 60 * 60;
                           const token    = jwt.sign({
@@ -357,24 +417,39 @@ app.post("/register/post", async (req,res) => {
                         }
                         console.log ("--------> Created new pro");
                         console.log(result.insertId);
+                        user["idUser"]=result.insertId
 
-                        let secret = process.env.JWT_SECRET_KEY;
-                        user["mail"]=login.mail
+                        dbHelper.addPagePro(result.insertId, db, function(err, added){
+                          if(!err){
+                            if(added){
+                              console.log("pro page added")
+                              let secret = process.env.JWT_SECRET_KEY;
+                              user["mail"]=login.mail
+                              
 
-                        const expireIn = 24 * 60 * 60;
-                        const token    = jwt.sign({
-                            infos: {
-                              "type" :1,
-                              "user":user
+                              const expireIn = 24 * 60 * 60;
+                              const token    = jwt.sign({
+                                  infos: {
+                                    "type" :1,
+                                    "user":user
+                                  }
+                              },
+                              secret,
+                              {
+                                  expiresIn: expireIn
+                              });
+
+                              res.header('Authorization', 'Bearer ' + token);
+                              return res.status(201).json("Professionnal account successfuly created")
+                            }else{
+                              console.log("cound not add pro page")
+                              return res.status(500).json("error server")
                             }
-                        },
-                        secret,
-                        {
-                            expiresIn: expireIn
-                        });
-
-                        res.header('Authorization', 'Bearer ' + token);
-                        return res.status(201).json("Professionnal account successfuly created")
+                          }else{
+                            console.log(err)
+                            return res.status(500).json("error server")
+                          }
+                        })
                     })
                     }else{
                       console.log("pb type")
