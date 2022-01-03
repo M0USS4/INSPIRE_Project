@@ -1,6 +1,8 @@
 const express = require("express");
+const cors = require("cors")
 const cookieParser = require("cookie-parser");
 const session = require('express-session');
+const nodemailer = require('nodemailer');
 
 require('dotenv').config()
 
@@ -8,6 +10,7 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 app.use(express.json())
+app.use(cors());
 
 const oneDay = 1000 * 60 * 60 * 24;
 
@@ -75,6 +78,7 @@ app.listen(PORT, () => {
   console.log("Serveur à l'écoute")
 })
 
+
 app.post("/pro/topic/create", async (req, res) => {
   let title = req.body.title;
   //let id_pro = req.decoded.infos.user.idUser
@@ -131,6 +135,63 @@ app.post("/pro/topic/create", async (req, res) => {
     console.log(err)
   }
 })
+})
+
+app.post("/sendemail", async (req, res) => {
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'projectinspire83@gmail.com',
+      pass: '83projectinspire'
+    }
+  });
+
+  let content = 'BEGIN:VCALENDAR\n' +
+  'VERSION:2.0\n' +
+  'BEGIN:VEVENT\n' +
+  'SUMMARY:Appointment Confirmation\n' +
+  'DTSTART;VALUE=DATE:20201030T093000Z\n' +
+  'DTEND;VALUE=DATE:20201030T113000Z\n' +
+  'LOCATION:Webex \n' +
+  'DESCRIPTION:Description123\n' +
+  'STATUS:CONFIRMED\n' +
+  'SEQUENCE:3\n' +
+  'BEGIN:VALARM\n' +
+  'TRIGGER:-PT10M\n' +
+  'DESCRIPTION:Description123\n' +
+  'ACTION:DISPLAY\n' +
+  'END:VALARM\n' +
+  'END:VEVENT\n' +
+  'END:VCALENDAR';
+  
+  const mailOptions = {
+    from: 'projectinspire83@gmail.com',
+    to: req.body.email,
+    subject: 'Appointment Confirmation',
+    text: 'Appointment confirmed.',
+    html: `<div style="height:150px; border: 1px solid 
+    #009ba4; text-align: center">
+         <div style="height:50px; background-color:#abe4e7;">
+         </div>
+    <p style="font-size:1rem;">${req.body.date}</p>
+    <p> Appointment confirmed </p></div>`,
+     icalEvent: {
+      filename: "invitation.ics",
+      method: 'request',
+      content: content
+      }
+  };
+  
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+    console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+      return res.status(200).send('email sent')
+    }
+  });
+
 })
 
 app.post("/pro/appt/create", async (req, res) => {
@@ -565,9 +626,10 @@ app.post("/login/post", (req, res)=> {
                       expiresIn: expireIn
                   });
 
+                  user.token = token;
                   res.header('Authorization', 'Bearer ' + token);
 
-                return res.status(200).json('auth_ok');
+                return res.status(200).json(user);
 
               }else{
                 console.log("error getting the mail")

@@ -32,6 +32,10 @@
   margin: 10px auto;
 }
 
+.search-card .css-1foeew5-MuiGrid-root{
+  width: 100%;
+}
+
 .rdv {
   width: 70%;
 }
@@ -41,9 +45,9 @@
   text-align: center;
 }
 
-.rdv-image {
+/* .rdv-image {
   margin: auto;
-}
+} */
 .rdv-info-details {
   padding-left: 20px;
   width: 100%;
@@ -58,8 +62,97 @@
   width: 100%;
 }
 
-.rdv-button {
+/* .rdv-button {
   text-align: center;
+} */
+
+.rdv-title{
+  background-color: var(--secondary);
+  text-transform: uppercase;
+}
+
+.pro-profile-client{
+  background-color: '#f8f9fa';
+}
+
+.pro-profile-client h2,h3, span{
+  font-weight: 500;
+}
+
+
+.profile-header-basic{
+  display: flex;
+}
+.profile-header-basic img{
+  width: 150px;
+  height: 150px;
+  border-radius: 5px;
+}
+
+.profile-header-basic .header-basic-info{
+  margin-left: 10px;
+}
+.profile-header-basic .header-basic-info h2, .header-basic-info h3, .rating, .header-basic-info-sub-title{
+  margin: 0px 0px 10px 10px;
+}
+
+.header-basic-info-sub-title{
+  display: block;
+}
+
+.css-1xfk6hs-MuiPaper-root.profile-body-main{
+  display: block;
+}
+
+.profile-header-container{
+ margin: auto;
+}
+
+.css-1q7592u-MuiButtonBase-root-MuiTab-root.Mui-selected {
+  color: #009ba4;
+}
+
+.identity-button{
+  width: 100%;
+  text-transform: uppercase;
+}
+.pro-data-header{
+  display: flex;
+  border-bottom: 1px solid var(--primary);
+  padding-bottom: 10px;
+}
+
+.pro-img-circle{
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  box-shadow: 10px;
+  margin-right: 15px;
+}
+
+.booking-stepper .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root.Mui-completed, .booking-stepper .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root.Mui-active {
+  color: var(--primary);
+}
+
+.confirm-account{
+  display: flex;
+}
+
+.confirm-account p{
+  /* margin: auto; */
+}
+
+.confirm-account .css-vqmohf-MuiButtonBase-root-MuiRadio-root.Mui-checked {
+  color: var(--primary);
+}
+
+.filter-bar .css-gbe34y{
+  padding: 0;
+}
+
+
+.css-11l2rxr-MuiCardContent-root:last-child {
+  padding-bottom: 0 !important;
 }
 
 @media (min-width: 574px) {
@@ -87,4 +180,7 @@
   .search-card {
     width: 70%;
   }
+  /* .profile-header-container{
+    width: 70%;
+  } */
 }

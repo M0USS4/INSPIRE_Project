@@ -9,9 +9,6 @@
   width: 100%;
   overflow: hidden;
   background: url(../../images/Untitled\ design.png);
-  /* display: flex;
-    justify-content: center;
-    align-items: center; */
 }
 
 .login-hero {
@@ -20,7 +17,6 @@
 }
 .login-content {
   padding: 0px 15px;
-  /* border: 1px solid var(--primary); */
   box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
   background-color: rgba(255, 255, 255, 0.3);
   opacity: 0.8;
@@ -82,9 +78,9 @@
   color: red;
 }
 
-.invalid label {
-  /* color: red; */
-}
+/* .invalid label {
+  color: red;
+} */
 
 .forgotten-password {
   color: black;
