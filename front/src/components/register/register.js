@@ -3,11 +3,11 @@ import {React, useState} from 'react';
 import './register.css';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
-import axios from 'axios';
 import Alert from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import CloseIcon from '@mui/icons-material/Close';
+import authService from '../../auth.service';
 
 const Register = () => {
   let navigate = useNavigate();
@@ -40,7 +40,7 @@ const Register = () => {
     };
     console.log(registerData);
 
-    axios.post('http://localhost:2021/register/post', registerData)
+    authService.register(registerData)
       .then(response => {
         console.log(response);
         setsuccess(true);

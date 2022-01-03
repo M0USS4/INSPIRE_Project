@@ -1,10 +1,10 @@
 /* eslint-disable no-useless-escape */
 import {React, useState} from 'react';
 import './login.css';
-import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import CollapseAlert from '../shared/Alert';
+import authService from '../../auth.service';
 
 const Login = () => {
   let navigate = useNavigate();
@@ -21,12 +21,14 @@ const Login = () => {
         password: data.password,
       }
     };
-    axios.post('http://localhost:2021/login/post', loginData)
+    authService.login(loginData)
       .then(response => {
         console.log(response);
         console.log(success);
         setsuccess(true);
-        navigate('/pro-profile',      { state: {
+        localStorage.setItem('userInfo', JSON.stringify(response.data));
+
+        navigate('/',      { state: {
           success: success,
         }});
 
@@ -50,7 +52,7 @@ const Login = () => {
         open={open}
         setopen={setopen}
         message={message}
-        severity={'success'}
+        severity={success? 'success' : 'error'}
       />
       <div className="login-fields">
         <form >
