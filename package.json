@@ -23,6 +23,7 @@
     "formik": "^2.2.9",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
+    "nodemailer": "^6.7.2",
     "react-hook-form": "^7.21.0",
     "redis": "^4.0.0"
   },
