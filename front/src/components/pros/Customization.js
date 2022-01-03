@@ -3,7 +3,6 @@ import {React, useState, useEffect } from 'react';
 import { experimentalStyled as styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-import CancelIcon from '@mui/icons-material/Cancel';
 import LoadingButton from '@mui/lab/LoadingButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import IconButton from '@mui/material/IconButton';
@@ -11,6 +10,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
 import moment from 'moment';
 import TimeslotsDialog from '../shared/TimeslotsDialog';
+import { Button, Chip } from '@mui/material';
+import professionals from '../../data/pro-data';
 
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -31,7 +32,12 @@ const removeButtonStyle = {
   color: 'red'
 };
 
+const ListItem = styled('li')(({ theme }) => ({
+  margin: theme.spacing(0.5),
+}));
+
 const Customization = () => {
+  const [practicianData, setpracticianData] = useState({});
   const [motifs, setmotifs] = useState([]);
   const [motifValue, setmotifValue] = useState('');
   const [scheduleDays, setscheduleDays] = useState([]);
@@ -56,15 +62,32 @@ const Customization = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(() => {
-    const mot = ['Ostéopathie du sport', 'Ostéopathie de la femme enceinte', 'Ostéopathie biodynamique'];
-    setmotifs(mot);
+    // const types = [
+    //   {type:'Ostéopathie du sport',
+    //     price: 50,
+    //     duration: 60
+    //   },
+    //   {type:'Ostéopathie de la femme enceinte',
+    //     price: 45,
+    //     duration: 30
+    //   },
+    //   {type:'Ostéopathie biodynamique',
+    //     price: 30,
+    //     duration: 60
+    //   }];
+    setmotifs(practicianData.appointmentTypes);
     handleDays();
   }, [experiences]);
 
   useEffect(() => {
+    const data = professionals.find(pro => pro);
+    setpracticianData(data);
+    setscheduleDays(data.availability);
+    setcurrentDay(data.availability[0].id);
+    setcurrentTimeslots(data.availability[0].availability);
     handleTimeslots();
-
-  }, [currentTimeslots]);
+    setmotifs(data.appointmentTypes);
+  }, []);
 
   const handleDays = () => {
     const days = moment.weekdays();
@@ -85,9 +108,9 @@ const Customization = () => {
       };
       daysSchedule.push(timeslots);
     });
-    setscheduleDays(daysSchedule);
-    setcurrentDay(daysSchedule[0].day);
-    setcurrentTimeslots(daysSchedule[0].timeslots);
+    // setscheduleDays(daysSchedule);
+    // setcurrentDay(daysSchedule[0].day);
+    // setcurrentTimeslots(daysSchedule[0].timeslots);
     handleTimeslots();
 
   };
@@ -230,11 +253,19 @@ const Customization = () => {
       <Item>
           Appointment Types
         <div className="tags">
-          {motifs.map((motif, index) => (
-            <span className="tag" key={index}>
-              {motif}<CancelIcon onClick={() => setmotifs(motifs.filter(mot => mot !== motif))}/>
-            </span>
-          ))}
+          {
+            motifs.map((type, index) => (
+              // <div className="tag" key={index}>{type.type}</div>
+              <ListItem key={index}>
+                <Chip
+                  onDelete={() => setmotifs(motifs.filter(appointment => appointment.type !== type.type))}
+                  label={type.type}
+                  style={{backgroundColor: '#abe4e7'}}
+                />
+              </ListItem>
+
+            ))
+          }
         </div>
         <input
           className="form-control"
@@ -255,12 +286,18 @@ const Customization = () => {
       </Item>
       <Item>
           Schedule
-        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
+        <Grid container spacing={{ xs: 1, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }} >
           { scheduleDays && scheduleDays.map((schedule, index) => (
             <Grid item  className="schedule_days" key={index}>
-              <div className="button2" onClick={() => setcurrentTimeslots(schedule.timeslots)}>
+              {/* <div className="button2" onClick={() => setcurrentTimeslots(schedule.timeslots)}>
                 {schedule.day}
-              </div>
+              </div> */}
+              <Button
+                variant="outlined"
+                onClick={() => setcurrentTimeslots(schedule.availability)}>
+                {schedule.id}
+              </Button>
+
             </Grid>
           ))}
         </Grid>
@@ -277,17 +314,28 @@ const Customization = () => {
         add slot
           </LoadingButton>
         </div>
-        <Grid className="timeslot-contents" container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
+        <Grid
+          className="timeslot-contents tags" container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
           {currentTimeslots && currentTimeslots.map((timeslot, index) => (
             timeslot.start && <Grid item  key={index} className="schedule_days" >
-              <div className="button1" >
+              {/* <div className="button1" >
                 {`${timeslot.start} - ${timeslot.end}`}
                 <CancelIcon
                   onClick={() =>
                     setcurrentTimeslots(
                       currentTimeslots.filter(time => time !== currentTimeslots))
                   } />
-              </div>
+              </div> */}
+              <ListItem key={index}>
+                <Chip
+                  deleteIcon={<DeleteIcon />}
+                  onDelete={() =>
+                    setcurrentTimeslots(
+                      currentTimeslots.filter(time => time !== currentTimeslots))}
+                  label={`${timeslot.start} - ${timeslot.end}`}
+                  style={{backgroundColor: '#abe4e7'}}
+                />
+              </ListItem>
             </Grid>
 
           ))}
