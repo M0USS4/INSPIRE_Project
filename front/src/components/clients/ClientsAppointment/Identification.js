@@ -6,8 +6,12 @@ import Register from '../../register/register';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import { Grid } from '@mui/material';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import pic from '../../../images/ben-parker-OhKElOkQ3RE-unsplash.jpg';
+import authService from '../../../auth.service';
+
+import Radio from '@mui/material/Radio';
+
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   color: 'black',
@@ -21,22 +25,25 @@ const IdType = {
   register: 'register'
 };
 
-const Identification = ({practicianData}) => {
+const Identification = ({practicianData, handleNext}) => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [expanded, setExpanded] = useState({
     login: false,
     register: false
   });
   const [appointmentData, setappointmentData] = useState({});
-
+  const [currentUser, setcurrentUser] = useState();
   useEffect(() => {
     const paramsToObject = Object.fromEntries(new URLSearchParams(searchParams));
     const paramsFiltered = Object.keys(paramsToObject)
       .filter(key => key !== 'active')
       .reduce((cur, key) => { return Object.assign(cur, { [key]: paramsToObject[key] });}, {});
     setappointmentData(paramsFiltered);
-
+    const user = authService.getCurrentUser();
+    console.log(user);
+    setcurrentUser(user);
   }, []);
 
   const handleExpandClick = (type) => {
@@ -55,6 +62,19 @@ const Identification = ({practicianData}) => {
       break;
     }
   };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const queryString = Object.keys(appointmentData).map(key => key + '=' + appointmentData[key]).join('&');
+    setappointmentData(appointmentData);
+    console.log(appointmentData);
+    handleNext();
+    navigate({
+      pathname: '/pro-profile/1/booking',
+      search: `?active=2&${queryString}`,
+    });
+  };
+
   return (
     <div>
       <Grid
@@ -72,7 +92,27 @@ const Identification = ({practicianData}) => {
               Se connecter
             </button>}
             <Collapse in={expanded.login} timeout="auto" unmountOnExit>
-              <Login/>
+              {
+                currentUser ?
+                  <div>
+
+                    <form onSubmit={handleSubmit}>
+                      <label>Confirm Account</label>
+                      <div className='confirm-account'>
+                        <Radio
+                          checked={true}
+                        />
+                        <p>{`${currentUser.name} ${currentUser.surname}`}</p>
+                      </div>
+
+                      <button sx={{ mt: 1, mr: 1 }} type="submit" className='button2' disabled={!currentUser}>
+                          Confirm
+                      </button>
+                    </form>
+                  </div>
+                  :
+                  <Login/>
+              }
             </Collapse>
           </Item>
           <Item>
@@ -111,5 +151,6 @@ const Identification = ({practicianData}) => {
 
 Identification.propTypes = {
   practicianData: PropTypes.object,
+  handleNext: PropTypes.func
 };
 export default Identification;

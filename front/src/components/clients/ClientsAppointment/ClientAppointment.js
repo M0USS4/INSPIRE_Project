@@ -11,6 +11,7 @@ import Identification from './Identification';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import PropTypes from 'prop-types';
+import Confirmation from './Confirmation';
 
 const Root = styled('div')(({ theme }) => ({
   padding: theme.spacing(1),
@@ -88,6 +89,7 @@ const ClientAppointment = ({selectedType}) => {
       pathname: '/pro-profile/1/booking',
       search: `?active=1&${queryString}`,
     });
+    handleNext();
   };
 
   return (
@@ -104,7 +106,7 @@ const ClientAppointment = ({selectedType}) => {
             );
           })}
         </Stepper>
-        {activeStep === 0 ?
+        {activeStep === 0 &&
           practicianData &&
           <ChooseAppointment
             practicianData={practicianData}
@@ -112,9 +114,15 @@ const ClientAppointment = ({selectedType}) => {
             setappointmentType={setappointmentType}
             appointmentType={appointmentType}
           />
-          :
+        }
+        {activeStep === 1 &&
           practicianData &&
-          <Identification practicianData={practicianData} appointmentType={appointmentType}/>}
+          <Identification practicianData={practicianData} handleNext={handleNext}/>
+        }
+        {activeStep === 2 &&
+          practicianData &&
+          <Confirmation practicianData={practicianData} handleNext={handleNext}/>
+        }
         <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
           <Button
             color="inherit"

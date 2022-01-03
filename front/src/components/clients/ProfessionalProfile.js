@@ -36,10 +36,13 @@ const Root = styled('div')(({ theme }) => ({
     width: '100%',
   },
   [theme.breakpoints.up('md')]: {
-    width: '90%',
+    width: '100%',
   },
   [theme.breakpoints.up('lg')]: {
-    width: '70%',
+    width: '90%',
+  },
+  [theme.breakpoints.up('xl')]: {
+    width: '75%',
   },
 }));
 
@@ -128,7 +131,11 @@ const ProfessionalProfile = () => {
                     emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
                   />
                   <div>
-                    <Link href=""><LocationOnIcon/> 89 Avenue de Bretagne 59000 Lille</Link>
+                    <Link href="" style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                    }}><LocationOnIcon fontSize='small'/> 89 Avenue de Bretagne 59000 Lille</Link>
                   </div>
                 </div>
               </div>
@@ -219,6 +226,9 @@ const ProfessionalProfile = () => {
               </Grid>
               <Grid item xs={12} sm={12} md={4} lg={3} >
                 <Item>
+                  <div className='rdv-title'>
+                    Prendez un rendez-vous
+                  </div>
                   <h3>Choose Appointment Type</h3>
                   {selectedType}
                   <select

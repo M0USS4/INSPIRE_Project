@@ -45,9 +45,9 @@
   text-align: center;
 }
 
-.rdv-image {
+/* .rdv-image {
   margin: auto;
-}
+} */
 .rdv-info-details {
   padding-left: 20px;
   width: 100%;
@@ -62,8 +62,13 @@
   width: 100%;
 }
 
-.rdv-button {
+/* .rdv-button {
   text-align: center;
+} */
+
+.rdv-title{
+  background-color: var(--secondary);
+  text-transform: uppercase;
 }
 
 .pro-profile-client{
@@ -127,6 +132,27 @@
 
 .booking-stepper .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root.Mui-completed, .booking-stepper .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root.Mui-active {
   color: var(--primary);
+}
+
+.confirm-account{
+  display: flex;
+}
+
+.confirm-account p{
+  /* margin: auto; */
+}
+
+.confirm-account .css-vqmohf-MuiButtonBase-root-MuiRadio-root.Mui-checked {
+  color: var(--primary);
+}
+
+.filter-bar .css-gbe34y{
+  padding: 0;
+}
+
+
+.css-11l2rxr-MuiCardContent-root:last-child {
+  padding-bottom: 0 !important;
 }
 
 @media (min-width: 574px) {
