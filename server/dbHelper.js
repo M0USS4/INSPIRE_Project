@@ -126,7 +126,9 @@ module.exports = {
                     console.log(adress)
                     return callback(null, adress);
                 }
-                else{}
+                else{
+                    return callback(new console.error("no adress found"), null)
+                }
             })
         })
     },
@@ -198,7 +200,6 @@ module.exports = {
             }
               console.log("Loading topics from db")
               const sqlSearch = "SELECT * FROM topic"
-              //const search_query = mysql.format(sqlSearch,[idClient])
       
               connection.query (sqlSearch, (err, result) => {  
                 if (err) {
@@ -367,7 +368,6 @@ module.exports = {
             }
               console.log("Fetching rdv type")
               const sqlSearch = "SELECT * FROM type_rdv"
-              //const search_query = mysql.format(sqlSearch,[idClient])
       
               connection.query (sqlSearch, (err, result) => {  
                 if (err) {
