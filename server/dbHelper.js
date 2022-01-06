@@ -347,7 +347,8 @@ module.exports = {
                         "startDate":sDate,
                         "endDate":eDate,
                         "price":result[0].price,
-                        "public":result[0].public==1
+                        "public":result[0].public==1,
+                        "idPro":result[0].id_pro
                     }
                     console.log(rdv_type)
                     return callback(null, rdv_type);
@@ -386,7 +387,8 @@ module.exports = {
                             "startDate":sDate,
                             "endDate":eDate,
                             "price":result[typeNb].price,
-                            "public":result[typeNb].public==1
+                            "public":result[typeNb].public==1,
+                            "idPro":result[typeNb].id_pro
                         }
                         if(rdv_type.public){
                             types.push(rdv_type)
@@ -410,8 +412,8 @@ module.exports = {
                 return callback(err, null);
             }
               console.log("Adding appt type: "+apptType)
-              const sqlInsert = "INSERT INTO type_rdv (nom, duration, price, startDate, endDate, public) VALUES (?,?,?,?,?,?)"
-              const insert_query = mysql.format(sqlInsert,[apptType.name, apptType.duration, apptType.price, apptType.startDate, apptType.endDate, apptType.public])
+              const sqlInsert = "INSERT INTO type_rdv (nom, duration, price, startDate, endDate, public, id_pro) VALUES (?,?,?,?,?,?,?)"
+              const insert_query = mysql.format(sqlInsert,[apptType.name, apptType.duration, apptType.price, apptType.startDate, apptType.endDate, apptType.public, apptType.idPro])
       
               connection.query (insert_query,  (err, result) => {  
                 if (err) {
@@ -516,6 +518,179 @@ module.exports = {
                         "id_pro":id_pro
                     }
                     return callback(null, page)
+                }
+            })
+        })
+    },
+    getRdvTypeForPro:function (idPro, db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Searching rdv type for pro: "+idPro)
+              const sqlSearch = "SELECT * FROM type_rdv where id_pro = ?"
+              const search_query = mysql.format(sqlSearch,[idPro])
+      
+              connection.query (search_query, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    let rdv_types = []
+                    for(let typeNB=0;typeNB<result.length;typeNB++){
+                    let sDate, eDate;
+                    try
+                    { sDate = fix.fixStringDateFromSQL(result[typeNB].startDate)
+                     eDate = fix.fixStringDateFromSQL(result[typeNB].endDate)}
+                    catch(err){
+                         sDate = result[typeNB].startDate;
+                         eDate = result[typeNB].endDate;
+                    }
+                    let rdv_type={
+                        "name":result[typeNB].nom,
+                        "duration":result[typeNB].duration,
+                        "startDate":sDate,
+                        "endDate":eDate,
+                        "price":result[typeNB].price,
+                        "public":result[typeNB].public==1
+                    }
+                    rdv_types.push(rdv_type)
+                    console.log(rdv_type)
+                }
+                    return callback(null, rdv_types);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("no rdv_type found")
+                        return callback(null, null);
+                    }
+                }
+            })
+        })
+    },
+    getAllMedicine:function ( db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Fetching all medicines")
+              const sqlSearch = "SELECT * FROM type_medicine"
+      
+              connection.query (sqlSearch, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    let medicines = []
+                    for(let medNB=0;medNB<result.length;medNB++){
+                    
+                    let medicine={
+                        "id":result[medNB].id,
+                        "name":result[medNB].nom,
+                        "text1":result[medNB].text1,
+                        "text2":result[medNB].text2,
+                        "text3":result[medNB].text3,
+                        "img":result[medNB].img
+                    }
+                    medicines.push(medicine)
+                    console.log(medicine)
+                }
+                    return callback(null, medicines);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("no medicines found")
+                        return callback(null, null);
+                    }
+                }
+            })
+        })
+    },
+    getAllMedicineIdForPro:function ( idPro, db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Fetching all medicines id for pro "+idPro)
+              const sqlSearch = "SELECT * FROM `medicine_pro` where id_pro= ?"
+              const search_query = mysql.format(sqlSearch,[idPro])
+      
+              connection.query (search_query, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    let medicinesNb = []
+                    for(let medNB=0;medNB<result.length;medNB++){
+                        medicinesNb.push(result[medNB].id_medicine)
+                    }
+                    return callback(null, medicinesNb);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("no medicines found")
+                        return callback(null, null);
+                    }
+                }
+            })
+        })
+    },
+    getMedicine:function ( idMed, db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Fetching medicine "+idMed)
+              const sqlSearch = "SELECT * FROM `type_medicine` where id= ?"
+              const search_query = mysql.format(sqlSearch,[idMed])
+      
+              connection.query (search_query, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    let medicine={
+                        "id":result[0].id,
+                        "name":result[0].nom,
+                        "text1":result[0].text1,
+                        "text2":result[0].text2,
+                        "text3":result[0].text3,
+                        "img":result[0].img
+                    }
+                    return callback(null, medicine);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("no medicine found")
+                        return callback(null, null);
+                    }
+                }
+            })
+        })
+    },
+    linkMedPro:function (idPro, idMed, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Adding link btw medicine: "+idMed+" and pro: "+idPro)
+              const sqlInsert = "INSERT INTO `medicine_pro` (id_pro, id_medicine) VALUES (?,?)"
+              const insert_query = mysql.format(sqlInsert,[idPro, idMed])
+      
+              connection.query (insert_query,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    console.log("Linked")
+                    return callback(null, true)
                 }
             })
         })
