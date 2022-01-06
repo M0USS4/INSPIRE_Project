@@ -14,10 +14,10 @@ DROP TABLE IF EXISTS `page-topic`;
 DROP TABLE IF EXISTS `topic`;
 DROP TABLE IF EXISTS `pro_page`;
 DROP TABLE IF EXISTS `rdv`;
+DROP TABLE IF EXISTS `type_rdv`;
 DROP TABLE IF EXISTS `pro`;
 DROP TABLE IF EXISTS `client`;
 DROP TABLE IF EXISTS `administrator`;
-DROP TABLE IF EXISTS `type_rdv`;
 DROP TABLE IF EXISTS `adress`;
 DROP TABLE IF EXISTS `login`;
 DROP TABLE IF EXISTS `type_medicine`;
@@ -31,18 +31,6 @@ CREATE TABLE Inspire.`login`
 PRIMARY KEY (id)
 );
 
-CREATE TABLE Inspire.`type_rdv`
-(
- id       int NOT NULL AUTO_INCREMENT ,
- nom      varchar(45) NOT NULL ,
- duration float NOT NULL ,
- price    float NOT NULL ,
- startDate date NOT NULL,
- endDate date NOT NULL,
- `public`   bit NOT NULL ,
-
-PRIMARY KEY (id)
-);
 
 CREATE TABLE Inspire.`type_medicine`
 (
@@ -134,6 +122,22 @@ KEY FK_203 (id_login),
 CONSTRAINT pro_login FOREIGN KEY FK_203 (id_login) REFERENCES login (id),
 KEY FK_44 (id_adress),
 CONSTRAINT adress_pro FOREIGN KEY FK_44 (id_adress) REFERENCES adress (id)
+);
+
+CREATE TABLE Inspire.`type_rdv`
+(
+ id       int NOT NULL AUTO_INCREMENT ,
+ nom      varchar(45) NOT NULL ,
+ duration float NOT NULL ,
+ price    float NOT NULL ,
+ startDate date NOT NULL,
+ endDate date NOT NULL,
+ `public`   bit NOT NULL ,
+ id_pro int NOT NULL,
+
+PRIMARY KEY (id),
+KEY FK_248 (id_pro),
+CONSTRAINT rdvtype_pro FOREIGN KEY FK_248 (id_pro) REFERENCES pro (id)
 );
 
 CREATE TABLE Inspire.`rdv`
@@ -239,5 +243,6 @@ CONSTRAINT `article_cmd-article` FOREIGN KEY FK_115 (id_article) REFERENCES arti
 INSERT INTO Inspire.`login` (mail, mdp) VALUES ("block","");
 INSERT INTO Inspire.`adress` (pays, num, rue, codeP, ville, supp) VALUES ("","","",0,"","");
 INSERT INTO Inspire.`client` (nom, prenom, id_login, tel, birth, id_adress) VALUES ("","",1,"","",1);
-INSERT INTO Inspire.`type_rdv` (nom, duration, price, startDate, endDate, `public`) VALUES ("Blocked",30,0,"","",false);
+INSERT INTO Inspire.`pro` (nom, prenom, id_login, tel, birth, id_adress, img, cv, diplome, etat) VALUES ("","",1,"","",1, "", "", "", 0);
+INSERT INTO Inspire.`type_rdv` (nom, duration, price, startDate, endDate, `public`, id_pro) VALUES ("Blocked",30,0,"","",false,1);
 
