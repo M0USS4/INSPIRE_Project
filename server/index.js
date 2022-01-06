@@ -23,7 +23,6 @@ const bcrypt = require("bcrypt")
 
 const dbHelper = require('./dbHelper');
 const security = require('./security');
-const searchManager = require('./searchManager');
 
 const DB_HOST = process.env.DB_HOST
 const DB_USER = process.env.DB_USER
@@ -701,4 +700,72 @@ app.post("/login/post", (req, res)=> {
     console.log(error);
     return res.status(500).json("error server")
   }
+})
+
+app.get("/practices/all", (req, res)=> {
+  dbHelper.getAllMedicine(db, function(err, medicines){
+    if(err){
+      return res.status(500).json("error server")
+    }else{
+      if(medicines.length!=0){
+        return res.status(200).json(medicines)
+      }else{
+        return res.status(204).json("no practices found")
+      }
+    }
+  })
+})
+
+  app.post("/pro/practice/link", security.checkJWTPro, (req, res)=> {
+
+    dbHelper.linkMedPro(req.decoded.infos.idUser, req.body.id_medicine,db, function(err, linked){
+      if(err){
+        return res.status(500).json("error server")
+      }else{
+        if(linked){
+          return res.status(201).json("link created")
+        }else{
+          return res.status(500).json("error server")
+        }
+      }
+    })
+  })
+
+  app.get("/pro/practice/all", security.checkJWTPro, (req, res)=> {
+
+    dbHelper.getAllMedicineIdForPro(req.decoded.infos.idUser, db, function(err, medId){
+      if(err){
+        return res.status(500).json("error server")
+      }else{
+        if(medId.length!=0){
+          let medicines = []
+          dbHelper.getAllMedicine( db, function(err, allMeds){
+            if(err){
+              return res.status(500).json("error server")
+            }else{
+              if(allMeds.length!=0){
+                let medicines = []
+                for(let i=0;i<medId.length;i++){
+                  for(let j=0;j<allMeds.length;j++){
+                    if(medId[i]==allMeds[j].id){
+                      medicines.push(allMeds[j])
+                    }
+                  }
+                }
+                if(medicines.length!=0){
+                  return res.status(200).json(medicines)
+                }else{
+                  return res.status(500).json("error server")
+                }
+              }else
+                {
+                  return res.status(204).json("no practices found")
+              }
+            }
+          })
+        }else{
+          return res.status(204).json("no practices found")
+        }
+      }
+    })
 })

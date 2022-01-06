@@ -604,7 +604,7 @@ module.exports = {
                 else{
                     if(result.length===0){
                         console.log("no medicines found")
-                        return callback(null, null);
+                        return callback(null, []);
                     }
                 }
             })
