@@ -43,47 +43,15 @@ const db = mysql.createPool({
 db.getConnection( (err, connection)=> {   if (err) throw (err)
   console.log ("DB connected successful: " + connection.threadId)})
 
-app.get('/testSearch' , async (req,res) => {
-  let search = "arrêter de fumer d'habitude"
-  search.toLowerCase()
-  search = search.replaceAll('é','e').replaceAll('ê','e').replaceAll('è','e').replaceAll('ë','e').replaceAll('à','a').replaceAll('ù','u')
-  search = search.replaceAll('_',' ').replaceAll('-',' ').replaceAll('\'',' ')
-  let sSplit = search.split(" ")
-  let sRes=[]
-  sSplit.forEach(s=>{
-    console.log(s+" "+s.length)
-    if (s.length>2){
-      sRes.push(s)
-    }
-  })
-  console.log(sSplit)
-  console.log(sRes)
-  dbHelper.getAllTopics(db, function(err, topics){
-    if(!err){
-      topics.forEach(topic=>console.log(topic.title))
-      return res.status(200).json(topics)
-    }else{
-      console.log(err)
-    }
-  })
-  searchManager.getAccPageProToSearch(["arreter","fumer"], ["fumer","stress","sophrologie"]);
-  searchManager.getAccPageProToSearch(["stress","fumer"], ["fumer","stress","sophrologie"]);
-});
-
-app.get("/test", async (req, res) => {
-  
-});
-
 app.listen(PORT, () => {
   console.log("Serveur à l'écoute")
 })
 
 
-app.post("/pro/topic/create", async (req, res) => {
+app.post("/pro/topic/create", security.checkJWTPro, async (req, res) => {
   let title = req.body.title;
-  //let id_pro = req.decoded.infos.user.idUser
+  let id_pro = req.decoded.infos.user.idUser
   console.log("trying to add "+title)
-  let id_pro = 2
   let id_topic = 0;
   dbHelper.getPagePro(db, function(err, page){
     if(!err){
@@ -102,11 +70,14 @@ app.post("/pro/topic/create", async (req, res) => {
           if(!err){
             if(linked){
               console.log("successfuly linked")
+              return res.status(200).json("topic already exists, linked to the page")
             }else{
               console.log("could not link")
+              return res.status(500).json("error server, could not link")
             }
           }else{
             console.log(err)
+            return res.status(500).json("error server, could not link")
           }
         })
       }else{
@@ -116,15 +87,18 @@ app.post("/pro/topic/create", async (req, res) => {
               if(!err){
                 if(linked){
                   console.log("successfuly linked")
+                  return res.status(201).json("Created and linked topic")
                 }else{
                   console.log("could not link")
                 }
               }else{
                 console.log(err)
+                return res.status(500).json("error server, could not link")
               }
             })
           }else{
             console.log(err)
+            return res.status(500).json("error server, could not create topic")
           }
         })
       }
@@ -133,6 +107,7 @@ app.post("/pro/topic/create", async (req, res) => {
   }
   else{
     console.log(err)
+    return res.status(404).json("error server, could not find page for pro")
   }
 })
 })
@@ -194,9 +169,8 @@ app.post("/sendemail", async (req, res) => {
 
 })
 
-app.post("/pro/appt/create", async (req, res) => {
+app.post("/pro/appt/create", security.checkJWTPro, async (req, res) => {
   console.log("Creating appt ")
-  //appt.idClient, appt.idPro, appt.idType, appt.apptDateStart,appt.apptDateEnd
 
   let rdv_type, client;
 
@@ -234,10 +208,9 @@ app.post("/pro/appt/create", async (req, res) => {
   })
 })
 
-app.get("/pro/appt/all", async (req, res) => {
+app.get("/pro/appt/all", security.checkJWTPro, async (req, res) => {
 
-  //let idPro = req.decoded.infos.user.idUser
-  let idPro = 1;
+  let idPro = req.decoded.infos.user.idUser
   let completedAppts=[];
   dbHelper.getApptForPro(idPro, db, function(err, appts){
     if(!err){
@@ -533,7 +506,7 @@ app.post("/register/post", async (req,res) => {
   catch(error){
       console.log("error")
       console.log(error)
-      return res.status(400).json("Could not process the registration")
+      return res.status(500).json("Could not process the registration")
   }}else{
     console.log("password verif not correct")
     console.log(passwd+" vs "+passwdV)
@@ -542,8 +515,6 @@ app.post("/register/post", async (req,res) => {
 })
 
 app.post("/login/post", (req, res)=> {
-
-  //console.log(req)
 
   const login = {
     "mail":req.body.login.mail,
@@ -586,8 +557,6 @@ app.post("/login/post", (req, res)=> {
           console.log(login.password+"  et   "+hashedPassword)
         
           console.log("VERIF: "+canConnect)
-
-          //const passwd = bcrypt.hash(login.password,10)
             
           if (canConnect) {
          console.log("---------> Login Successful")
@@ -730,6 +699,6 @@ app.post("/login/post", (req, res)=> {
     }) 
   }catch(error){
     console.log(error);
-    return res.status(400).json("bad request")
+    return res.status(500).json("error server")
   }
 })
