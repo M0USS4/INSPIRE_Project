@@ -19,8 +19,7 @@ module.exports = {
                 }
                 console.log(result);
                 if (result.length != 0) {
-                    console.log("pro found "+result[0].name)
-                    //console.log(result[0].nom)
+
                     let dBirth = new Date(result[0].birth);
                     let dBirthM = fix.fixStringDateFromSQL(result[0].birth)
                     let user = {
@@ -68,8 +67,7 @@ module.exports = {
                 }
                 console.log(result);
                 if (result.length != 0) {
-                    console.log("client found")
-                    //console.log(result[0].nom)
+                
                     let dBirth = new Date(result[0].birth);
                     console.log(dBirth);
                     let dBirthM = fix.fixStringDateFromSQL(result[0].birth)
@@ -171,8 +169,8 @@ module.exports = {
                 }
                 console.log(result);
                 if (result.length != 0) {
-                    console.log("client found")
-                    //console.log(result[0].nom)
+                    console.log("admin found")
+                    
                     let user = {
                         "idlogin":result[0].id_login,
                         "found":true
@@ -564,7 +562,7 @@ module.exports = {
                 else{
                     if(result.length===0){
                         console.log("no rdv_type found")
-                        return callback(null, null);
+                        return callback(null, []);
                     }
                 }
             })
