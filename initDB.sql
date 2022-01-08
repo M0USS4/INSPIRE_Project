@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS Inspire;
 
 USE Inspire;
 
-
+DROP TABLE IF EXISTS `practice_rdv_type`;
 DROP TABLE IF EXISTS `cmd-article`;
 DROP TABLE IF EXISTS `commande`;
 DROP TABLE IF EXISTS `article`;
@@ -238,6 +238,19 @@ KEY FK_105 (id_commande),
 CONSTRAINT `commande_cmd-article` FOREIGN KEY FK_105 (id_commande) REFERENCES commande (id),
 KEY FK_115 (id_article),
 CONSTRAINT `article_cmd-article` FOREIGN KEY FK_115 (id_article) REFERENCES article (id)
+);
+
+CREATE TABLE Inspire.`practice_rdv_type`
+(
+ id_rdv_type  int NOT NULL ,
+ id_practice int NOT NULL ,
+ id     int NOT NULL AUTO_INCREMENT ,
+
+PRIMARY KEY (id),
+KEY FK_261 (id_rdv_type),
+CONSTRAINT `type_rdv_link` FOREIGN KEY FK_105 (id_rdv_type) REFERENCES type_rdv (id),
+KEY FK_262 (id_practice),
+CONSTRAINT `type_medicine_link` FOREIGN KEY FK_115 (id_practice) REFERENCES type_medicine (id)
 );
 
 INSERT INTO Inspire.`login` (mail, mdp) VALUES ("block","");

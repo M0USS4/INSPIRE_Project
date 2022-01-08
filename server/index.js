@@ -33,8 +33,6 @@ const app = express();
 app.use(express.json())
 app.use(cors());
 
-const oneDay = 1000 * 60 * 60 * 24;
-
 app.use(cookieParser());
 
 const mysql = require("mysql")
@@ -64,7 +62,7 @@ db.getConnection( (err, connection)=> {   if (err) throw (err)
   console.log ("DB connected successful: " + connection.threadId)})
 
 app.listen(PORT, () => {
-  console.log("Serveur à l'écoute")
+  console.log("Server listening")
 })
 
 
@@ -285,12 +283,10 @@ app.post("/pro/appt/create", security.checkJWTPro, async (req, res) => {
 
   if(req.body.appointmentType===0)
   {
-    console.log("cas O")
     rdv_type = process.env.BLOCK_TYPE_ID;
     client = process.env.BLOCK_CLIENT_ID;
     console.log(rdv_type+" et "+client)
   }else{
-    console.log("cas autre")
     rdv_type = req.body.appointmentType;
     client = req.body.clientId;
     console.log(rdv_type+" et "+client)
@@ -324,7 +320,6 @@ app.get("/pro/appt/all", security.checkJWTPro, async (req, res) => {
     if(!err){
       if(appts.length>0){
         for(let i =0; i<appts.length;i++){
-          console.log("for i "+i)
           dbHelper.getRdvType(appts[i].id_type, db, function(err, rdv_type){
             if(!err){
                   dbHelper.getClient(appts[i].id_client, db, function(err, userdb){
@@ -348,7 +343,6 @@ app.get("/pro/appt/all", security.checkJWTPro, async (req, res) => {
                             "client":user,
                             "type":rdv_type
                           })
-                          console.log("pushed to appts")
                           if(completedAppts.length===appts.length){
                             console.log("finished fetching appts")
                             console.log(completedAppts)
@@ -394,10 +388,7 @@ app.get("/pro/appt/all", security.checkJWTPro, async (req, res) => {
 
 app.post("/register/post", async (req,res) => {
 
-  console.log("Register for")
-  console.log(req.body)
-  console.log("user")
-  console.log(req.body.user)
+  console.log("Registration")
 
   const passwd = req.body.login.password
   const passwdV = req.body.login.password_v
@@ -418,7 +409,6 @@ app.post("/register/post", async (req,res) => {
   let user;
   let dBirth = new Date(req.body.user.birth)
   dBirth.setHours(14)
-  console.log("birth: "+dBirth)
 
   if(type==0){
     user={
@@ -441,7 +431,7 @@ app.post("/register/post", async (req,res) => {
       "status": 1
     }
   }else{
-    console.log("type: "+type)
+    console.log("type error: "+type)
     return res.status(400).json("bad request")
   }
 
@@ -451,8 +441,6 @@ app.post("/register/post", async (req,res) => {
       "mail":req.body.login.mail,
       "password":hashedPassword
     }
-    console.log("Trying to register "+login.mail)
-    console.log(user)
 
     db.getConnection( async (err, connection) => { 
       if (err) {
@@ -473,16 +461,13 @@ app.post("/register/post", async (req,res) => {
             console.log(err)
             return res.status(500).json("error server")
           }
-          console.log("------> Search Results")
           console.log(result.length)  
           if (result.length != 0) {
-            //connection.release()
             console.log("------> User already exists")
             return res.status(409).json("Mail already in use")
           } 
           else {
-             connection.query (insert_query, (err, result)=> {   
-              //connection.release()   
+             connection.query (insert_query, (err, result)=> {      
               if (err) {
                   console.log(err)
                   return res.status(500).json("error server")
@@ -494,12 +479,11 @@ app.post("/register/post", async (req,res) => {
 
               console.log("different from 0? : "+(idlogin!=0))
               if(idlogin!=0){
-                console.log("adress loop")
                 const sqlInsertAdress = "INSERT INTO adress (pays, num, rue, codeP, ville, supp) VALUES ('FR',?,?,?,?,?)"
                 const insertAdress_query = mysql.format(sqlInsertAdress,[user.adress.number, user.adress.street, user.adress.postalC, user.adress.city, user.adress.supp])
 
                  connection.query (insertAdress_query, (err, result)=> {   
-                    //connection.release()   
+  
                     if (err) {
                         console.log(err)
                         return res.status(500).json("error server")
@@ -519,7 +503,7 @@ app.post("/register/post", async (req,res) => {
                     const insertUser_query = mysql.format(sqlInsertUser,[user.name, user.surname, idlogin, user.phone, user.birth, idAdress, true])
       
                      connection.query (insertUser_query, (err, result)=> {   
-                        //connection.release()   
+
                         if (err) {
                             console.log(err)
                             return res.status(500).json("error server")
@@ -553,7 +537,6 @@ app.post("/register/post", async (req,res) => {
                     const insertPro_query = mysql.format(sqlInsertPro,[user.name, user.surname, idlogin, user.phone, user.birth, idAdress, user.img, user.cv, user.diploma, false])
       
                      connection.query (insertPro_query, (err, result)=> {   
-                        //connection.release()   
                         if (err) {
                             console.log(err)
                             return res.status(500).json("error server")
@@ -933,10 +916,6 @@ app.post("/login/post", (req, res)=> {
          console.log(result)
           const hashedPassword = result[0].mdp
           const canConnect = await bcrypt.compare(login.password, hashedPassword);
-
-          console.log(login.password+"  et   "+hashedPassword)
-        
-          console.log("VERIF: "+canConnect)
             
           if (canConnect) {
          console.log("---------> Login Successful")
@@ -982,9 +961,11 @@ app.post("/login/post", (req, res)=> {
 
               }else{
                 console.log("error getting the mail")
+                return res.status(500).json("error server")
               }
               });}else{
                 console.log("error getting adress")
+                return res.status(500).json("error server")
               }
             });}else{
               dbHelper.getPro(id_user, db, function(err, userdb){
@@ -1023,9 +1004,11 @@ app.post("/login/post", (req, res)=> {
                           return res.status(200).json('auth_ok');
                       }else{
                         console.log("error getting the mail")
+                        return res.status(500).json("error server")
                       }
                       });}else{
                         console.log("error getting adress")
+                        return res.status(500).json("error server")
                       }
                     });
                   }else{
