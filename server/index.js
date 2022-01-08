@@ -3,7 +3,28 @@ const cors = require("cors")
 const cookieParser = require("cookie-parser");
 const session = require('express-session');
 const nodemailer = require('nodemailer');
+const cloudinary = require("cloudinary").v2;
 
+const multer = require("multer");
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = file.mimetype.split('/');
+console.log(ext[1]);
+    cb(null, file.originalname+ '-' +file.fieldname + '-' + uniqueSuffix + '.' + ext[1] )
+  }
+})
+
+cloudinary.config({
+  cloud_name: "inspire84",
+  api_key: "476589914828429",
+  api_secret: "-rxdHP0p0ovnNquoShm2744m5A0"
+})
+const upload = multer({ storage: storage });
+const fs = require('fs');
 require('dotenv').config()
 
 const PORT = process.env.PORT || 3001;
@@ -168,6 +189,95 @@ app.post("/sendemail", async (req, res) => {
 
 })
 
+app.post('/upload-images', upload.array('files'), async (req, res) => {
+  console.log('ssssss');
+  const uploader = async (path, originalname) => await cloudinary.uploads(path, originalname);
+
+
+    const urls = []
+    const files = req.files;
+    const data = JSON.parse(req.body.data);
+    // console.log(files);
+    console.log(data);
+    for (const file of files) {
+      // console.log(file)
+      const { path, originalname } = file;
+      const newPath = await uploader(path, originalname)
+      urls.push(newPath)
+      // console.log(newPath)
+      fs.unlinkSync(path)
+    }
+
+    console.log(urls)
+
+    res.status(200).send({
+      message: 'images uploaded successfully',
+      data: urls
+    })
+
+  // } else {
+  //   res.status(405).json({
+  //     err: `${req.method} method not allowed`
+  //   })
+  // }
+})
+
+app.post("/upload",upload.array("files"), async (request, response) => {
+  // collected image from a user
+  const data = request.body;
+  const files = request.files;
+  console.log(data);
+  console.log(request.files);
+
+  // console.log(JSON.parse(JSON.stringify(request.body)));
+
+  for (const file of files) {
+    // console.log(`${file}`);
+      // upload image here
+  cloudinary.uploader.upload(file.path)
+  .then((result) => {
+    response.status(200).send({
+      message: `${file.originalname} upload success`,
+      result,
+    });
+  }).catch((error) => {
+    console.log(error)
+    response.status(500).send({
+      message:`${file.originalname} upload failure`,
+      error,
+    });
+  });
+  }
+  // upload image here
+  // cloudinary.uploader.upload(data.image)
+  // .then((result) => {
+  //   response.status(200).send({
+  //     message: "success",
+  //     result,
+  //   });
+  // }).catch((error) => {
+  //   response.status(500).send({
+  //     message: "failure",
+  //     error,
+  //   });
+  // });
+
+});
+app.get("/getAllPros", async (req, res) => {
+  dbHelper.getAllPros( db, function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send(result)
+      }else{
+        return res.status(500).json("Could not find pros")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+
+})
 app.post("/pro/appt/create", security.checkJWTPro, async (req, res) => {
   console.log("Creating appt ")
 
@@ -208,7 +318,6 @@ app.post("/pro/appt/create", security.checkJWTPro, async (req, res) => {
 })
 
 app.get("/pro/appt/all", security.checkJWTPro, async (req, res) => {
-
   let idPro = req.decoded.infos.user.idUser
   let completedAppts=[];
   dbHelper.getApptForPro(idPro, db, function(err, appts){
@@ -328,7 +437,8 @@ app.post("/register/post", async (req,res) => {
       "adress":adress,
       "img":req.body.user.img,
       "cv":req.body.user.cv,
-      "diploma":req.body.user.diploma
+      "diploma":req.body.user.diploma,
+      "status": 1
     }
   }else{
     console.log("type: "+type)
@@ -404,9 +514,9 @@ app.post("/register/post", async (req,res) => {
                 console.log("Loop creation user")
                 if(type===0){
                   console.log("type=0")
-                    const sqlInsertUser = "INSERT INTO client (nom, prenom, id_login, tel, birth, id_adress) VALUES (?,?,?,?,?,?)"
+                    const sqlInsertUser = "INSERT INTO client (nom, prenom, id_login, tel, birth, id_adress, status) VALUES (?,?,?,?,?,?,?)"
                     
-                    const insertUser_query = mysql.format(sqlInsertUser,[user.name, user.surname, idlogin, user.phone, user.birth, idAdress])
+                    const insertUser_query = mysql.format(sqlInsertUser,[user.name, user.surname, idlogin, user.phone, user.birth, idAdress, true])
       
                      connection.query (insertUser_query, (err, result)=> {   
                         //connection.release()   
@@ -511,6 +621,277 @@ app.post("/register/post", async (req,res) => {
     console.log(passwd+" vs "+passwdV)
     return res.status(400).json("Passwords are different")
   }
+})
+
+app.post("/register/pro/post",upload.array("files"), async (req,res) => {
+  const files = req.files;
+  const data = JSON.parse(req.body.data);
+  let imageUrl;
+  let cvUrl;
+  let diplomeUrl;
+  let upload_res = files.map(file => 
+    new Promise((resolve, reject) => {
+      const { path, originalname } = file;
+
+      cloudinary.uploader.upload(path, {
+        resource_type: "auto",
+        folder: originalname
+      },function (error, result) {
+        console.log('...trying to upload')  
+        if(error) {
+            console.log(error)
+            reject(error)
+          }
+          else {
+            switch(originalname){
+            case 'image':
+              imageUrl = result.url;
+              break
+            case 'cv':
+              cvUrl = result.url;
+              break
+            case 'diplome':
+              diplomeUrl = result.url;
+              break
+            }
+            fs.unlinkSync(path)
+            resolve({
+              url: result.url,
+              id: result.public_id,
+              type: originalname
+          })
+          }
+      })
+  })
+    
+  )
+
+  Promise.all(upload_res)
+    .then(async result => {
+        console.log('result:')
+        console.log(result);
+        console.log("Register for")
+        console.log(data)
+        console.log("user")
+        console.log(data.user)
+      
+        const passwd = data.login.password
+        const passwdV = data.login.password_v
+        
+        if(passwd==passwdV)
+        {
+          console.log("password valid")
+          const type = data.type;
+      
+        const adress = {
+          "number":data.user.adress.number,
+          "street":data.user.adress.street,
+          "postalC":data.user.adress.postalC,
+          "city":data.user.adress.city,
+          "supp":data.user.adress.supp
+        }
+      
+        let user;
+        let dBirth = new Date(data.user.birth)
+        dBirth.setHours(14)
+        console.log("birth: "+dBirth)
+      
+        if(type==1){
+          user={
+            "name":data.user.name,
+            "surname":data.user.surname,
+            "phone":data.user.phone,
+            "birth":dBirth,
+            "adress":adress,
+            "img":imageUrl,
+            "cv":cvUrl,
+            "diploma":diplomeUrl,
+          }
+        }else{
+          console.log("type: "+type)
+          return res.status(400).json("bad request")
+        }
+      
+        try
+        {const hashedPassword = await bcrypt.hash(data.login.password,10);
+          const login = {
+            "mail":data.login.mail,
+            "password":hashedPassword
+          }
+          console.log("Trying to register "+login.mail)
+          console.log(user)
+      
+          db.getConnection( async (err, connection) => { 
+            if (err) {
+              console.log(err)
+              return res.status(500).json("error server")
+            }
+              const sqlSearch = "SELECT * FROM login WHERE mail = ?"
+              const search_query = mysql.format(sqlSearch,[login.mail]) 
+      
+              const sqlInsert = "INSERT INTO login (mail, mdp) VALUES (?,?)"
+              const insert_query = mysql.format(sqlInsert,[login.mail, login.password])
+      
+              var idlogin = 0;
+              var idAdress = 0;
+      
+               connection.query (search_query, async (err, result) => {  
+                if (err) {
+                  console.log(err)
+                  return res.status(500).json("error server")
+                }
+                console.log("------> Search Results")
+                console.log(result.length)  
+                if (result.length != 0) {
+                  //connection.release()
+                  console.log("------> User already exists")
+                  return res.status(409).json("Mail already in use")
+                } 
+                else {
+                   connection.query (insert_query, (err, result)=> {   
+                    //connection.release()   
+                    if (err) {
+                        console.log(err)
+                        return res.status(500).json("error server")
+                    }
+                    console.log ("--------> Created new login");
+                    console.log(result.insertId);
+                    idlogin = result.insertId;
+                    console.log("new login has id "+idlogin)
+      
+                    console.log("different from 0? : "+(idlogin!=0))
+                    if(idlogin!=0){
+                      console.log("adress loop")
+                      const sqlInsertAdress = "INSERT INTO adress (pays, num, rue, codeP, ville, supp) VALUES ('FR',?,?,?,?,?)"
+                      const insertAdress_query = mysql.format(sqlInsertAdress,[user.adress.number, user.adress.street, user.adress.postalC, user.adress.city, user.adress.supp])
+      
+                       connection.query (insertAdress_query, (err, result)=> {   
+                          //connection.release()   
+                          if (err) {
+                              console.log(err)
+                              return res.status(500).json("error server")
+                          }
+                          console.log ("--------> Created new adress");
+                          console.log("id adress created is "+result.insertId);
+      
+                          idAdress = result.insertId;
+      
+                          console.log("idadresse: "+idAdress+" et idLogin: "+idlogin);
+                    if(idAdress != 0 && idlogin != 0){
+                      console.log("Loop creation user")
+                      if(type===0){
+                        console.log("type=0")
+                          const sqlInsertUser = "INSERT INTO client (nom, prenom, id_login, tel, birth, id_adress, status) VALUES (?,?,?,?,?,?,?)"
+                          
+                          const insertUser_query = mysql.format(sqlInsertUser,[user.name, user.surname, idlogin, user.phone, user.birth, idAdress, true])
+            
+                           connection.query (insertUser_query, (err, result)=> {   
+                              //connection.release()   
+                              if (err) {
+                                  console.log(err)
+                                  return res.status(500).json("error server")
+                              }
+                              console.log ("--------> Created new client");
+                              console.log(result.insertId);
+                              let secret = process.env.JWT_SECRET_KEY;
+      
+                              user["mail"]=login.mail
+                              user["idUser"]=result.insertId
+      
+                              const expireIn = 24 * 60 * 60;
+                                const token    = jwt.sign({
+                                    infos: {
+                                      "type" :0,
+                                      "user":user
+                                    }
+                                },
+                                secret,
+                                {
+                                    expiresIn: expireIn
+                                });
+      
+                                res.header('Authorization', 'Bearer ' + token);
+                              return res.status(201).json("Client account successfuly created")
+                          })
+                      }else if (type === 1){
+                        console.log("type=1")
+                        console.log(user.img)
+                          const sqlInsertPro = "INSERT INTO pro (nom, prenom, id_login, tel, birth, id_adress, img, cv, diplome, etat, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+                          const insertPro_query = mysql.format(sqlInsertPro,[user.name, user.surname, idlogin, user.phone, user.birth, idAdress, user.img, user.cv, user.diploma, false, false])
+            
+                           connection.query (insertPro_query, (err, result)=> {   
+                              //connection.release()   
+                              if (err) {
+                                  console.log(err)
+                                  return res.status(500).json("error server")
+                              }
+                              console.log ("--------> Created new pro");
+                              console.log(result.insertId);
+                              user["idUser"]=result.insertId
+      
+                              dbHelper.addPagePro(result.insertId, db, function(err, added){
+                                if(!err){
+                                  if(added){
+                                    console.log("pro page added")
+                                    let secret = process.env.JWT_SECRET_KEY;
+                                    user["mail"]=login.mail
+                                    
+      
+                                    const expireIn = 24 * 60 * 60;
+                                    const token    = jwt.sign({
+                                        infos: {
+                                          "type" :1,
+                                          "user":user
+                                        }
+                                    },
+                                    secret,
+                                    {
+                                        expiresIn: expireIn
+                                    });
+      
+                                    res.header('Authorization', 'Bearer ' + token);
+                                    return res.status(201).json("Professionnal account successfuly created")
+                                  }else{
+                                    console.log("cound not add pro page")
+                                    return res.status(500).json("error server")
+                                  }
+                                }else{
+                                  console.log(err)
+                                  return res.status(500).json("error server")
+                                }
+                              })
+                          })
+                          }else{
+                            console.log("pb type")
+                            return res.status(400).json("Bad request")
+                          }
+                        }else{
+                          console.log("pb creation compte")
+                          return res.status(400).json("Bad request")
+                        }
+                      })
+                    }else{
+                    console.log("probleme sur l'id login")
+                    return res.status(400).json("Bad request")
+                  }
+                  })
+                }
+              })
+            }) 
+        }
+        catch(error){
+            console.log("error")
+            console.log(error)
+            return res.status(500).json("Could not process the registration")
+        }}else{
+          console.log("password verif not correct")
+          console.log(passwd+" vs "+passwdV)
+          return res.status(400).json("Passwords are different")
+        }
+       }
+      )
+    .catch(error => error)
+
 })
 
 app.post("/login/post", (req, res)=> {

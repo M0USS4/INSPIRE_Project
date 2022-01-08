@@ -2,7 +2,35 @@ const mysql = require("mysql")
 const fix = require('./generalHelper');
 
 module.exports = {
-
+    getAllPros:function (db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Searching for all pros")
+              const sqlSearch = "SELECT * FROM pro INNER JOIN adress ON pro.id_adress=adress.id;"
+            //   const search_query = mysql.format(sqlSearch,[idPro])
+      
+              connection.query (sqlSearch, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    console.log("pros found ")
+                    console.log(result)
+                    return callback(null, result);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("no pro not found")
+                        return callback(null, []);
+                    }
+                }
+            })
+        })
+    },
     getPro:function (idPro, db, callback){
         db.getConnection( (err, connection) => { 
             if (err) {
