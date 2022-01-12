@@ -3,9 +3,13 @@ import PropTypes from 'prop-types';
 import avatar from '../../../images/avatar.png';
 import pdf from '../../../images/pdf.png';
 import './Uploader.css';
+// import { styled } from '@mui/material/styles';
+// import Button from '@mui/material/Button';
+// const Input = styled('input')({
+//   display: 'none',
+// });
 
 const Uploader = ({ uploadSingleFile , file, title, type}) => {
-//   const [file, setfile] = useState(null);
   const [accept, setaccept] = useState('image/*, .pdf, .doc');
   useEffect(() => {
     switch (type){
@@ -14,7 +18,8 @@ const Uploader = ({ uploadSingleFile , file, title, type}) => {
       break;
     case 'pdf':
       setaccept('.pdf, .doc');}
-  }, []);
+    // setaccept('image/*, .pdf, .doc');
+  }, [accept]);
 
   return (
     <div className="file-uploader">
@@ -36,8 +41,18 @@ const Uploader = ({ uploadSingleFile , file, title, type}) => {
         <input type="file" className="choose-file" onChange={uploadSingleFile} accept={accept}/>
         <label htmlFor="file">{title}</label>
       </div>
+
+      {/* <label htmlFor="contained-button-file">
+        {accept}
+        {accept && <Input  onChange={uploadSingleFile} accept={accept} id="contained-button-file" type="file" />}
+        <Button variant="outlined" component="span" sx={{backgroundColor: 'white'}}>
+          {title}
+        </Button>
+      </label> */}
+
       {/* <button  className="upload-button" onClick={upload}>{title}</button> */}
     </div>
+
   );
 };
 
