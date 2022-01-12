@@ -10,8 +10,8 @@ const data = [
   {
     id: 1,
     title: 'Long Event',
-    start: new Date(2021, 11, 8, 9, 0, 0),
-    end: new Date(2021, 11, 2, 0, 0, 0),
+    date_start: new Date('2022-01-12T09:00:00.000Z'),
+    end: new Date('2022-01-12T10:00:00.000Z'),
     name: 'Nom Prenom',
     type: 'block',
     status: true
@@ -19,8 +19,8 @@ const data = [
   {
     id: 113,
     title: 'Appointment with Client1',
-    start: new Date(2021, 11, 13, 9, 0, 0),
-    end: new Date(2021, 11, 13, 10, 0, 0),
+    start: new Date(2022, 1, 13, 9, 0, 0),
+    end: new Date(2022, 1, 13, 10, 0, 0),
     name: 'Test Name',
     type: 'appointment',
     status: true
@@ -28,8 +28,8 @@ const data = [
   {
     id: 213,
     title: 'Appointment with Client2',
-    start: new Date(2021, 11, 13, 10, 0, 0),
-    end: new Date(2021, 11, 13, 11, 0, 0),
+    start: new Date(2022, 0, 13, 10, 0, 0),
+    end: new Date(2022, 0, 13, 11, 0, 0),
     name: 'Test Name',
     type: 'appointment',
     status: true
