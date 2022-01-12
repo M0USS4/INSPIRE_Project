@@ -12,7 +12,7 @@ import { Grid } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CollapseAlert from './Alert';
+import CollapsableAlert from './CollapsableAlert';
 
 const addButtonStyle = {
   border: 'none',
@@ -80,7 +80,7 @@ const TimeslotsDialog =
       >
         <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
             Edit Timeslots for {currentDay}
-          <CollapseAlert
+          <CollapsableAlert
             message={rangeErrorMessage}
             setopen={setopenRangeErrorAlert}
             open={openRangeErrorAlert}

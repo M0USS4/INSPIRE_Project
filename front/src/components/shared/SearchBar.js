@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
-import InputBase from '@mui/material/InputBase';
+// import InputBase from '@mui/material/InputBase';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
@@ -15,6 +15,8 @@ import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/system';
 import { makeStyles } from '@material-ui/styles';
+import { Autocomplete, TextField } from '@mui/material';
+import axios from 'axios';
 
 const useStyles  = makeStyles({
   inputbase : {
@@ -26,39 +28,72 @@ const useStyles  = makeStyles({
   invalid: {
     color: 'red'
   },
+  noBorder: {
+    border: 'none',
+  },
 });
-const SearchBar = () => {
+const SearchBar = ({ handleSearch, type }) => {
   let navigate = useNavigate();
   const theme = useTheme();
   const classes = useStyles();
   const mobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [allMedicine, setallMedicine] = useState([]);
+  const [autoCompleteData, setautoCompleteData] = useState([]);
+  const [selectedLocation, setselectedLocation] = useState(null);
+  const [selectedPractice, setselectedPractice] = useState(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm();
+
+  useEffect(() => {
+    axios.get('http://localhost:2021/getAllMedicine')
+      .then(response => {
+        if (response.data) {
+          console.log(response.data);
+          setallMedicine(response.data);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }, []);
+
   const onSubmit = (data) =>{
-    console.log(data);
-    const location = new String(data.location).toLowerCase();
-    const practice = new String(data.practice).toLowerCase();
+    const location = JSON.stringify(selectedLocation.geometry.coordinates);
+    const label = JSON.stringify(selectedLocation.properties.label);
+    const practice = data.practice;
+    console.log(location);
+    console.log(practice);
+    console.log(selectedLocation);
+    console.log(selectedPractice);
     navigate( {
       pathname: '/search',
-      search: `?practice=${practice}&location=${location}`,
+      search: `?practice=${practice}&location=${location}&label=${label}`,
     });
-    window.location.reload();
-    // setfilterParams(
-    //   {
-    //     location: location,
-    //     practice: practice
-    //   }
-    // );
-    // handleSearch(location , practice);
+    if(type === 'search'){
+      handleSearch(practice, location, label);
+    }
   };
+
+  const autoComplete = (e) => {
+    const query = e.target.value;
+    axios.get(`https://api-adresse.data.gouv.fr/search/?q=${query}&type=street&autocomplete=1`)
+      .then(response => {
+        console.log(response.data.features);
+        setautoCompleteData(response.data.features);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
   return (
     <div>
       <form action="">
         <Paper
           component="form"
-          sx={{  display: 'flex', alignItems: 'center', height: 50 }}
+          sx={{  display: 'flex', alignItems: 'center',  }}
         >
-          <InputBase
+          {/* <InputBase
             sx={{ ml: 1, flex: 1 }}
             placeholder="Practique, Therapeute, ..."
             startAdornment={
@@ -68,9 +103,67 @@ const SearchBar = () => {
             }
             className={`${errors.practice ? classes.inputbase : ''}`}
             {...register('practice', { required: true,  minLength: 2 })}
+          /> */}
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            options={allMedicine.map(medicine => medicine.name)}
+            sx={{ flex: 1}}
+            value={selectedPractice}
+            onChange={(e, value) => setselectedPractice(value)}
+            renderInput={(params) =>
+              <TextField
+                {...params}
+                InputProps={{
+                  ...params.InputProps,
+                  classes:{notchedOutline:classes.noBorder},
+                  startAdornment: (
+                    <>
+                      <InputAdornment position="start">
+                        <PersonSearchIcon color='primary' className={`${errors.practice ? classes.invalid : ''}`}/>
+                      </InputAdornment>
+                      {params.InputProps.startAdornment}
+                    </>
+                  ),
+                  disableUnderline: true,
+                }}
+                sx={{width: '100%', border: 'none'}}
+                // label="Practique..."
+                {...register('practice', { required: true,  minLength: 2 })}
+              />
+            }
           />
           <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-          <InputBase
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            options={autoCompleteData}
+            getOptionLabel={option => option.properties.label}
+            sx={{  ml: 1, flex: 1 }}
+            value={selectedLocation}
+            onChange={(e, value) => setselectedLocation(value)}
+            renderInput={(params) =>
+              <TextField
+                {...params}
+                InputProps={{
+                  ...params.InputProps,
+                  classes:{notchedOutline:classes.noBorder},
+                  startAdornment: (
+                    <>
+                      <InputAdornment position="start">
+                        <LocationOnIcon color='primary' className={`${errors.location ? classes.invalid : ''}`}/>
+                      </InputAdornment>
+                      {params.InputProps.startAdornment}
+                    </>
+                  )
+                }}
+                // label="Location..."
+                onKeyDown={(e) => autoComplete(e)}
+                {...register('location', { required: true,  minLength: 2 })}
+              />
+            }
+          />
+          {/* <InputBase
             sx={{ ml: 1, flex: 1 }}
             placeholder="Ville"
             startAdornment={
@@ -80,7 +173,7 @@ const SearchBar = () => {
             }
             className={`${errors.location ? classes.inputbase : ''}`}
             {...register('location', { required: true,  minLength: 2 })}
-          />
+          /> */}
           {mobile &&
           <>
             <Divider sx={{ height: 30, m: 0.5 }} orientation="vertical" />
@@ -93,7 +186,7 @@ const SearchBar = () => {
           {!mobile &&
           <Button
             variant="contained"
-            sx={{ height: 50, ml: 1, flex: 0.3 }}
+            sx={{ height: 56, ml: 1, flex: 0.3}}
             onClick={handleSubmit(onSubmit)}
           >Trouvez</Button>
           }
@@ -105,7 +198,8 @@ const SearchBar = () => {
 
 SearchBar.propTypes = {
   handleSearch: PropTypes.func,
-  setfilterParams: PropTypes.func
+  setfilterParams: PropTypes.func,
+  type: PropTypes.oneOf(['home, search']),
 };
 
 export default SearchBar;
