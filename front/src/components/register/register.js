@@ -7,13 +7,15 @@ import Alert from '@mui/material/Alert';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import CloseIcon from '@mui/icons-material/Close';
-import authService from '../../auth.service';
+import authService from '../helpers/auth.service';
+import axios from 'axios';
 
 const Register = () => {
   let navigate = useNavigate();
   const [success, setsuccess] = useState(null);
   const [message, setmessage] = useState('');
   const [open, setopen] = useState(false);
+  const [autoCompleteData, setautoCompleteData] = useState([]);
 
   const { register, handleSubmit, formState: { errors } } = useForm();
   const onSubmit = (data) => {
@@ -54,6 +56,19 @@ const Register = () => {
         setopen(true);
         setmessage(err.data);
         setsuccess(false);
+      });
+  };
+
+  const autoComplete = () => {
+    console.log('auto');
+
+    axios.get('https://api-adresse.data.gouv.fr/search/?q=Lille&type=housenumber&autocomplete=0')
+      .then(response => {
+        console.log(response.data);
+        setautoCompleteData(response.data);
+      })
+      .catch(err => {
+        console.log(err);
       });
   };
 
@@ -206,8 +221,14 @@ const Register = () => {
               type="text"
               placeholder="Additional Info..."
               name="add"
+              onKeyUp={autoComplete}
               {...register('add', { required: false, maxLength: 40, minLength: 2 })}
             />
+            <ul>
+              {autoCompleteData.map((data, index) => (
+                <li key={index}>{data.context}</li>
+              ))}
+            </ul>
           </div>
         </div>
         <div className="register-buttons">

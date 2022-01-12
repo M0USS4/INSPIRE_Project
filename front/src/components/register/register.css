@@ -11,7 +11,7 @@
 }
 
 .field-container {
-  padding: 2px 20px;
+  padding: 2px 15px;
 }
 
 .register-fields input {
@@ -57,31 +57,31 @@
 }
 
 .reg {
-  height: 100%;
-  position: absolute;
-  left: 0;
-  width: 100%;
-  overflow: hidden;
+  /* height: 100%; */
+  /* position: absolute; */
+  /* left: 0; */
+  /* width: 100%; */
+  /* overflow: hidden; */
+  padding-top: 3%;
   background: url(../../images/Untitled\ design.png);
 }
 .stepper {
   box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
-  background-color: rgba(255, 255, 255, 0.3);
-  opacity: 0.8;
+  background-color: white;
   min-height: 700px;
   margin: auto;
   display: block;
   align-content: center;
-  padding-top: 10px;
+  padding: 15px;
 }
 
 .stepper .register-buttons {
   display: none;
 }
 
-.stepper .registration-title-pro {
+.registration-title-pro {
   text-align: center;
-  font-size: 50px;
+  font-size: 40px;
   margin: 0px;
 }
 
@@ -138,7 +138,7 @@
 
 @media (min-width: 554px) {
   .stepper {
-    padding-top: 50px;
+    /* padding-top: 50px; */
 
     /* margin-top: 50px; */
   }
@@ -173,7 +173,7 @@
 
 @media (min-width: 600px) {
   .stepper {
-    margin-top: 50px;
+    /* margin-top: 50px; */
     width: 800px;
   }
 }
@@ -194,7 +194,7 @@
 
 @media (min-width: 900px) {
   .stepper {
-    margin-top: 100px;
+    /* margin-top: 100px; */
     width: 850px;
   }
 }

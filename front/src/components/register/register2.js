@@ -1,58 +1,102 @@
 import {React, useState} from 'react';
-// import avatar from '../../images/avatar.png';
+import PropTypes from 'prop-types';
 import Uploader from './Uploader/Uploader';
 import './register-pros.css';
+import authService from '../helpers/auth.service';
+import { Button } from '@mui/material';
 
-const Register2 = () => {
-  const [file, setfile] = useState({});
+const Register2 = ({data, setmessage, setopen, setsuccess, handleBack}) => {
+  const [files, setfile] = useState([]);
   const uploadSingleFile = (id, e) => {
-    setfile({...file, [id]: URL.createObjectURL(e.target.files[0])});
+    setfile([...files, {
+      [id]: e.target.files[0],
+      name: id,
+      data: e.target.files[0]
+    }]);
   };
 
-  const upload = () => {
-    const formData = { image: file };
-    console.log(formData);
+  const upload = (e) => {
+    e.prevenDefault;
+    console.log(files);
+    if(files.length === 3){
+      const formData = new FormData();
+      console.log(data);
+      formData.append('data', JSON.stringify(data));
+      for(let file of files){
+        formData.append('files', file.data, `${file.name}`);
+      }
+      // let url = 'http://localhost:2021/upload-images';
+      // axios.post(url, formData)
+      //   .then(res => {
+      //     console.log(res.data);
+      //   });
 
-    // let url = 'http://localhost:8000/...';
-    // axios.post(url, formData, {
-    // })
-    //   .then(res => {
-    //     console.log(res.data);
-    //   });
-
+      authService.registerPro(formData)
+        .then(response => {
+          console.log(response);
+          setopen(true);
+          setmessage('Registered');
+          setsuccess(true);
+          // navigate('/',      { state: {
+          //   success: success,
+          // }});
+        })
+        .catch(err => {
+          console.log(err);
+          setopen(true);
+          setmessage(err.data);
+          setsuccess(false);
+        });
+    }
+    else{
+      alert('select all files');
+    }
   };
+
   return (
-    <form>
+    <form >
       <div className="register-uploader">
         <Uploader
           className="register-uploader-content"
           upload={upload}
-          uploadSingleFile={(e) => uploadSingleFile(1, e)}
+          uploadSingleFile={(e) => uploadSingleFile('image', e)}
           index={1}
-          file={file[1]}
-          title="Upload image"
+          file={files['image']}
+          title="Choose image"
           type="image"
         />
         <Uploader
           upload={upload}
-          uploadSingleFile={(e) => uploadSingleFile(2, e)}
+          uploadSingleFile={(e) => uploadSingleFile('cv', e)}
           index={2}
-          file={file[2]}
-          title="Upload CV"
+          file={files['cv']}
+          title="Choose CV"
           type="pdf"
         />
         <Uploader
           upload={upload}
-          uploadSingleFile={(e) => uploadSingleFile(3, e)}
+          uploadSingleFile={(e) => uploadSingleFile('diplome', e)}
           index={3}
-          file={file[3]}
-          title="Upload Diplome"
+          file={files['diplome']}
+          title="Choose Diplome"
           type="pdf"
         />
+      </div>
+      <div style={{display: 'flex', justifyContent: 'center', margin: '10px', gap: '10px'}}>
+        <Button onClick={handleBack}>Back</Button>
+        <Button variant='contained' type="button" onClick={(e) => upload(e)}>Upload Files</Button>
       </div>
 
     </form >
   );
 };
 
+Register2.propTypes = {
+  data: PropTypes.object,
+  onsubmit: PropTypes.func,
+  setsuccess: PropTypes.func,
+  setopen: PropTypes.func,
+  setmessage: PropTypes.func,
+  handleBack: PropTypes.func,
+};
 export default Register2;
