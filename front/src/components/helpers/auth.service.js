@@ -24,8 +24,20 @@ class AuthService {
     return axios.post(API_URL + 'register/post', registerData);
   }
 
+  registerPro(registerData) {
+    return axios.post(API_URL + 'register/pro/post', registerData);
+  }
+
   getCurrentUser() {
     return JSON.parse(localStorage.getItem('user'));
+  }
+
+  isLogin(){
+    if (localStorage.getItem('user')) {
+      return true;
+    }
+
+    return false;
   }
 }
 
