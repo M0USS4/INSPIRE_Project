@@ -1,5 +1,5 @@
 @import "react-alice-carousel/lib/alice-carousel.css";
-
+/* .rbc-time-slot { min-height: 80px; } */
 .card {
   display: flex;
   align-content: center;
@@ -50,12 +50,11 @@
 .pro-profile-menu-list li{
 list-style-type: none;
 display: flex;
-font-size: 1.2em;
-margin: 2em 0;
+margin: 1em 0;
 }
 
 .u-list-icon{
-  margin-right: 15px;
+  margin-right: 5px;
 }
 
 

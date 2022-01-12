@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './pros.css';
-import proImage from '../../images/ben-parker-OhKElOkQ3RE-unsplash.jpg';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -16,30 +15,47 @@ import {
   Outlet,
   Link,
 } from 'react-router-dom';
+import axios from 'axios';
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'center',
   color: theme.palette.text.secondary,
 }));
 
-const Appointment = () => {
+const ProProfile = () => {
+
+  const [practicianData, setpracticianData] = useState({});
+  useEffect(() => {
+    axios.get('http://localhost:2021/getProDetailed',{
+      params: {
+        pro_id: 11
+      }
+    })
+      .then(response => {
+        console.log(response.data);
+        setpracticianData(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }, []);
   return (
     <section className="pro-profile">
-      <Box sx={{ flexGrow: 1, backgroundColor: '#f8f9fa' }}>
+      <Box sx={{ flexGrow: 1, margin: '10px' }}>
         <Grid
           container
           spacing={2}
           // alignItems="stretch"
           justifyContent="center"
         >
-          <Grid item xs={12} sm={12} md={5} lg={3}>
+          <Grid item xs={12} sm={12} md={4} lg={2.5}>
             <Item >
               <div className="pro-profile-menu">
                 <img className="pro-profile-menu-image"
-                  src={proImage}
+                  src={practicianData.img}
                   alt=""/>
-                <h2>Dr. Prenom Nom</h2>
-                <h3>BDS. Osteology</h3>
+                <h2>{`${practicianData.prenom} ${practicianData.nom}`}</h2>
+                <h3>{practicianData.nom_medicine}</h3>
                 <ul className="pro-profile-menu-list">
                   <li>
                     <div className="u-list-icon u-list-icon-1">
@@ -77,7 +93,7 @@ const Appointment = () => {
                     <div className="u-list-icon u-list-icon-1">
                       <AppSettingsAltIcon/>
                     </div>
-                    <Link to="password">Account Settings</Link>
+                    <Link to="profile-settings">Account Settings</Link>
 
                   </li>
                   <li>
@@ -90,12 +106,10 @@ const Appointment = () => {
               </div>
             </Item>
           </Grid>
-          <Grid item xs={12} sm={12} md={6} lg={8} style={{height: '100%' }}>
-            {/* <Item> */}
-            <div className="u-container-layout u-container-layout-2">
+          <Grid item xs={12} sm={12} md={8} lg={7.5} style={{height: '100%' }}>
+            <Item>
               <Outlet/>
-            </div>
-            {/* </Item> */}
+            </Item>
           </Grid>
         </Grid>
       </Box>
@@ -104,4 +118,4 @@ const Appointment = () => {
   );
 };
 
-export default Appointment;
+export default ProProfile;
