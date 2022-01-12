@@ -2,12 +2,12 @@
 import {React, useState} from 'react';
 import './login.css';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import CollapseAlert from '../shared/Alert';
-import authService from '../../auth.service';
+// import { useNavigate } from 'react-router';
+import authService from '../helpers/auth.service';
+import CollapsableAlert from '../shared/CollapsableAlert';
 
 const Login = () => {
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
   const [success, setsuccess] = useState(null);
   const [message, setmessage] = useState('');
   const [open, setopen] = useState(false);
@@ -27,16 +27,17 @@ const Login = () => {
         console.log(success);
         setsuccess(true);
         localStorage.setItem('userInfo', JSON.stringify(response.data));
+        window.location.reload();
 
-        navigate('/',      { state: {
-          success: success,
-        }});
+        // navigate('/',      { state: {
+        //   success: success,
+        // }});
 
       })
       .catch(err => {
         console.log(err);
         setopen(true);
-        setmessage(err.data);
+        setmessage('Account does not exist');
         setsuccess(false);
       });
   };
@@ -48,7 +49,7 @@ const Login = () => {
                         Welcome
           </h1>
         </div> */}
-      <CollapseAlert
+      <CollapsableAlert
         open={open}
         setopen={setopen}
         message={message}

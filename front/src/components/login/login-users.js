@@ -5,7 +5,7 @@ import './login.css';
 // import axios from 'axios';
 // import { useForm } from 'react-hook-form';
 // import { useNavigate } from 'react-router';
-// import CollapseAlert from '../shared/Alert';
+// import CollapsableAlert from '../shared/CollapsableAlert';
 
 const LoginUsers = () => {
   // let navigate = useNavigate();
@@ -48,7 +48,7 @@ const LoginUsers = () => {
                         Welcome
             </h1>
           </div>
-          {/* <CollapseAlert
+          {/* <CollapsableAlert
             open={open}
             setopen={setopen}
             message={message}
