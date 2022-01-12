@@ -11,8 +11,8 @@ exports.fixStringDateFromSQL = (date) => {
 exports.fixStringDateTimeFromSQL = (date) => {
     try{
     let dateToFix = new Date(date);
-    let fixedDate = new Date(dateToFix.getTime()+60*60*1000)
-    return(fixedDate)}
+    // let fixedDate = new Date(dateToFix.getTime()+60*60*1000)
+    return(dateToFix)}
     catch(err){
         return date
     }

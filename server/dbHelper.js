@@ -8,9 +8,122 @@ module.exports = {
               return callback(err, null);
             }
               console.log("Searching for all pros")
-              const sqlSearch = "SELECT * FROM pro INNER JOIN adress ON pro.id_adress=adress.id;"
+              const sqlSearch = `SELECT *, pro.id as pro_id FROM pro 
+              INNER JOIN adress ON pro.id_adress=adress.id 
+              INNER JOIN type_medicine ON pro.id_type_medicine=type_medicine.id
+              INNER JOIN login ON pro.id_login=login.id
+              ;`
             //   const search_query = mysql.format(sqlSearch,[idPro])
       
+              connection.query (sqlSearch, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    console.log("pros found ")
+                    console.log(result)
+                    return callback(null, result);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("no pro not found")
+                        return callback(null, []);
+                    }
+                }
+            })
+        })
+    },
+    getAllClients:function (db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Searching for all pros")
+              const sqlSearch = `SELECT *, client.id as client_id FROM client 
+              INNER JOIN adress ON client.id_adress=adress.id 
+              INNER JOIN login ON client.id_login=login.id
+              ;`      
+              connection.query (sqlSearch, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    console.log("clients found ")
+                    console.log(result)
+                    return callback(null, result);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("no client not found")
+                        return callback(null, []);
+                    }
+                }
+            })
+        })
+    },
+    getClientsStats:function (db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Searching for all client stats")
+              const sqlSearch = `SELECT *, client.id as client_id FROM client 
+              INNER JOIN adress ON client.id_adress=adress.id 
+              INNER JOIN login ON client.id_login=login.id
+              ;`      
+              connection.query (sqlSearch, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result)
+                const verified = result.filter(r => r.status.data[0] === 1);
+                const unverified = result.filter(r => r.status.data[0] === 0);
+
+                let res = {
+                    total : result.length,
+                    number_verified : verified,
+                    number_unverified : unverified
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    console.log("clients stats found ")
+                    console.log(res)
+                    return callback(null, res);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("no client not found")
+                        return callback(null, []);
+                    }
+                }
+            })
+        })
+    },
+    getAllProsByParams:function (db, params, callback){
+        db.getConnection( (err, connection) => {
+            console.log(params);
+            const practice = params.practice;
+            const location = JSON.parse(params.location)
+            const paramLat = location[0];
+            const paramLong = location[1];
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Searching for all pros")
+              // 3959 for miles
+              // 6371 for km
+              const sqlSearch = `SELECT *, pro.id as pro_id , type_medicine.id as medicine_id , 
+              ( 6371 * acos( cos( radians(${paramLat}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(${paramLong}) ) + sin( radians(${paramLat}) ) * sin( radians( latitude ) ) ) ) 
+              AS distance FROM pro 
+              INNER JOIN adress ON pro.id_adress=adress.id
+              INNER JOIN type_medicine ON pro.id_type_medicine=type_medicine.id 
+              INNER JOIN login ON pro.id_login=login.id
+              HAVING distance < 20 AND nom_medicine ='${practice}' ORDER BY distance LIMIT 0 , 20;`      
               connection.query (sqlSearch, (err, result) => {  
                 if (err) {
                     console.log(err);
@@ -74,6 +187,150 @@ module.exports = {
                         }
                         console.log(user)
                         return callback(null, user);
+                    }
+                }
+            })
+        })
+    },
+    getProDetailed:function (idPro, db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Searching for pro id: "+idPro)
+              const sqlSearch = `SELECT *, pro.id as pro_id FROM pro INNER JOIN adress ON pro.id_adress=adress.id 
+              INNER JOIN type_medicine ON pro.id_type_medicine=type_medicine.id
+              INNER JOIN login ON pro.id_login=login.id
+               where id_login = ?`
+              const search_query = mysql.format(sqlSearch,[idPro])
+      
+              connection.query (search_query, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    return callback(null, result[0]);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("pro not found")
+                        let user = {
+                            "found":false
+                        }
+                        console.log(user)
+                        return callback(null, user);
+                    }
+                }
+            })
+        })
+    },
+
+    SendConfirmatoryEmail:function (appt, db, transporter, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Searching for client id: "+appt.idClient)
+              const sqlSearch = `SELECT * FROM client INNER JOIN login ON client.id_login=login.id where id_login = ?`
+              const search_query = mysql.format(sqlSearch,[appt.idClient])
+      
+              connection.query (search_query, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    let content = 'BEGIN:VCALENDAR\n' +
+                    'VERSION:2.0\n' +
+                    'BEGIN:VEVENT\n' +
+                    'SUMMARY:Appointment Confirmation\n' +
+                    `DTSTART;VALUE=DATE:${appt.apptDateStart}\n` +
+                    'DTEND;VALUE=DATE:20201030T113000Z\n' +
+                    'LOCATION:Webex \n' +
+                    'DESCRIPTION:Description123\n' +
+                    'STATUS:CONFIRMED\n' +
+                    'SEQUENCE:3\n' +
+                    'BEGIN:VALARM\n' +
+                    'TRIGGER:-PT10M\n' +
+                    'DESCRIPTION:Description123\n' +
+                    'ACTION:DISPLAY\n' +
+                    'END:VALARM\n' +
+                    'END:VEVENT\n' +
+                    'END:VCALENDAR';
+                    
+                    const mailOptions = {
+                      from: 'projectinspire83@gmail.com',
+                      to: result[0].mail,
+                      cc: appt.proMail,
+                      subject: 'Appointment Confirmation',
+                      text: 'Appointment confirmed.',
+                      html: `<div style="height:150px; border: 1px solid 
+                      #009ba4; text-align: center">
+                           <div style="height:50px; background-color:#abe4e7;">
+                           </div>
+                      <p style="font-size:1rem;">${appt.apptDateStart} - ${appt.apptDateEnd}</p>
+                      <p> Appointment confirmed </p></div>`,
+                       icalEvent: {
+                        filename: "invitation.ics",
+                        method: 'request',
+                        content: content
+                        }
+                    };
+                    
+                    transporter.sendMail(mailOptions, function(error, info){
+                      if (error) {
+                      console.log(error);
+                      } else {
+                        console.log('appt added and Email sent: ' + info.response);
+                        // return res.status(200).send('appt added and email sent')
+                        return callback(null, 'appt added and email sent');
+
+                      }
+                    });
+                }
+                else{
+                    if(result.length===0){
+                        console.log("pro not found")
+                        let user = {
+                            "found":false
+                        }
+                        console.log(user)
+                        return callback(null, user);
+                    }
+                }
+            })
+        })
+    },
+
+    getAppointmentTypes:function (idPro, db, callback){
+        db.getConnection( (err, connection) => { 
+            if (err) {
+              return callback(err, null);
+            }
+              console.log("Searching for appointment types of id: "+idPro)
+              const sqlSearch = `SELECT * FROM type_rdv where id_pro = ?`
+              const search_query = mysql.format(sqlSearch,[idPro])
+      
+              connection.query (search_query, (err, result) => {  
+                if (err) {
+                    console.log(err);
+                    return callback(err, null);
+                }
+                console.log(result);
+                if (result.length != 0) {
+                    return callback(null, result);
+                }
+                else{
+                    if(result.length===0){
+                        console.log("Types not found")
+                        let apt = {
+                            "found":false
+                        }
+                        console.log(apt)
+                        return callback(null, apt);
                     }
                 }
             })
@@ -147,7 +404,9 @@ module.exports = {
                         "postalC":result[0].codeP,
                         "city":result[0].ville,
                         "supp":result[0].supp,
-                        "country":result[0].pays
+                        "country":result[0].pays,
+                        "latitude": result[0].latitude,
+                        "longitude": result[0].longitude,
                     }
                     console.log(adress)
                     return callback(null, adress);
@@ -260,7 +519,10 @@ module.exports = {
               return callback(err, null);
             }
               console.log("Searching for appt for pro id: "+idPro)
-              const sqlSearch = "SELECT * FROM rdv where id_pro = ?"
+              const sqlSearch = `SELECT *,client.nom as nom_client,  type_rdv.nom as nom_type FROM rdv 
+              INNER JOIN type_rdv ON rdv.id_type=type_rdv.id
+              LEFT JOIN client ON rdv.id_client=client.id
+              where rdv.id_pro = ?`
               const search_query = mysql.format(sqlSearch,[idPro])
       
               connection.query (search_query, (err, result) => {  
@@ -268,7 +530,7 @@ module.exports = {
                     console.log(err);
                     return callback(err, null);
                 }
-                console.log(result);
+                console.log(result.le);
                 if (result.length != 0) {
                     let appts=[];
                     
@@ -278,10 +540,15 @@ module.exports = {
                         appts.push(
                             {
                                 "id_type":result[apptNb].id_type,
+                                "id_pro":result[apptNb].id_pro,
                                 "id_client":result[apptNb].id_client,
+                                "nom_type":result[apptNb].nom_type,
+                                "nom_client":result[apptNb].nom_client,
+                                "prenom_client":result[apptNb].prenom,
                                 "date_start":start,
                                 "date_end":end,
-                                "note_pro":result[apptNb].note_pro
+                                "note_pro":result[apptNb].note_pro,
+                                "status":result[0].status
                             }
                         )
                     }
@@ -303,7 +570,11 @@ module.exports = {
               return callback(err, null);
             }
               console.log("Searching for appt for client id: "+idClient)
-              const sqlSearch = "SELECT * FROM rdv where id_client = ?"
+              const sqlSearch = `SELECT *,pro.nom as nom_pro,  type_rdv.nom as nom_type FROM rdv 
+              INNER JOIN type_rdv ON rdv.id_type=type_rdv.id
+              LEFT JOIN pro ON rdv.id_pro=pro.id
+              LEFT JOIN adress ON pro.id_adress=adress.id
+              where id_client = ?`
               const search_query = mysql.format(sqlSearch,[idClient])
       
               connection.query (search_query, (err, result) => {  
@@ -314,22 +585,22 @@ module.exports = {
                 console.log(result);
                 if (result.length != 0) {
                     let appts=[];
-                    for(let apptNb=0;apptNb<result.length;apptNb++){
-                        let start = fix.fixStringDateTimeFromSQL(result[apptNb].appt_dateStart)
-                        let end = fix.fixStringDateTimeFromSQL(result[apptNb].appt_dateEnd)
-                        appts.push(
-                            {
-                                "id_type":result[apptNb].id_type,
-                                "id_client":result[apptNb].id_client,
-                                "date_start":start,
-                                "date_end":end,
-                                "note_client":result[apptNb].note_client,
-                                "status":result[apptNb].status==1
-                            }
-                        )
-                    }
+                    // for(let apptNb=0;apptNb<result.length;apptNb++){
+                    //     let start = fix.fixStringDateTimeFromSQL(result[apptNb].appt_dateStart)
+                    //     let end = fix.fixStringDateTimeFromSQL(result[apptNb].appt_dateEnd)
+                    //     appts.push(
+                    //         {
+                    //             "id_type":result[apptNb].id_type,
+                    //             "id_client":result[apptNb].id_client,
+                    //             "date_start":start,
+                    //             "date_end":end,
+                    //             "note_client":result[apptNb].note_client,
+                    //             "status":result[apptNb].status==1
+                    //         }
+                    //     )
+                    // }
                     console.log(appts)
-                    return callback(null, appts);
+                    return callback(null, result);
                 }
                 else{
                     if(result.length===0){
@@ -374,7 +645,7 @@ module.exports = {
                         "endDate":eDate,
                         "price":result[0].price,
                         "public":result[0].public==1,
-                        "idPro":result[0].id_pro
+                        "idPro":result[0].id_pro,
                     }
                     console.log(rdv_type)
                     return callback(null, rdv_type);
@@ -414,7 +685,7 @@ module.exports = {
                             "endDate":eDate,
                             "price":result[typeNb].price,
                             "public":result[typeNb].public==1,
-                            "idPro":result[typeNb].id_pro
+                            "idPro":result[typeNb].id_pro,
                         }
                         if(rdv_type.public){
                             types.push(rdv_type)
@@ -456,8 +727,42 @@ module.exports = {
                 return callback(err, null);
             }
               console.log("Adding appt: "+appt)
-              const sqlInsert = "INSERT INTO rdv (id_client, id_pro, id_type, appt_dateStart, appt_dateEnd) VALUES (?,?,?,?,?)"
-              const insert_query = mysql.format(sqlInsert,[appt.idClient, appt.idPro, appt.idType, appt.apptDateStart,appt.apptDateEnd])
+              const sqlInsert = "INSERT INTO rdv (id_client, id_pro, id_type, appt_dateStart, appt_dateEnd, status) VALUES (?,?,?,?,?,?)"
+              const insert_query = mysql.format(sqlInsert,[appt.idClient, appt.idPro, appt.idType, appt.apptDateStart,appt.apptDateEnd, false])
+      
+              connection.query (insert_query,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    return callback(null, true)
+                }
+            })
+        })
+    },
+    updateApptClient:function (appt, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Updating appt by client: "+appt)
+              var sql = `UPDATE rdv SET note_client = '${appt.note_client}', rating = ${appt.rating}  WHERE rdv.id_client = ${appt.id_client} AND rdv.id_pro = ${appt.id_pro}`;      
+              connection.query (sql,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    return callback(null, true)
+                }
+            })
+        })
+    },
+    updateApptPro:function (appt, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Adding appt: "+appt)
+              const sqlInsert = "UPDATE `rdv` SET (`note_client`, `rating`) VALUES (?,?) where rdv.id_client = ? AND rdv.id_pro = ?"
+              const insert_query = mysql.format(sqlInsert,[appt.note_client, appt.rating, appt.id_client, appt.id_pro])
       
               connection.query (insert_query,  (err, result) => {  
                 if (err) {
@@ -616,11 +921,11 @@ module.exports = {
                     
                     let medicine={
                         "id":result[medNB].id,
-                        "name":result[medNB].nom,
+                        "name":result[medNB].nom_medicine,
                         "text1":result[medNB].text1,
                         "text2":result[medNB].text2,
                         "text3":result[medNB].text3,
-                        "img":result[medNB].img
+                        "img":result[medNB].img_medicine
                     }
                     medicines.push(medicine)
                     console.log(medicine)
@@ -685,11 +990,11 @@ module.exports = {
                 if (result.length != 0) {
                     let medicine={
                         "id":result[0].id,
-                        "name":result[0].nom,
+                        "name":result[0].nom_medicine,
                         "text1":result[0].text1,
                         "text2":result[0].text2,
                         "text3":result[0].text3,
-                        "img":result[0].img
+                        "img":result[0].img_medicine
                     }
                     return callback(null, medicine);
                 }

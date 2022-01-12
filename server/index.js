@@ -2,6 +2,15 @@ const express = require("express");
 const cors = require("cors")
 const cookieParser = require("cookie-parser");
 const session = require('express-session');
+const mysql = require("mysql")
+const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt")
+
+
+const dbHelper = require('./dbHelper');
+const security = require('./security');
+const fs = require('fs');
+require('dotenv').config()
 const nodemailer = require('nodemailer');
 const cloudinary = require("cloudinary").v2;
 
@@ -19,13 +28,20 @@ console.log(ext[1]);
 })
 
 cloudinary.config({
-  cloud_name: "inspire84",
-  api_key: "476589914828429",
-  api_secret: "-rxdHP0p0ovnNquoShm2744m5A0"
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 })
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
 const upload = multer({ storage: storage });
-const fs = require('fs');
-require('dotenv').config()
+
 
 const PORT = process.env.PORT || 3001;
 
@@ -35,13 +51,7 @@ app.use(cors());
 
 app.use(cookieParser());
 
-const mysql = require("mysql")
-const jwt = require('jsonwebtoken');
-const bcrypt = require("bcrypt")
 
-
-const dbHelper = require('./dbHelper');
-const security = require('./security');
 
 const DB_HOST = process.env.DB_HOST
 const DB_USER = process.env.DB_USER
@@ -129,97 +139,7 @@ app.post("/pro/topic/create", security.checkJWTPro, async (req, res) => {
   }
 })
 })
-
-app.post("/sendemail", async (req, res) => {
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'projectinspire83@gmail.com',
-      pass: '83projectinspire'
-    }
-  });
-
-  let content = 'BEGIN:VCALENDAR\n' +
-  'VERSION:2.0\n' +
-  'BEGIN:VEVENT\n' +
-  'SUMMARY:Appointment Confirmation\n' +
-  'DTSTART;VALUE=DATE:20201030T093000Z\n' +
-  'DTEND;VALUE=DATE:20201030T113000Z\n' +
-  'LOCATION:Webex \n' +
-  'DESCRIPTION:Description123\n' +
-  'STATUS:CONFIRMED\n' +
-  'SEQUENCE:3\n' +
-  'BEGIN:VALARM\n' +
-  'TRIGGER:-PT10M\n' +
-  'DESCRIPTION:Description123\n' +
-  'ACTION:DISPLAY\n' +
-  'END:VALARM\n' +
-  'END:VEVENT\n' +
-  'END:VCALENDAR';
-  
-  const mailOptions = {
-    from: 'projectinspire83@gmail.com',
-    to: req.body.email,
-    subject: 'Appointment Confirmation',
-    text: 'Appointment confirmed.',
-    html: `<div style="height:150px; border: 1px solid 
-    #009ba4; text-align: center">
-         <div style="height:50px; background-color:#abe4e7;">
-         </div>
-    <p style="font-size:1rem;">${req.body.date}</p>
-    <p> Appointment confirmed </p></div>`,
-     icalEvent: {
-      filename: "invitation.ics",
-      method: 'request',
-      content: content
-      }
-  };
-  
-  transporter.sendMail(mailOptions, function(error, info){
-    if (error) {
-    console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-      return res.status(200).send('email sent')
-    }
-  });
-
-})
-
-app.post('/upload-images', upload.array('files'), async (req, res) => {
-  console.log('ssssss');
-  const uploader = async (path, originalname) => await cloudinary.uploads(path, originalname);
-
-
-    const urls = []
-    const files = req.files;
-    const data = JSON.parse(req.body.data);
-    // console.log(files);
-    console.log(data);
-    for (const file of files) {
-      // console.log(file)
-      const { path, originalname } = file;
-      const newPath = await uploader(path, originalname)
-      urls.push(newPath)
-      // console.log(newPath)
-      fs.unlinkSync(path)
-    }
-
-    console.log(urls)
-
-    res.status(200).send({
-      message: 'images uploaded successfully',
-      data: urls
-    })
-
-  // } else {
-  //   res.status(405).json({
-  //     err: `${req.method} method not allowed`
-  //   })
-  // }
-})
-
+ 
 app.post("/upload",upload.array("files"), async (request, response) => {
   // collected image from a user
   const data = request.body;
@@ -227,11 +147,8 @@ app.post("/upload",upload.array("files"), async (request, response) => {
   console.log(data);
   console.log(request.files);
 
-  // console.log(JSON.parse(JSON.stringify(request.body)));
 
   for (const file of files) {
-    // console.log(`${file}`);
-      // upload image here
   cloudinary.uploader.upload(file.path)
   .then((result) => {
     response.status(200).send({
@@ -246,20 +163,6 @@ app.post("/upload",upload.array("files"), async (request, response) => {
     });
   });
   }
-  // upload image here
-  // cloudinary.uploader.upload(data.image)
-  // .then((result) => {
-  //   response.status(200).send({
-  //     message: "success",
-  //     result,
-  //   });
-  // }).catch((error) => {
-  //   response.status(500).send({
-  //     message: "failure",
-  //     error,
-  //   });
-  // });
-
 });
 app.get("/getAllPros", async (req, res) => {
   dbHelper.getAllPros( db, function(err, result){
@@ -274,10 +177,94 @@ app.get("/getAllPros", async (req, res) => {
       return res.status(500).json("Error server")
     }
   })
+})
+
+app.get("/getAllClients", async (req, res) => {
+  dbHelper.getAllClients( db, function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send(result)
+      }else{
+        return res.status(500).json("Could not find clients")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+})
+
+app.get("/getAllProsByParams", async (req, res) => {
+  let params = req.query;
+  dbHelper.getAllProsByParams( db, params, function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send(result)
+      }else{
+        return res.status(500).json("Could not find pros")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
 
 })
-app.post("/pro/appt/create", security.checkJWTPro, async (req, res) => {
+
+app.get("/getProDetailed", async (req, res) => {
+  let pro_id = req.query.pro_id;
+  dbHelper.getProDetailed( pro_id, db,function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send(result)
+      }else{
+        return res.status(500).json("Could not find pros")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+
+})
+
+app.get("/getAppointmentTypes", async (req, res) => {
+  let pro_id = req.query.pro_id;
+  dbHelper.getAppointmentTypes( pro_id, db,function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send(result)
+      }else{
+        return res.status(500).json("Could not find pros")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+
+})
+
+app.get("/getAllMedicine", async (req, res) => {
+  dbHelper.getAllMedicine( db, function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send(result)
+      }else{
+        return res.status(500).json("Could not find Medicine types")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+
+})
+// app.post("/pro/appt/create", security.checkJWTPro, async (req, res) => {
+  app.post("/pro/appt/create",  async (req, res) => {
+
   console.log("Creating appt ")
+  console.log(req.body)
 
   let rdv_type, client;
 
@@ -296,13 +283,26 @@ app.post("/pro/appt/create", security.checkJWTPro, async (req, res) => {
     "idPro":req.body.proId,
     "idType":rdv_type,
     "apptDateStart":req.body.start,
-    "apptDateEnd":req.body.end
+    "apptDateEnd":req.body.end,
+    "proMail": req.body.proMail
   }
   console.log(appt)
   dbHelper.addAppt(appt, db, function(err, added){
     if(!err){
       if(added){
-        return res.status(201).json("appt added")
+        // return res.status(201).json("appt added")
+        dbHelper.SendConfirmatoryEmail(appt, db, transporter, function(err, resp){
+          if(!err){
+            if(resp){
+              return res.status(201).json(resp)
+            }else{
+              return res.status(500).json("Could not send confirrmatory email")
+            }
+          }else{
+            console.log(err)
+            return res.status(500).json("Error server")
+          }
+        })
       }else{
         return res.status(500).json("Could not add the appt")
       }
@@ -313,8 +313,69 @@ app.post("/pro/appt/create", security.checkJWTPro, async (req, res) => {
   })
 })
 
-app.get("/pro/appt/all", security.checkJWTPro, async (req, res) => {
-  let idPro = req.decoded.infos.user.idUser
+app.post("/client/appt/update",  async (req, res) => {
+
+  console.log("Updating appt ")
+  console.log(req.body)
+
+  let appt = {
+    "id_client":req.body.idClient,
+    "id_pro":req.body.idPro,
+    "note_client":req.body.note_client,
+    "rating":req.body.rating,
+  }
+  dbHelper.updateApptClient(appt, db, function(err, added){
+    if(!err){
+      if(added){
+        return res.status(201).json("rating and note updated")
+      }else{
+        return res.status(500).json("Could not add the appt")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+})
+app.get("/pro/appt/all/v2", async (req, res) => {
+  let pro_id = req.query.pro_id;
+  dbHelper.getApptForPro( pro_id, db,function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send(result)
+      }else{
+        return res.status(500).json("Could not find appointments for pro")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+
+})
+
+app.get("/client/appt/all/v2", async (req, res) => {
+  let client_id = req.query.client_id;
+  dbHelper.getApptForClient( client_id, db,function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send(result)
+      }else{
+        return res.status(500).json("Could not find appointments for client")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+
+})
+
+// app.get("/pro/appt/all", security.checkJWTPro, async (req, res) => {
+app.get("/pro/appt/all", async (req, res) => {
+  // let idPro = req.decoded.infos.user.idUser
+  let idPro = req.query.pro_id
+
   let completedAppts=[];
   dbHelper.getApptForPro(idPro, db, function(err, appts){
     if(!err){
@@ -389,6 +450,7 @@ app.get("/pro/appt/all", security.checkJWTPro, async (req, res) => {
 app.post("/register/post", async (req,res) => {
 
   console.log("Registration")
+  console.log(req.body.type);
 
   const passwd = req.body.login.password
   const passwdV = req.body.login.password_v
@@ -398,7 +460,7 @@ app.post("/register/post", async (req,res) => {
     console.log("password valid")
     const type = req.body.type;
 
-  const adress = {
+  let adress = {
     "number":req.body.user.adress.number,
     "street":req.body.user.adress.street,
     "postalC":req.body.user.adress.postalC,
@@ -411,6 +473,7 @@ app.post("/register/post", async (req,res) => {
   dBirth.setHours(14)
 
   if(type==0){
+
     user={
       "name":req.body.user.name,
       "surname":req.body.user.surname,
@@ -419,6 +482,15 @@ app.post("/register/post", async (req,res) => {
       "adress":adress,
     }
   }else if(type==1){
+    adress = {
+      "number":req.body.user.adress.number,
+      "street":req.body.user.adress.street,
+      "postalC":req.body.user.adress.postalC,
+      "city":req.body.user.adress.city,
+      "supp":req.body.user.adress.supp,
+      "latitude": req.body.user.adress.coordinates[0],
+      "longitude": req.body.user.adress.coordinates[1],
+    }
     user={
       "name":req.body.user.name,
       "surname":req.body.user.surname,
@@ -479,8 +551,8 @@ app.post("/register/post", async (req,res) => {
 
               console.log("different from 0? : "+(idlogin!=0))
               if(idlogin!=0){
-                const sqlInsertAdress = "INSERT INTO adress (pays, num, rue, codeP, ville, supp) VALUES ('FR',?,?,?,?,?)"
-                const insertAdress_query = mysql.format(sqlInsertAdress,[user.adress.number, user.adress.street, user.adress.postalC, user.adress.city, user.adress.supp])
+                const sqlInsertAdress = "INSERT INTO adress (pays, num, rue, codeP, ville, supp, latitude, longitude) VALUES ('FR',?,?,?,?,?,?, ?)"
+                const insertAdress_query = mysql.format(sqlInsertAdress,[user.adress.number, user.adress.street, user.adress.postalC, user.adress.city, user.adress.supp, user.adress.latitude, user.adress.longitude])
 
                  connection.query (insertAdress_query, (err, result)=> {   
   
@@ -671,7 +743,9 @@ app.post("/register/pro/post",upload.array("files"), async (req,res) => {
           "street":data.user.adress.street,
           "postalC":data.user.adress.postalC,
           "city":data.user.adress.city,
-          "supp":data.user.adress.supp
+          "supp":data.user.adress.supp,
+          "latitude": req.body.user.adress.coordinates[0],
+          "longitude": req.body.user.adress.coordinates[1],
         }
       
         let user;
@@ -689,6 +763,7 @@ app.post("/register/pro/post",upload.array("files"), async (req,res) => {
             "img":imageUrl,
             "cv":cvUrl,
             "diploma":diplomeUrl,
+            "practice": data.user.practice
           }
         }else{
           console.log("type: "+type)
@@ -745,8 +820,8 @@ app.post("/register/pro/post",upload.array("files"), async (req,res) => {
                     console.log("different from 0? : "+(idlogin!=0))
                     if(idlogin!=0){
                       console.log("adress loop")
-                      const sqlInsertAdress = "INSERT INTO adress (pays, num, rue, codeP, ville, supp) VALUES ('FR',?,?,?,?,?)"
-                      const insertAdress_query = mysql.format(sqlInsertAdress,[user.adress.number, user.adress.street, user.adress.postalC, user.adress.city, user.adress.supp])
+                      const sqlInsertAdress = "INSERT INTO adress (pays, num, rue, codeP, ville, supp, latitude, longitude) VALUES ('FR',?,?,?,?,?, ?, ?)"
+                      const insertAdress_query = mysql.format(sqlInsertAdress,[user.adress.number, user.adress.street, user.adress.postalC, user.adress.city, user.adress.supp, user.adress.latitude, user.adress.longitude])
       
                        connection.query (insertAdress_query, (err, result)=> {   
                           //connection.release()   
@@ -799,8 +874,8 @@ app.post("/register/pro/post",upload.array("files"), async (req,res) => {
                       }else if (type === 1){
                         console.log("type=1")
                         console.log(user.img)
-                          const sqlInsertPro = "INSERT INTO pro (nom, prenom, id_login, tel, birth, id_adress, img, cv, diplome, etat, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
-                          const insertPro_query = mysql.format(sqlInsertPro,[user.name, user.surname, idlogin, user.phone, user.birth, idAdress, user.img, user.cv, user.diploma, false, false])
+                          const sqlInsertPro = "INSERT INTO pro (nom, prenom, id_login, id_type_medicine, tel, birth, id_adress, img, cv, diplome, etat, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
+                          const insertPro_query = mysql.format(sqlInsertPro,[user.name, user.surname, idlogin, user.practice, user.phone, user.birth, idAdress, user.img, user.cv, user.diploma, false, false])
             
                            connection.query (insertPro_query, (err, result)=> {   
                               //connection.release()   
