@@ -1,4 +1,4 @@
-.alice-carou-container .alice-carousel {
+/* .alice-carou-container .alice-carousel {
   max-width: 500px;
 }
 
@@ -21,7 +21,7 @@
 }
 .picker-content {
   text-align: center;
-}
+} */
 
 .picker-more {
   text-align: center;
@@ -122,8 +122,8 @@
   /* margin: 10px; */
   border-radius: 5px;
   border: none;
-  background-color: var(--secondary);
-  color: black;
+  background-color: var(--primary);
+  color: white;
 }
 
 .k-timeslots .blocked {
