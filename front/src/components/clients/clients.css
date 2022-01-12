@@ -1,3 +1,7 @@
+.appointment-textarea:disabled{
+border: none;
+}
+
 .card {
   display: flex;
   /* justify-content: center; */
@@ -120,6 +124,9 @@
   display: flex;
   border-bottom: 1px solid var(--primary);
   padding-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+
 }
 
 .pro-img-circle{
@@ -130,9 +137,9 @@
   margin-right: 15px;
 }
 
-.booking-stepper .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root.Mui-completed, .booking-stepper .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root.Mui-active {
+/* .booking-stepper .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root.Mui-completed, .booking-stepper .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root.Mui-active {
   color: var(--primary);
-}
+} */
 
 .confirm-account{
   display: flex;

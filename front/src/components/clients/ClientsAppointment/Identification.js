@@ -5,19 +5,22 @@ import Login from '../../login/login';
 import Register from '../../register/register';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
-import { Grid } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import pic from '../../../images/ben-parker-OhKElOkQ3RE-unsplash.jpg';
-import authService from '../../../auth.service';
+import authService from '../../helpers/auth.service';
 
 import Radio from '@mui/material/Radio';
 
+const Div = styled('div')(() => ({
+}));
+
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
-  color: 'black',
+  // color: 'black',
   display: 'block',
   marginTop: theme.spacing(2),
-  backgroundColor: '#f0fafe'
+  backgroundColor: theme.palette.secondary.contrastText
 }));
 
 const IdType = {
@@ -35,6 +38,7 @@ const Identification = ({practicianData, handleNext}) => {
   });
   const [appointmentData, setappointmentData] = useState({});
   const [currentUser, setcurrentUser] = useState();
+  const [AnotherAccount, setAnotherAccount] = useState(false);
   useEffect(() => {
     const paramsToObject = Object.fromEntries(new URLSearchParams(searchParams));
     const paramsFiltered = Object.keys(paramsToObject)
@@ -70,7 +74,7 @@ const Identification = ({practicianData, handleNext}) => {
     console.log(appointmentData);
     handleNext();
     navigate({
-      pathname: '/pro-profile/1/booking',
+      // pathname: '/pro-profile/1/booking',
       search: `?active=2&${queryString}`,
     });
   };
@@ -86,14 +90,15 @@ const Identification = ({practicianData, handleNext}) => {
           <Item>
             <p>J&apos;ai déjà un compte Inspire ?</p>
             {!expanded.login &&
-            <button
-              className='button1 identity-button'
-              onClick={() => handleExpandClick(IdType.login)}>
+            <Button
+              variant='contained'
+              onClick={() => handleExpandClick(IdType.login)}
+              sx={{width: '100%'}}>
               Se connecter
-            </button>}
+            </Button>}
             <Collapse in={expanded.login} timeout="auto" unmountOnExit>
               {
-                currentUser ?
+                currentUser &&
                   <div>
 
                     <form onSubmit={handleSubmit}>
@@ -104,13 +109,29 @@ const Identification = ({practicianData, handleNext}) => {
                         />
                         <p>{`${currentUser.name} ${currentUser.surname}`}</p>
                       </div>
-
-                      <button sx={{ mt: 1, mr: 1 }} type="submit" className='button2' disabled={!currentUser}>
+                      <Div sx={{display: {sm: 'flex'}, gap: '10px'}}>
+                        <Button
+                          sx={{ width: '100%' }}
+                          variant='outlined'
+                          type="submit"
+                          disabled={!currentUser}>
                           Confirm
-                      </button>
+                        </Button>
+                        <Button
+                          sx={{ width: '100%' }}
+                          variant='outlined'
+                          type="button"
+                          onClick={() => setAnotherAccount(true)}
+                        >
+                          Use Another Account
+                        </Button>
+                      </Div>
+
                     </form>
                   </div>
-                  :
+              }
+              {
+                (AnotherAccount || !currentUser) &&
                   <Login/>
               }
             </Collapse>
@@ -118,12 +139,13 @@ const Identification = ({practicianData, handleNext}) => {
           <Item>
             <p>Nouveau sur Inspire ?</p>
             {!expanded.register &&
-            <button
-              className='button2 identity-button'
+            <Button
+              variant='outlined'
               onClick={() => handleExpandClick(IdType.register)}
+              sx={{width: '100%', backgroundColor: 'background.paper'}}
             >
               S&apos;inscrire
-            </button>}
+            </Button>}
             <Collapse in={expanded.register} timeout="auto" unmountOnExit>
               <Register/>
             </Collapse>
@@ -132,12 +154,14 @@ const Identification = ({practicianData, handleNext}) => {
         <Grid item xs={12} sm={10} md={4} lg={3}>
           <Item>
             <div className="pro-data-header">
-              <img src={pic} alt="" className='pro-img-circle'/>
-              <p>{practicianData.name}</p>
+              <div style={{display: 'flex'}}>
+                <img src={pic} alt="" className='pro-img-circle'/>
+                <p>{`${practicianData.prenom} ${practicianData.nom}`}</p>
+              </div>
             </div>
-            <p><b>{appointmentData.type}</b></p>
-            <p>{practicianData.address}</p>
-            <p>{`${practicianData.code} ${practicianData.city}`}</p>
+            <p><b>{appointmentData.nom}</b></p>
+            <p>{practicianData.rue}</p>
+            <p>{`${practicianData.codeP} ${practicianData.ville}`}</p>
             <p>{`${appointmentData.day} ${appointmentData.date}`}</p>
             <p>{appointmentData.time}</p>
             <p>{`Price: ${appointmentData.price} Duration: ${appointmentData.duration}`}</p>

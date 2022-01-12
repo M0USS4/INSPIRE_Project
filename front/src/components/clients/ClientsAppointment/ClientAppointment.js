@@ -5,13 +5,13 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import ChooseAppointment from './ChooseAppointment';
-import professonals from  '../../../data/pro-data';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import Identification from './Identification';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import PropTypes from 'prop-types';
 import Confirmation from './Confirmation';
+import axios from 'axios';
 
 const Root = styled('div')(({ theme }) => ({
   padding: theme.spacing(1),
@@ -29,7 +29,7 @@ const Root = styled('div')(({ theme }) => ({
 
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
-  color: 'black',
+  // color: 'black',
   margin: '5px'
 }));
 
@@ -45,20 +45,70 @@ const ClientAppointment = ({selectedType}) => {
   const getActive = searchParams.get('active');
   const [activeStep, setActiveStep] = useState(getActive | 0);
   const [practicianData, setpracticianData] = useState();
+  const [appointmentTypes, setappointmentTypes] = useState();
   const [appointmentData, setappointmentData] = useState( {});
   const [appointmentType, setappointmentType] = useState(selectedType | '');
+  const [eventList, seteventList] = useState([]);
+
   const params = useParams();
 
   useEffect(() => {
-    const practician = professonals.find(pro => pro.id === Number(params.id) );
-    setpracticianData(practician);
+    // const practician = professonals.find(pro => pro.id === Number(params.id) );
+    // setpracticianData(practician);
+    axios.get('http://localhost:2021/getProDetailed',{
+      params: {
+        pro_id: params.id
+      }
+    })
+      .then(response => {
+        console.log(response.data);
+        setpracticianData(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    axios.get('http://localhost:2021/getAppointmentTypes',{
+      params: {
+        pro_id: params.id
+      }
+    })
+      .then(response => {
+        console.log(response.data);
+        setappointmentTypes(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    axios.get('http://localhost:2021/pro/appt/all/v2',{
+      params: {
+        pro_id: params.id
+      }
+    })
+      .then(response => {
+        console.log(response.data);
+        const data = response.data.map(event => {
+          return {
+            start: new Date(event.date_start),
+            end: new Date(event.date_end),
+            title: 'Testing',
+            status: event.status.data[0] === 0 ? false : true
+          };
+        });
+        console.log(data);
+        seteventList(data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
     const paramsToObject = Object.fromEntries(new URLSearchParams(searchParams));
     const paramsFiltered = Object.keys(paramsToObject)
       .filter(key => key !== 'active')
       .reduce((cur, key) => { return Object.assign(cur, { [key]: paramsToObject[key] });}, {});
     setappointmentData(paramsFiltered);
 
-  }, [practicianData]);
+  }, []);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -68,17 +118,20 @@ const ClientAppointment = ({selectedType}) => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleRdv = (id,day, date, time) => {
+  const handleRdv = (id,day, date, time_raw, time_formatted, fulldate) => {
     const type = appointmentType ?
-      practicianData.appointmentTypes.find(appointment => appointment.type === appointmentType)
-      : practicianData.appointmentTypes.find(appointment => appointment);
-    setappointmentType(type.type);
+      appointmentTypes.find(appointment => appointment.nom === appointmentType)
+      : appointmentTypes.find(appointment => appointment);
+    setappointmentType(type.nom);
     const appointmentDataTemp = {
       id: id,
       day: day,
       date: date,
-      time: time,
-      type: type.type,
+      fulldate: fulldate,
+      time_raw: time_raw,
+      time_formatted:time_formatted,
+      type: type.nom,
+      type_id: type.id,
       duration: type.duration,
       price: type.price
     };
@@ -86,7 +139,7 @@ const ClientAppointment = ({selectedType}) => {
     setappointmentData(appointmentDataTemp);
     console.log(appointmentData);
     navigate({
-      pathname: '/pro-profile/1/booking',
+      pathname: `/pro-profile/${params.id}/booking`,
       search: `?active=1&${queryString}`,
     });
     handleNext();
@@ -113,6 +166,8 @@ const ClientAppointment = ({selectedType}) => {
             handleRdv={handleRdv}
             setappointmentType={setappointmentType}
             appointmentType={appointmentType}
+            appointmentTypes={appointmentTypes}
+            eventList={eventList}
           />
         }
         {activeStep === 1 &&

@@ -5,9 +5,8 @@ import Paper from '@mui/material/Paper';
 import Rating from '@mui/material/Rating';
 import StarIcon from '@mui/icons-material/Star';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import proImage from '../../images/ben-parker-OhKElOkQ3RE-unsplash.jpg';
 import { Chip, Grid, Link } from '@mui/material';
-import Picker from '../shared/Picker';
+import Picker from '../shared/Picker/Picker';
 import { Box } from '@mui/system';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -21,12 +20,11 @@ import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ClientAppointment from './ClientsAppointment/ClientAppointment';
-import professionals from '../../data/pro-data';
+import axios from 'axios';
 
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
-  color: 'black',
-  margin: '5px'
+  margin: '5px',
 }));
 
 const Root = styled('div')(({ theme }) => ({
@@ -50,11 +48,16 @@ const ListItem = styled('li')(({ theme }) => ({
   margin: theme.spacing(0.5),
 }));
 
-const ProfessionalProfile = () => {
+const Div = styled('div')(() => ({
+}));
+
+const PublicProProfile = () => {
   const [value, setValue] = useState('1');
   const [selectedType, setselectedType] = useState(null);
   const [appointmentData, setappointmentData] = useState({});
   const [practicianData, setpracticianData] = useState();
+  const [appointmentTypes, setappointmentTypes] = useState();
+  const [eventList, seteventList] = useState([]);
 
   const navigate = useNavigate();
   const params = useParams();
@@ -63,23 +66,74 @@ const ProfessionalProfile = () => {
   const matches = useMediaQuery(theme.breakpoints.up('md'));
 
   useEffect(() => {
-    const practician = professionals.find(pro => pro.id === Number(params.id) );
-    setpracticianData(practician);
+    // const practician = professionals.find(pro => pro.id === Number(params.id) );
+    // setpracticianData(practician);
+    axios.get('http://localhost:2021/getProDetailed',{
+      params: {
+        pro_id: params.id
+      }
+    })
+      .then(response => {
+        console.log(response.data);
+        setpracticianData(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    axios.get('http://localhost:2021/getAppointmentTypes',{
+      params: {
+        pro_id: params.id
+      }
+    })
+      .then(response => {
+        console.log(response.data);
+        setappointmentTypes(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    axios.get('http://localhost:2021/pro/appt/all/v2',{
+      params: {
+        pro_id: params.id
+      }
+    })
+      .then(response => {
+        console.log(response.data);
+        const data = response.data.map(event => {
+          return {
+            start: new Date(event.date_start),
+            end: new Date(event.date_end),
+            title: 'Testing',
+            status: event.status.data[0] === 0 ? false : true
+          };
+        });
+        console.log(data);
+        seteventList(data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }, []);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const handleRdv = (id,day, date, time) => {
+  const handleRdv = (id,day, date, time_raw, time_formatted, fulldate) => {
     const type = selectedType ?
-      practicianData.appointmentTypes.find(appointment => appointment.type === selectedType)
-      : practicianData.appointmentTypes.find(appointment => appointment);
+      appointmentTypes.find(appointment => appointment.nom === selectedType)
+      : appointmentTypes.find(appointment => appointment);
     const appointmentDataTemp = {
       id: id,
       day: day,
       date: date,
-      time: time,
-      type: type.type,
+      fulldate: fulldate,
+      time_raw: time_raw,
+      time_formatted:time_formatted,
+      type: type.nom,
+      type_id: type.id,
       duration: type.duration,
       price: type.price
     };
@@ -87,41 +141,26 @@ const ProfessionalProfile = () => {
     setappointmentData(appointmentDataTemp);
     console.log(appointmentData);
     navigate({
-      pathname: '/pro-profile/1/booking',
+      pathname: `/pro-profile/${params.id}/booking`,
       search: `?active=1&${queryString}`,
     });
-
   };
 
   const ratingValue = 4.5;
-  const types = [
-    {type:'Ostéopathie du sport',
-      price: 50,
-      duration: 60
-    },
-    {type:'Ostéopathie de la femme enceinte',
-      price: 45,
-      duration: 30
-    },
-    {type:'Ostéopathie biodynamique',
-      price: 30,
-      duration: 60
-    }];
 
   return (
     <Root className="pro-profile-client">
-      <span>{`theme.breakpoints.up('sm') matches: ${matches}`}</span>
 
-      {matches ?
+      {(matches && practicianData && appointmentTypes) ?
         <div>
           <Item >
             <div className="profile-header-container">
               <div className="profile-header-basic">
-                <img src={proImage} alt="" />
+                <img src={practicianData.img} alt="" />
                 <div className="header-basic-info">
-                  <h3>Dr. Prenom Nom</h3>
-                  <span className="header-basic-info-sub-title">BDS, Osteology</span>
-                  <span className="header-basic-info-sub-title">Osteopatist</span>
+                  <h3>{`${practicianData.prenom} ${practicianData.nom}`}</h3>
+                  <span className="header-basic-info-sub-title">{practicianData.nom_medicine}</span>
+                  <span className="header-basic-info-sub-title">{practicianData.nom_medicine}</span>
                   <Rating
                     className="rating"
                     name="text-feedback"
@@ -135,7 +174,7 @@ const ProfessionalProfile = () => {
                       display: 'flex',
                       alignItems: 'center',
                       flexWrap: 'wrap',
-                    }}><LocationOnIcon fontSize='small'/> 89 Avenue de Bretagne 59000 Lille</Link>
+                    }}><LocationOnIcon fontSize='small'/>{practicianData.rue}</Link>
                   </div>
                 </div>
               </div>
@@ -177,10 +216,12 @@ const ProfessionalProfile = () => {
                           <label htmlFor="about"><h3>Expertises and acts</h3></label>
                           <div className="tags">
                             {
-                              types.map((type, index) => (
+                              appointmentTypes.map((type, index) => (
                                 // <div className="tag" key={index}>{type.type}</div>
                                 <ListItem key={index}>
-                                  <Chip  label={type.type} style={{backgroundColor: '#abe4e7'}}/>
+                                  <Chip
+                                    label={type.nom}
+                                    sx={{backgroundColor: 'primary.main', color: 'white'}}/>
                                 </ListItem>
 
                               ))
@@ -188,25 +229,24 @@ const ProfessionalProfile = () => {
                           </div>
                         </div>
                         <div className="basic-info-container">
-                          <label htmlFor="about"><h3>Charges</h3></label>
+                          <label htmlFor="charges"><h3>Charges</h3></label>
                           <TableContainer component={Paper}>
-                            <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-                              <TableHead>
-                                <TableRow sx={{backgroundColor: '#abe4e7'}}>
+                            <Table size="small">
+                              <TableHead sx={{backgroundColor: 'primary.main', color: 'white'}}>
+                                <TableRow >
                                   <TableCell>Appointment Type</TableCell>
                                   <TableCell align="right">Price</TableCell>
                                   <TableCell align="right">Duration</TableCell>
-
                                 </TableRow>
                               </TableHead>
                               <TableBody>
-                                {types.map((type) => (
+                                {appointmentTypes.map((type) => (
                                   <TableRow
                                     key={type.type}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                   >
                                     <TableCell component="th" scope="row">
-                                      {type.type}
+                                      {type.nom}
                                     </TableCell>
                                     <TableCell align="right">{type.price}</TableCell>
                                     <TableCell align="right">{type.duration}</TableCell>
@@ -225,11 +265,14 @@ const ProfessionalProfile = () => {
 
               </Grid>
               <Grid item xs={12} sm={12} md={4} lg={3} >
-                <Item>
-                  <div className='rdv-title'>
-                    Prendez un rendez-vous
-                  </div>
-                  <h3>Choose Appointment Type</h3>
+                <Item sx={{textAlign: 'center'}}>
+                  <Div
+                    sx={{
+                      borderBottom:'1px solid', borderColor: 'primary.main',
+                      textTransform: 'uppercase', padding: '10px'}}>
+                    <span>Prendez un rendez-vous</span>
+                  </Div>
+                  <p>Choose Appointment Type</p>
                   {selectedType}
                   <select
                     className="form-control"
@@ -237,11 +280,19 @@ const ProfessionalProfile = () => {
                     value={selectedType || ''}
                     onChange={(e) => setselectedType(e.target.value)}
                   >
-                    {types.map((type, index) => (
-                      <option  key={index}>{type.type}</option>
+                    {appointmentTypes.map((type, index) => (
+                      <option  key={index}>{type.nom}</option>
                     ))}
                   </select>
-                  <Picker practicianData={practicianData} columns={3} handleRdv={handleRdv}/>
+
+                  <Picker
+                    practicianData={practicianData}
+                    columns={3}
+                    handleRdv={handleRdv}
+                    selectedType={selectedType}
+                    eventList={eventList}
+                  />
+
                 </Item>
 
               </Grid>
@@ -256,4 +307,4 @@ const ProfessionalProfile = () => {
   );
 };
 
-export default ProfessionalProfile;
+export default PublicProProfile;
