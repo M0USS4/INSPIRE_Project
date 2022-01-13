@@ -24,6 +24,8 @@ import PublicProProfile from './components/clients/PublicProProfile';
 import ProfessionalRegistration from './components/register/register-pros';
 import GeneralNvabar from './components/shared/GeneralNvabar';
 import MyAppointments from './components/clients/ClientsAppointment/MyAppointments';
+import CreatePracticeType from './components/admin/CreatePracticeType';
+import authService from './components/helpers/auth.service';
 // import PrivateRoute from './components/helpers/PrivateRoutes';
 
 const baseTheme = createTheme({
@@ -71,7 +73,7 @@ const DarkMode = createTheme({
 const Div = styled('div')(() => ({
 }));
 
-function App() {
+const App = () => {
   const [data, setData] = useState(null);
   const isAdmin = false;
   const [isDarkMode, setisDarkMode] = useState(false);
@@ -113,13 +115,21 @@ function App() {
       .catch(err => console.log(err));
   }, []);
 
+  const logout = () => {
+    authService.logout();
+    window.location = '/';
+  };
   return (
     <ThemeProvider  theme={isDarkMode ? DarkMode : LightMode}>
       <Div className="App" sx={{backgroundColor: 'secondary.light'}}>
         {/* <header className="App-header">
           <Navbar></Navbar>
         </header> */}
-        <GeneralNvabar list={isAdmin ? adminNavList : navlist} setisDarkMode={setisDarkMode} isDarkMode={isDarkMode}/>
+        <GeneralNvabar
+          list={isAdmin ? adminNavList : navlist}
+          setisDarkMode={setisDarkMode}
+          isDarkMode={isDarkMode}
+          logout={logout}/>
         <Router>
           <Routes>
             <Route exact path="/" element={<Home />}/>
@@ -185,6 +195,9 @@ function App() {
               <Route  path="all-clients"
                 element={<AllClients />}
               />
+              <Route  path="create-practice"
+                element={<CreatePracticeType />}
+              />
             </Route>
 
           </Routes>
@@ -193,6 +206,6 @@ function App() {
     </ThemeProvider >
 
   );
-}
+};
 
 export default App;
