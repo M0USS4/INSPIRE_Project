@@ -22,6 +22,7 @@ const ChooseAppointment = ({practicianData, handleRdv, setappointmentType,
         <input type="text" className="form-control"
           value={address}
           onChange={(e) => setaddress(e.target.value)}
+          disabled
         />
       </div>
       <div style={{marginTop: '15px'}}>
