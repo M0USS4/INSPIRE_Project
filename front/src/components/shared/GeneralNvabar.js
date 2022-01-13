@@ -97,11 +97,24 @@ function GeneralNvabar({list, setisDarkMode, isDarkMode, ...props}) {
                 </li>
               ))}
             </ul>
+
+          </Div>
+
+          <Div sx={{ display: { xs: 'flex', sm: 'flex' }, justifyContent: 'space-evenly', alignItems: 'center'}}>
+
             <div>
               <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={()=> setisDarkMode(!isDarkMode)}
+                  sx={{ mr: 2 }}
+                >
+                  {isDarkMode ? <LightModeIcon/> : <DarkModeIcon/>}
+                </IconButton>
                 <Tooltip title="Account settings">
-                  <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
+                  <IconButton onClick={handleClick} size="small" sx={{ ml: 2 , display: { xs: 'none', sm: 'flex' }}}>
                     <AccountCircleIcon sx={{ width: 32, height: 32, color: 'white' }} fontSize="large"/>
                   </IconButton>
                 </Tooltip>
@@ -155,25 +168,17 @@ function GeneralNvabar({list, setisDarkMode, isDarkMode, ...props}) {
                 </MenuItem>
               </Menu>
             </div>
+
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2 , display: { sm: 'none' }}}
+            >
+              <MenuIcon />
+            </IconButton>
           </Div>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={()=> setisDarkMode(!isDarkMode)}
-            sx={{ mr: 2 }}
-          >
-            {isDarkMode ? <LightModeIcon/> : <DarkModeIcon/>}
-          </IconButton>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2 , display: { sm: 'none' }}}
-          >
-            <MenuIcon />
-          </IconButton>
         </Toolbar>
       </AppBar>
       <Box
