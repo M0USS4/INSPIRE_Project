@@ -7,22 +7,24 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import authService from '../../helpers/auth.service';
 import Button from '@mui/material/Button';
+import CollapsableAlert from '../../shared/CollapsableAlert';
 
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
-  color: 'black',
   display: 'block',
   marginTop: theme.spacing(2),
-  backgroundColor: '#f0fafe'
+  backgroundColor: theme.palette.secondary.contrastText
 }));
 
 const Confirmation = ({practicianData}) => {
   const [searchParams] = useSearchParams();
   const [appointmentData, setappointmentData] = useState({});
   const [currentUser, setcurrentUser] = useState({});
+  const [success, setsuccess] = useState(null);
+  const [open, setopen] = useState(false);
+  const [message, setmessage] = useState('');
   let navigate = useNavigate();
 
-  // const [success, setsuccess] = useState(false);
   useEffect(() => {
     const paramsToObject = Object.fromEntries(new URLSearchParams(searchParams));
     const paramsFiltered = Object.keys(paramsToObject)
@@ -33,32 +35,13 @@ const Confirmation = ({practicianData}) => {
     if(user){
       setcurrentUser(user);
     }
-    console.log(practicianData);
   }, []);
 
   const handleConfirm = () => {
-    const email = currentUser.mail;
-    // const date = `${appointmentData.day} ${appointmentData.date} ${appointmentData.time}`;
-    // axios.post('http://localhost:2021/sendemail', {email, date})
-    //   .then(response => {
-    //     if (response.data) {
-    //       console.log(response.data);
-    //       setsuccess(true);
-    //     }
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //   });
-    console.log(email);
-    console.log(appointmentData.datetime);
-    console.log(`${appointmentData.fulldate}T${appointmentData.time_raw}`);
     const startTime = Number(appointmentData.time_raw);
     const endTime = Number(appointmentData.time_raw) + 1;
     const startDate = `${appointmentData.fulldate} ${startTime + ':00'}`;
     const endDate = `${appointmentData.fulldate} ${endTime + ':00'}`;
-
-    console.log(startDate);
-
     axios.post('http://localhost:2021/pro/appt/create', {
       appointmentType: appointmentData.type_id,
       clientId: currentUser.idUser,
@@ -73,11 +56,13 @@ const Confirmation = ({practicianData}) => {
           navigate( {
             pathname: `/clients/${currentUser.idUser}/my-appoinments`,
           });
-          // setsuccess(true);
         }
       })
       .catch(error => {
         console.log(error);
+        setsuccess(false);
+        setmessage('Could not create Appointment');
+        setopen(true);
       });
   };
 
@@ -88,11 +73,15 @@ const Confirmation = ({practicianData}) => {
         spacing={2}
         justifyContent="center"
       >
-        <Grid item xs={12} sm={10} md={7} lg={8}>
+        <Grid item xs={12} sm={10} md={10} lg={8}>
           <Item>
-            {/* {success &&
-            <Alert severity='success'> Appointment is confirmed. Check your email to add to calendar</Alert>
-            } */}
+            {!success && <CollapsableAlert
+              open={open}
+              setopen={setopen}
+              message={message}
+              severity={success? 'success' : 'error'}
+            />
+            }
             <div className="pro-data-header">
               <div style={{display: 'flex'}}>
                 <img src={practicianData.img} alt="" className='pro-img-circle'/>
@@ -104,9 +93,12 @@ const Confirmation = ({practicianData}) => {
             <p>{practicianData.address}</p>
             <p>{`${practicianData.rue} ${practicianData.ville}`}</p>
             <p>{`${appointmentData.day} ${appointmentData.date}`}</p>
-            <p>{appointmentData.time}</p>
+            <p>{appointmentData.time_formatted}</p>
             <p>{`Price: ${appointmentData.price} Duration: ${appointmentData.duration}`}</p>
-            <Button className="button2" onClick={handleConfirm}>
+            <Button
+              variant='contained'
+              sx={{width: '100%'}}
+              onClick={handleConfirm}>
               Confirm
             </Button>
           </Item>
