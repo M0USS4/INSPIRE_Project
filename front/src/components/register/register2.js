@@ -17,20 +17,12 @@ const Register2 = ({data, setmessage, setopen, setsuccess, handleBack}) => {
 
   const upload = (e) => {
     e.prevenDefault;
-    console.log(files);
     if(files.length === 3){
       const formData = new FormData();
-      console.log(data);
       formData.append('data', JSON.stringify(data));
       for(let file of files){
         formData.append('files', file.data, `${file.name}`);
       }
-      // let url = 'http://localhost:2021/upload-images';
-      // axios.post(url, formData)
-      //   .then(res => {
-      //     console.log(res.data);
-      //   });
-
       authService.registerPro(formData)
         .then(response => {
           console.log(response);
