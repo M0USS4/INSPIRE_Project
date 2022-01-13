@@ -68,7 +68,7 @@
 .stepper {
   box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.2);
   background-color: white;
-  min-height: 700px;
+  min-height: 400px;
   margin: auto;
   display: block;
   align-content: center;

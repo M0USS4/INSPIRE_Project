@@ -19,10 +19,10 @@ import Register3 from './register3';
 
 const RegisterContainer = styled('div')(({ theme }) => ({
   padding: theme.spacing(1),
-  backgroundColor: 'white',
+  backgroundColor: theme.palette.background.paper,
   alignContent: 'center',
   boxShadow: '0 0 1rem 0 rgba(0, 0, 0, 0.2)',
-  minHeight: '850px',
+  minHeight: '550px',
   margin: 'auto',
   [theme.breakpoints.up('xs')]: {
     width: '100%',
@@ -74,60 +74,6 @@ const ProfessionalRegistration = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  // const onSubmit = (data) => {
-  //   const registerData = {
-  //     type: 0,
-  //     login: {
-  //       mail: data.email,
-  //       password: data.password,
-  //       password_v: data.confirm_password,
-  //     },
-  //     user: {
-  //       name: data.firstname,
-  //       surname: data.lastname,
-  //       phone: data.phone,
-  //       birth: data.dateofBirth,
-  //       adress: {
-  //         number: data.number,
-  //         street: data.street,
-  //         postalC: data.postal,
-  //         city: data.city,
-  //         supp: data.add
-  //       }
-  //     }
-  //   };
-  //   console.log(registerData);
-
-  //   authService.register(registerData)
-  //     .then(response => {
-  //       console.log(response);
-  //       setsuccess(true);
-  //       navigate('/',      { state: {
-  //         success: success,
-  //       }});
-
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //       setopen(true);
-  //       setmessage(err.data);
-  //       setsuccess(false);
-  //     });
-  // };
-
-  // const autoComplete = (e) => {
-  //   console.log(e.target.value);
-  //   const query = e.target.value;
-  //   axios.get(`https://api-adresse.data.gouv.fr/search/?q=${query}&type=housenumber&autocomplete=0`)
-  //     .then(response => {
-  //       console.log(response.data);
-  //       setautoCompleteData(response.data);
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //     });
-  // };
-
   return (
     <div className="reg">
 
@@ -137,7 +83,7 @@ const ProfessionalRegistration = () => {
         <div>
           <RegisterContainer>
             <h2 className="registration-title-pro">Inscription</h2>
-            <Stepper activeStep={activeStep} alternativeLabel>
+            <Stepper activeStep={activeStep} alternativeLabel sx={{paddingTop: '25px'}}>
               {steps.map((label) => {
                 const stepProps = {};
                 // const labelProps = {};

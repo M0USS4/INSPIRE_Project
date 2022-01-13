@@ -112,8 +112,7 @@ const Register3 = ({data, setdata, setActiveStep, handleBack}) => {
       >
         <Select
           open={openList}
-          name="form-field-name"
-          sx={{ ml: 1, flex: 1, height: 40 }}
+          sx={{ ml: 1, flex: 1, border: 'none', height: 40 }}
           //   value="one"
           //   options={autoCompleteData.map(data => data.properties.label)}
           onChange={(e) =>handleChange(e)}
@@ -128,7 +127,7 @@ const Register3 = ({data, setdata, setActiveStep, handleBack}) => {
         </Select>
         <Button
           variant="contained"
-          sx={{ height: 50, ml: 1, flex: 0.3 }}
+          sx={{ height: 40, flex: 0.3 }}
           onClick={handleSubmit(autoComplete)}
         >Find Address</Button>
       </Paper>
