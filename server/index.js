@@ -312,7 +312,67 @@ app.get("/getAllMedicine", async (req, res) => {
     }
   })
 })
+app.post("/admin/medicine/create",upload.array("files"), async (req,res) => {
+  const files = req.files;
+  const data = JSON.parse(req.body.data);
+  console.log(files);
+  console.log(data);
 
+  let imageUrl;
+
+
+  let upload_res = files.map(file => 
+    new Promise((resolve, reject) => {
+      const { path, originalname } = file;
+
+      cloudinary.uploader.upload(path, {
+        resource_type: "auto",
+        folder: originalname
+      },function (error, result) {
+        console.log('...trying to upload')  
+        if(error) {
+            console.log(error)
+            reject(error)
+          }
+          else {
+            imageUrl = result.url;
+
+            fs.unlinkSync(path)
+            resolve({
+              url: result.url,
+              id: result.public_id,
+          })
+          }
+      })
+  })
+    
+  )
+  Promise.all(upload_res)
+  .then(async result => {
+    const medicine = {
+      nom_medicine : data.name, 
+      text1 : data.text1, 
+      text2 : data.text2,
+      text3 : data.text3, 
+      img_medicine : imageUrl
+    }
+
+    dbHelper.addMedicine( medicine, db, function(err, result){
+      if(!err){
+        if(result){
+          return res.status(200).send(result)
+        }else{
+          return res.status(500).json("Could not create Medicine type")
+        }
+      }else{
+        console.log(err)
+        return res.status(500).json("Error server")
+      }
+    })
+  }
+    )
+  .catch(error => error)
+})
 app.post("/client/appt/update",  async (req, res) => {
 
   console.log("Updating appt ")
@@ -722,14 +782,7 @@ app.post("/register/pro/post",upload.array("files"), async (req,res) => {
   )
 
   Promise.all(upload_res)
-    .then(async result => {
-        console.log('result:')
-        console.log(result);
-        console.log("Register for")
-        console.log(data)
-        console.log("user")
-        console.log(data.user)
-      
+    .then(async result => {      
         const passwd = data.login.password
         const passwdV = data.login.password_v
         

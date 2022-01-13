@@ -739,6 +739,26 @@ module.exports = {
             })
         })
     },
+    addMedicine:function (medicine, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Adding medicine: "+medicine)
+            //   const sql = `IF NOT EXISTS (SELECT 1 FROM type_medicine WHERE nom_medicine = ?) BEGIN INSERT INTO type_medicine (nom_medicine, text1, text2, text3, img_medicine) VALUES (?, ?,?,?,?,?)
+            //   END`
+              const sqlInsert = "INSERT INTO `type_medicine` (`nom_medicine`, `text1`, `text2`, `text3`, `img_medicine`) VALUES (?,?,?,?,?)"
+              const insert_query = mysql.format(sqlInsert,[medicine.nom_medicine, medicine.nom_medicine, medicine.text1, medicine.text2, medicine.text3, medicine.img_medicine])
+      
+              connection.query (insert_query,  (err, result) => {  
+                if (err) {
+                    return callback(err, null);
+                }else{
+                    return callback(null, 'medicine type created')
+                }
+            })
+        })
+    },
     updateApptClient:function (appt, db, callback){
         db.getConnection(  (err, connection) => { 
             if (err) {
