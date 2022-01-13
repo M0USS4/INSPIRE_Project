@@ -17,7 +17,6 @@ const Div = styled('div')(() => ({
 
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
-  // color: 'black',
   display: 'block',
   marginTop: theme.spacing(2),
   backgroundColor: theme.palette.secondary.contrastText
@@ -74,7 +73,6 @@ const Identification = ({practicianData, handleNext}) => {
     console.log(appointmentData);
     handleNext();
     navigate({
-      // pathname: '/pro-profile/1/booking',
       search: `?active=2&${queryString}`,
     });
   };
@@ -111,19 +109,19 @@ const Identification = ({practicianData, handleNext}) => {
                       </div>
                       <Div sx={{display: {sm: 'flex'}, gap: '10px'}}>
                         <Button
-                          sx={{ width: '100%' }}
-                          variant='outlined'
+                          sx={{ width: '100%', margin: '10px auto',  }}
+                          variant='contained'
                           type="submit"
                           disabled={!currentUser}>
                           Confirm
                         </Button>
                         <Button
-                          sx={{ width: '100%' }}
+                          sx={{ width: '100%', margin: '10px auto', backgroundColor: 'background.paper' }}
                           variant='outlined'
                           type="button"
-                          onClick={() => setAnotherAccount(true)}
+                          onClick={() => setAnotherAccount(!AnotherAccount)}
                         >
-                          Use Another Account
+                          {AnotherAccount ? 'Use Current Account' : 'Use Another Account'}
                         </Button>
                       </Div>
 
