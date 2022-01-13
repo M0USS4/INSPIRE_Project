@@ -30,7 +30,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 const drawerWidth = 240;
 const Div = styled('div')(() => ({
 }));
-function GeneralNvabar({list, setisDarkMode, isDarkMode, ...props}) {
+function GeneralNvabar({list, setisDarkMode, isDarkMode, logout, ...props}) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [navlist, setnavlist] = useState([]);
@@ -160,7 +160,7 @@ function GeneralNvabar({list, setisDarkMode, isDarkMode, ...props}) {
                   <Avatar /> Practicien
                 </MenuItem>
                 <Divider />
-                <MenuItem>
+                <MenuItem onClick={logout}>
                   <ListItemIcon>
                     <Logout fontSize="small" />
                   </ListItemIcon>
@@ -209,6 +209,7 @@ function GeneralNvabar({list, setisDarkMode, isDarkMode, ...props}) {
 
 GeneralNvabar.propTypes = {
   window: PropTypes.func,
+  logout: PropTypes.func,
   list: PropTypes.array,
   setisDarkMode: PropTypes.func,
   isDarkMode: PropTypes.bool
