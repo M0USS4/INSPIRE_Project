@@ -10,10 +10,8 @@ const ChooseAppointment = ({practicianData, handleRdv, setappointmentType,
   appointmentType, appointmentTypes, eventList}) => {
   const [address, setaddress] = useState('');
   const theme = useTheme();
-  // const matches = useMediaQuery(theme.breakpoints.up('md'));
   useEffect(() => {
     setaddress(`${practicianData.rue}, ${practicianData.ville}`);
-    console.log('working');
   }, []);
   return (
     <div style={{margin: '15px'}}>
