@@ -4,8 +4,10 @@ import Uploader from './Uploader/Uploader';
 import './register-pros.css';
 import authService from '../helpers/auth.service';
 import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Register2 = ({data, setmessage, setopen, setsuccess, handleBack}) => {
+  const navigate =  useNavigate();
   const [files, setfile] = useState([]);
   const uploadSingleFile = (id, e) => {
     setfile([...files, {
@@ -29,9 +31,7 @@ const Register2 = ({data, setmessage, setopen, setsuccess, handleBack}) => {
           setopen(true);
           setmessage('Registered');
           setsuccess(true);
-          // navigate('/',      { state: {
-          //   success: success,
-          // }});
+          navigate('/pro-profile/customization');
         })
         .catch(err => {
           console.log(err);
