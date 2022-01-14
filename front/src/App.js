@@ -6,7 +6,6 @@ import LoginUsers from './components/login/login-users';
 import LoginProfessionals from './components/login/login-pros';
 import UserRegistration from './components/register/register-users';
 import MyClients from './components/pros/MyClients';
-import Picker from './components/shared/Picker/Picker';
 import Clients from './components/clients/clients';
 import Search from './components/clients/search';
 import ProfileSettings from './components/pros/ProfileSettings';
@@ -133,6 +132,7 @@ const App = () => {
         <Router>
           <Routes>
             <Route exact path="/" element={<Home />}/>
+            <Route path="/home" element={<Home />}/>
             <Route path="/login" element={<LoginUsers />}/>
             <Route path="/login-pro" element={<LoginProfessionals />}/>
             <Route path="/register" element={<UserRegistration />} />
@@ -146,13 +146,13 @@ const App = () => {
               <Route  path="appointments/:id"
                 element={<Appointments className="u-expanded-width u-image u-image-default u-image-2"/>}
               />
-              <Route  path="customization"
+              <Route  path="customization/:id"
                 element={<Customization className="u-expanded-width u-image u-image-default u-image-2"/>}
               />
-              <Route path="clients"
+              <Route path="my-clients/:id"
                 element={<MyClients className="u-expanded-width u-image u-image-default u-image-2"/>}
               />
-              <Route path="profile-settings"
+              <Route path="profile-settings/:id"
                 element={<ProfileSettings className="u-expanded-width u-image u-image-default u-image-2"/>}
               />
             </Route>
@@ -167,9 +167,6 @@ const App = () => {
             <Route path="/clients/:id" element={<Clients />} >
               <Route exact path="/clients/:id"
                 element={<MyAppointments className="u-expanded-width u-image u-image-default u-image-2"/>}
-              />
-              <Route  path="booking"
-                element={<Picker className="u-expanded-width u-image u-image-default u-image-2"/>}
               />
               <Route path="my-appoinments"
                 element={<MyAppointments className="u-expanded-width u-image u-image-default u-image-2"/>}
