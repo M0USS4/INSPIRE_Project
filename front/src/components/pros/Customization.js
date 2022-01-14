@@ -1,163 +1,66 @@
 /* eslint-disable no-useless-escape */
 import {React, useState, useEffect } from 'react';
 import { experimentalStyled as styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
-import LoadingButton from '@mui/lab/LoadingButton';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
-import moment from 'moment';
-import TimeslotsDialog from '../shared/TimeslotsDialog';
 import { Button, Chip } from '@mui/material';
-import professionals from '../../data/pro-data';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import Availability from './Availability';
 
-const Item = styled(Paper)(({ theme }) => ({
+const Item = styled('div')(({ theme }) => ({
   padding: theme.spacing(2),
   textAlign: 'center',
-  color: 'black',
   marginBottom: theme.spacing(3),
 }));
-
-const addButtonStyle = {
-  border: 'none',
-  background: 'none',
-  textTransformation: 'none',
-  boxShadow: 'none',
-  color: '#009ba4'
-};
-
-const removeButtonStyle = {
-  color: 'red'
-};
 
 const ListItem = styled('li')(({ theme }) => ({
   margin: theme.spacing(0.5),
 }));
 
 const Customization = () => {
+  const params = useParams();
+
   const [practicianData, setpracticianData] = useState({});
-  const [motifs, setmotifs] = useState([]);
+  const [appointmentTypes, setappointmentTypes] = useState([]);
   const [motifValue, setmotifValue] = useState('');
   const [scheduleDays, setscheduleDays] = useState([]);
-  const [currentDay, setcurrentDay] = useState([]);
-  const [currentTimeslots, setcurrentTimeslots] = useState([
-    {
-      start: 0,
-      end: 0
-    }
-  ]
-  );
-  const [openTimeslotEdit, setopenTimeslotEdit] = useState(false);
-  const [experiences, setexperiences] = useState([{
-    hospital: '1',
-    from: '',
-    to: '',
-    location: ''
-  }]);
-  const [startTimes, setstartTimes] = useState([]);
-  const [openRangeErrorAlert, setopenRangeErrorAlert] = useState(false);
-  const [rangeErrorMessage, setrangeErrorMessage] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(() => {
-    // const types = [
-    //   {type:'Ostéopathie du sport',
-    //     price: 50,
-    //     duration: 60
-    //   },
-    //   {type:'Ostéopathie de la femme enceinte',
-    //     price: 45,
-    //     duration: 30
-    //   },
-    //   {type:'Ostéopathie biodynamique',
-    //     price: 30,
-    //     duration: 60
-    //   }];
-    setmotifs(practicianData.appointmentTypes);
-    handleDays();
-  }, [experiences]);
+    axios.get('http://localhost:2021/getProDetailed',{
+      params: {
+        pro_id: params.id
+      }
+    })
+      .then(response => {
+        setpracticianData(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
 
-  useEffect(() => {
-    const data = professionals.find(pro => pro);
-    setpracticianData(data);
-    setscheduleDays(data.availability);
-    setcurrentDay(data.availability[0].id);
-    setcurrentTimeslots(data.availability[0].availability);
-    handleTimeslots();
-    setmotifs(data.appointmentTypes);
+    axios.get('http://localhost:2021/getAppointmentTypes',{
+      params: {
+        pro_id: params.id
+      }
+    })
+      .then(response => {
+        setappointmentTypes(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }, []);
 
-  const handleDays = () => {
-    const days = moment.weekdays();
-    const daysSchedule = [];
-    days.forEach(day => {
-      let timeslots = {
-        day: day,
-        timeslots: [
-          {
-            start: 9,
-            end: 13
-          },
-          {
-            start: 14,
-            end: 17
-          }
-        ]
-      };
-      daysSchedule.push(timeslots);
-    });
-    // setscheduleDays(daysSchedule);
-    // setcurrentDay(daysSchedule[0].day);
-    // setcurrentTimeslots(daysSchedule[0].timeslots);
-    handleTimeslots();
+  useEffect(() => {
+    init();
+  }, [practicianData]);
 
-  };
-  const handleTimeslots = () => {
-    let updatedCurrentTimeslots = [];
-    let tempCurrentTimeslots = [...currentTimeslots];
-    for(let i = 0; i < 24; i++){
-      updatedCurrentTimeslots.push({
-        time: i,
-        status: false
-      });
+  const init = () => {
+    if(practicianData.availability){
+      const availability = JSON.parse(practicianData.availability);
+      setscheduleDays(availability);
     }
-
-    tempCurrentTimeslots.map(time => {
-      for(let j = time.start; j <= time.end; j++){
-        updatedCurrentTimeslots.forEach(t => {
-          if(t.time === j){
-            t.status = true;
-            // console.log(j);
-
-          }
-        });
-      }
-    });
-    // console.log(updatedCurrentTimeslots);
-    setstartTimes(updatedCurrentTimeslots);
-  };
-  const checkTimeslotReccursion = (time) => {
-    let updatedCurrentTimeslots = [];
-    let find;
-    let find2;
-    for(let i = 0; i < 24; i++){
-      updatedCurrentTimeslots.push({
-        time: i,
-        status: false
-      });
-    }
-
-    for(let j = time.start; j <= time.end; j++){
-      find = startTimes.some(t => t.time === j);
-      find2 = startTimes.find(t =>
-      {
-        return t.time === j && t.status === true;
-      });
-      console.log(find2);
-    }
-    return find;
   };
 
   const onSubmit = (data) => {
@@ -165,71 +68,6 @@ const Customization = () => {
   };
   const handleChange = (e) => {
     setmotifValue(e.target.value);
-  };
-
-  let handleAddExperiences = (i, e) => {
-    let newFormValues = [...experiences];
-    newFormValues[i][e.target.name] = e.target.value;
-    setexperiences(newFormValues);
-  };
-
-  let handleAddTimeslots = (i, e) => {
-    let newFormValues = [...currentTimeslots];
-    if(e.target.name === 'start'){
-      newFormValues[i][e.target.name] = Number(e.target.value);
-      newFormValues[i]['end'] = Number(e.target.value) + 1;
-    }
-    else{
-      const currentTimeslot = {
-        start: newFormValues[i]['start'],
-        end: newFormValues[i]['end']
-      };
-      const check = checkTimeslotReccursion(currentTimeslot);
-      if(check){
-        setrangeErrorMessage('Time range already taken');
-        setopenRangeErrorAlert(true);
-      }
-      else newFormValues[i][e.target.name] = Number(e.target.value);
-    }
-    setcurrentTimeslots(newFormValues);
-
-  };
-
-  let addFormFields = () => {
-    setexperiences([...experiences, {
-      hospital: '',
-      from: '',
-      to: '',
-      location: ''
-    }]);
-  };
-
-  let addTimeslotFormFields = () => {
-    const availableTime = startTimes.find(timeslot => timeslot.status === false);
-    if(availableTime){
-      const tempCurrentTimeslots = [...currentTimeslots, {
-        start: availableTime.time,
-        end: availableTime.time + 1
-      }];
-      setcurrentTimeslots(tempCurrentTimeslots);
-    }
-    else{
-      setrangeErrorMessage('No timeslot left');
-      setopenRangeErrorAlert(true);
-    }
-    setopenTimeslotEdit(true);
-  };
-
-  let removeFormFields = (i) => {
-    let newFormValues = [...experiences];
-    newFormValues.splice(i, 1);
-    setexperiences(newFormValues);
-  };
-
-  let removeTimeslotFormFields = (i) => {
-    let newFormValues = [...currentTimeslots];
-    newFormValues.splice(i, 1);
-    setcurrentTimeslots(newFormValues);
   };
 
   return (
@@ -254,12 +92,12 @@ const Customization = () => {
           Appointment Types
         <div className="tags">
           {
-            motifs.map((type, index) => (
-              // <div className="tag" key={index}>{type.type}</div>
-              <ListItem key={index}>
+            appointmentTypes.map((type, index) => (
+              <ListItem key={'a'+index}>
                 <Chip
-                  onDelete={() => setmotifs(motifs.filter(appointment => appointment.type !== type.type))}
-                  label={type.type}
+                  onDelete={() =>
+                    setappointmentTypes(appointmentTypes.filter(appointment => appointment.nom !== type.nom))}
+                  label={type.nom}
                   style={{backgroundColor: '#abe4e7'}}
                 />
               </ListItem>
@@ -278,168 +116,14 @@ const Customization = () => {
           onChange={event => handleChange(event)}
           onKeyPress={event => {
             if(event.key === 'Enter'){
-              setmotifs([...motifs, event.target.value]);
+              setappointmentTypes([...appointmentTypes, event.target.value]);
               setmotifValue('');
             }
           }}
         />
       </Item>
-      <Item>
-          Schedule
-        <Grid container spacing={{ xs: 1, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }} >
-          { scheduleDays && scheduleDays.map((schedule, index) => (
-            <Grid item  className="schedule_days" key={index}>
-              {/* <div className="button2" onClick={() => setcurrentTimeslots(schedule.timeslots)}>
-                {schedule.day}
-              </div> */}
-              <Button
-                variant="outlined"
-                onClick={() => setcurrentTimeslots(schedule.availability)}>
-                {schedule.id}
-              </Button>
-
-            </Grid>
-          ))}
-        </Grid>
-        <div className="timeslot-container">
-          Time Slots
-          <LoadingButton
-            onClick={() => addTimeslotFormFields()}
-            endIcon={<AddCircleOutlineIcon />}
-            loading={false}
-            loadingPosition="end"
-            variant="contained"
-            style={addButtonStyle}
-          >
-        add slot
-          </LoadingButton>
-        </div>
-        <Grid
-          className="timeslot-contents tags" container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
-          {currentTimeslots && currentTimeslots.map((timeslot, index) => (
-            timeslot.start && <Grid item  key={index} className="schedule_days" >
-              {/* <div className="button1" >
-                {`${timeslot.start} - ${timeslot.end}`}
-                <CancelIcon
-                  onClick={() =>
-                    setcurrentTimeslots(
-                      currentTimeslots.filter(time => time !== currentTimeslots))
-                  } />
-              </div> */}
-              <ListItem key={index}>
-                <Chip
-                  deleteIcon={<DeleteIcon />}
-                  onDelete={() =>
-                    setcurrentTimeslots(
-                      currentTimeslots.filter(time => time !== currentTimeslots))}
-                  label={`${timeslot.start} - ${timeslot.end}`}
-                  style={{backgroundColor: '#abe4e7'}}
-                />
-              </ListItem>
-            </Grid>
-
-          ))}
-        </Grid>
-        {currentTimeslots && <TimeslotsDialog
-          open={openTimeslotEdit}
-          currentDay={currentDay}
-          currentTimeslots={currentTimeslots}
-          handleAddTimeslots={handleAddTimeslots}
-          addTimeslotFormFields={addTimeslotFormFields}
-          removeTimeslotFormFields={removeTimeslotFormFields}
-          setopenRangeErrorAlert={setopenRangeErrorAlert}
-          openRangeErrorAlert={openRangeErrorAlert}
-          startTimes={startTimes}
-          rangeErrorMessage={rangeErrorMessage}
-        />}
-      </Item>
-      <Item>
-          Experience
-        { experiences && experiences.map((experience, index) => (
-          <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} key={index}>
-            <Grid item xs={6} sm={6} md={6} className={`basic-info-container  ${errors.hospital ? 'invalid' : ''}`}>
-              {/* <div className={`field-container ${errors.lastname ? 'invalid' : ''}`}> */}
-              <label htmlFor="hospital"><b>Hospital</b></label>
-              <input
-                className="form-control"
-                type="text"
-                placeholder="Enter hospital"
-                name="hospital"
-                value={experience.hospital || ''}
-                onChange={e => handleAddExperiences(index, e)}
-              />
-              {/* </div> */}
-            </Grid>
-            <Grid item xs={6} sm={6} md={6} className={`basic-info-container  ${errors.location ? 'invalid' : ''}`}>
-              <label htmlFor="location"><b>Location</b></label>
-              <input
-                className="form-control"
-                type="text"
-                placeholder="Enter location"
-                name="location"
-                value={experience.location || ''}
-                onChange={e => handleAddExperiences(index, e)}
-              />
-            </Grid>
-            <Grid item xs={6} sm={6} md={6} className={`basic-info-container  ${errors.from ? 'invalid' : ''}`}>
-              <label htmlFor="from"><b>From</b></label>
-              <input
-                className="form-control"
-
-                type="date"
-                placeholder="Enter start date"
-                name="from"
-                {...register('from', { })}
-                value={experience.from || ''}
-                onChange={e => handleAddExperiences(index, e)}
-              />
-            </Grid>
-            <Grid item xs={6} sm={6} md={6} className={`basic-info-container  ${errors.to ? 'invalid' : ''}`}>
-              <label htmlFor="to"><b>To</b></label>
-              <input
-                className="form-control"
-
-                type="date"
-                placeholder="Enter end Date"
-                name="to"
-                // {...register('to', { })}
-                value={experience.to || ''}
-                onChange={e => handleAddExperiences(index, e)}
-              />
-            </Grid>
-            <Grid item xs={6} sm={6} md={6} className={`basic-info-container  ${errors.lastname ? 'invalid' : ''}`}>
-              {
-                index ?
-                  <button
-                    type="button"
-                    className="button remove"
-                    onClick={() => removeFormFields(index)}>Remove</button>
-                  : null
-              }
-              {
-                index ?
-                  <IconButton size="large" style={removeButtonStyle} onClick={() => removeFormFields(index)}>
-                    <DeleteIcon fontSize="inherit" />
-                  </IconButton>
-                  : null
-              }
-            </Grid>
-          </Grid>
-        ))}
-        <LoadingButton
-          onClick={() => addFormFields()}
-          endIcon={<AddCircleOutlineIcon />}
-          loading={false}
-          loadingPosition="end"
-          variant="contained"
-          style={addButtonStyle}
-        >
-        add more
-        </LoadingButton>
-        {/* <button className="button add" type="button" onClick={() => addFormFields()}>Add</button> */}
-
-      </Item>
-      <button onClick={handleSubmit(onSubmit)} className="button1">Creer un Compte</button>
+      {scheduleDays.length && <Availability scheduleDays={scheduleDays}/>}
+      <Button onClick={handleSubmit(onSubmit)} variant='contained'>Update</Button>
 
     </div>
   );
