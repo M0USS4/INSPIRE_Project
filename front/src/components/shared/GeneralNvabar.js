@@ -85,9 +85,9 @@ function GeneralNvabar({list, setisDarkMode, isDarkMode, logout, ...props}) {
         <Toolbar
           sx={{ justifyContent: 'space-between'}}
         >
-          <Link to="/">
+          <a href="/home">
             <img className="logo" style={{height: '60px'}} src={logo} alt="Logo" />
-          </Link>
+          </a>
 
           <Div sx={{ display: { xs: 'none', sm: 'flex' }, justifyContent: 'space-evenly', alignItems: 'center'}}>
             <ul style={{display: 'flex', justifyContent: 'space-evenly'}}>
