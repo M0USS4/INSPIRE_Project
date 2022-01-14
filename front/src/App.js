@@ -25,6 +25,7 @@ import GeneralNvabar from './components/shared/GeneralNvabar';
 import MyAppointments from './components/clients/ClientsAppointment/MyAppointments';
 import CreatePracticeType from './components/admin/CreatePracticeType';
 import authService from './components/helpers/auth.service';
+import NotFound from './components/shared/404';
 // import PrivateRoute from './components/helpers/PrivateRoutes';
 
 const baseTheme = createTheme({
@@ -133,6 +134,7 @@ const App = () => {
           <Routes>
             <Route exact path="/" element={<Home />}/>
             <Route path="/home" element={<Home />}/>
+            <Route path="*" element={<NotFound/>} />
             <Route path="/login" element={<LoginUsers />}/>
             <Route path="/login-pro" element={<LoginProfessionals />}/>
             <Route path="/register" element={<UserRegistration />} />
