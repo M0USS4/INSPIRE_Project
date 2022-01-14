@@ -1,7 +1,6 @@
-import { Avatar, Typography } from '@mui/material';
+import { Avatar, Skeleton, Typography } from '@mui/material';
 import {React, useState, useEffect} from 'react';
-// import Picker from '../shared/Picker';
-// import professionals from '../../data/pro-data';
+
 import './clients.css';
 import { useNavigate } from 'react-router';
 import { Grid, Link } from '@mui/material';
@@ -55,6 +54,7 @@ const Search = () => {
   });
   const [searchData, setsearchData] = useState([]);
   const [data, setdata] = useState({});
+  const [loading, setloading] = useState(true);
 
   useEffect(() => {
     console.log(filterParams);
@@ -67,20 +67,30 @@ const Search = () => {
       practice: practice,
       label: label
     });
-    axios.get('http://localhost:2021/getAllProsByParams',{
-      params: {
-        practice: practice,
-        location: location
-      }
-    })
-      .then(response => {
-        console.log(response.data);
-        setsearchData(response.data);
+    setloading(true);
+
+    if(location && practice){
+      axios.get('http://localhost:2021/getAllProsByParams',{
+        params: {
+          practice: practice,
+          location: location
+        }
       })
-      .catch(error => {
-        console.log(error);
-      });
+        .then(response => {
+          console.log(response.data);
+          setsearchData(response.data);
+          setloading(false);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+    else{
+      alert('select practice and location');
+    }
+
   };
+
   const handleRdv = (id,day, date, time) => {
     setdata({
       id: id,
@@ -113,49 +123,69 @@ const Search = () => {
           container
           spacing={2}
         >
-          {searchData.length ?
-            <Grid item xs={12} sm={7} md={7} lg={7} >
-              {searchData && searchData.map(pro => (
-                <Card key={pro.id} sx={{margin: '5px', padding: theme.spacing(1), backgroundColor: 'primary.light'}} >
-                  <CardHeader
-                    avatar={
-                      <Avatar sx={{ width: 56, height: 56 }}  src={pro.img}>
+          <Grid item xs={12} sm={7} md={7} lg={7} >
+            {!loading && searchData.map(pro => (
+              <Card key={pro.id} sx={{margin: '5px', padding: theme.spacing(1), backgroundColor: 'primary.light'}} >
+                <CardHeader
+                  avatar={
+                    <Avatar sx={{ width: 56, height: 56 }}  src={pro.img}>
                     R
-                      </Avatar>
-                    }
-                    sx={{padding: '2px', borderBottom: '1px solid', borderColor: 'primary.main'}}
-                    title={`${pro.prenom} ${pro.nom}`}
-                    subheader={pro.nom_medicine}
-                  />
-                  <CardContent sx={{padding: '5px', display: 'flex'}}>
-                    <div style={{marginRight: '15px'}}>
-                      <Typography variant="body2" sx={{textTransform: 'uppercase'}}>
-                        {pro.nom_medicine}
+                    </Avatar>
+                  }
+                  sx={{padding: '2px', borderBottom: '1px solid', borderColor: 'primary.main'}}
+                  title={`${pro.prenom} ${pro.nom}`}
+                  subheader={pro.nom_medicine}
+                />
+                <CardContent sx={{padding: '5px', display: 'flex'}}>
+                  <div style={{marginRight: '15px'}}>
+                    <Typography variant="body2" sx={{textTransform: 'uppercase'}}>
+                      {pro.nom_medicine}
+                    </Typography>
+                    <Link href="" >
+                      <Typography variant="body2" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                      }}>
+                        <LocationOnIcon fontSize="small" />
+                        {`${pro.rue} ${pro.codeP}, ${pro.ville}`}
                       </Typography>
-                      <Link href="" >
-                        <Typography variant="body2" style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
-                        }}>
-                          <LocationOnIcon fontSize="small" />
-                          {`${pro.rue} ${pro.codeP}, ${pro.ville}`}
-                        </Typography>
-                      </Link>
-                      <Button variant="contained" onClick={() => goToProPage(pro.pro_id)}>Prendez un rdv</Button>
-                    </div>
+                    </Link>
+                    <Button variant="contained" onClick={() => goToProPage(pro.pro_id)}>Prendez un rdv</Button>
+                  </div>
 
-                  </CardContent>
-                </Card>
-              ))}
-            </Grid>
-            :
-            <Grid item xs={12} sm={7} md={7} lg={7} >
-              <Typography variant="subtitle2" sx={{textTransform: 'uppercase'}}>
-          No practician Found... please search with different criteria
-              </Typography>
-            </Grid>
+                </CardContent>
+              </Card>
+            ))}
+          </Grid>
+          {loading &&
+
+          <Grid item xs={12} sm={7} md={7} lg={7} >
+            <Card sx={{margin: '5px', padding: theme.spacing(1), backgroundColor: 'primary.light'}} >
+              <CardHeader
+                avatar={
+                  <Skeleton variant="circular" width={56} height={56} />
+                }
+                sx={{padding: '2px', borderBottom: '1px solid', borderColor: 'divider'}}
+                title={<Skeleton variant="text"  />
+                }
+                subheader={<Skeleton variant="text"  />}
+
+              />
+              <CardContent sx={{padding: '5px', display: 'block'}}>
+                {<Skeleton variant="text"  />}
+                <Skeleton variant="text"  width={'70px'} height={'40px'}/>
+              </CardContent>
+            </Card>
+
+          </Grid>
           }
+
+          {(!loading && !searchData.length) && <Grid item xs={12} sm={7} md={7} lg={7} >
+            <Typography variant="subtitle2" sx={{textTransform: 'uppercase'}}>
+                No practician Found... please search with different criteria
+            </Typography>
+          </Grid>}
           {searchData.length ? <Grid item xs={12} sm={5} md={5} lg={5}>
             <Item>
               <Map address={searchData} />
