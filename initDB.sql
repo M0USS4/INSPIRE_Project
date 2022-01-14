@@ -17,17 +17,41 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+CREATE DATABASE IF NOT EXISTS Inspire;
+
+
+USE Inspire;
+
 --
 -- Database: `inspire`
 --
 
 -- --------------------------------------------------------
 
+DROP TABLE IF EXISTS `practice_rdv_type`;
+DROP TABLE IF EXISTS `cmd-article`;
+DROP TABLE IF EXISTS `commande`;
+DROP TABLE IF EXISTS `article`;
+DROP TABLE IF EXISTS `review`;
+DROP TABLE IF EXISTS `medicine_pro`;
+DROP TABLE IF EXISTS `baseH`;
+DROP TABLE IF EXISTS `page-topic`;
+DROP TABLE IF EXISTS `topic`;
+DROP TABLE IF EXISTS `pro_page`;
+DROP TABLE IF EXISTS `rdv`;
+DROP TABLE IF EXISTS `type_rdv`;
+DROP TABLE IF EXISTS `pro`;
+DROP TABLE IF EXISTS `client`;
+DROP TABLE IF EXISTS `administrator`;
+DROP TABLE IF EXISTS `adress`;
+DROP TABLE IF EXISTS `login`;
+DROP TABLE IF EXISTS `type_medicine`;
+
 --
 -- Table structure for table `administrator`
 --
 
-DROP TABLE IF EXISTS `administrator`;
+
 CREATE TABLE IF NOT EXISTS `administrator` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_login` int(11) NOT NULL,
@@ -41,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `administrator` (
 -- Table structure for table `adress`
 --
 
-DROP TABLE IF EXISTS `adress`;
+
 CREATE TABLE IF NOT EXISTS `adress` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `pays` varchar(45) NOT NULL,
@@ -60,17 +84,18 @@ CREATE TABLE IF NOT EXISTS `adress` (
 --
 
 INSERT INTO `adress` (`id`, `pays`, `num`, `rue`, `codeP`, `ville`, `supp`, `latitude`, `longitude`) VALUES
-(1, 'Jordan', '648', '3 PLACE RICHEBE', '', 'North Jamesonside', '', 3.062313, 50.632366),
-(2, 'Bhutan', '153', 'FACE AU 8 RUE ANATOLE FRANCE', '50459', 'Bergnaumport', '', 3.065902, 50.637486),
-(3, 'Bhutan', '144', '12, RUE DE NORMANDIE', '742645610', 'Port Guillermofort', '', 3.118579, 50.643883),
-(4, 'Chad', '651', 'RUE DE LA CHEVALERIE', '517625', 'East Anna', '', 3.130853, 50.636082),
-(5, 'Saint Helena', '123', 'FACE AU 1 BIS RUE DE LA STATION', '7826', 'North Franciscoville', '', 3.148620, 50.625801),
-(6, 'Nigeria', '285', '40 RUE ROYALE', '82738', 'East Elvis', '', 3.057740, 50.640308),
-(7, 'Vanuatu', '134', '80854 Danny Common', '76662', 'West Adrian', '', 3.062053, 50.640385),
-(8, 'United Kingdom', '153', 'ROUBAIX', '299999', 'Lake Berniebury', '', 3.172165, 50.694099),
-(9, 'Guinea', '113', '26624 Roberto Summit Apt. 880', '23', 'Klockoville', '', 3.110669, 50.632393),
-(10, 'Netherlands Antilles', '750', '243 Douglas Cliffs Apt. 661', '7', 'Batzborough', '', 3.161625, 50.738892),
-(11, 'FR', '178', 'Rue Sadi Carnot', '59320', 'Haubourdin', '', 2.994708, 50.611256),
+(1, "","","","","","",0,0),
+(2, 'Jordan', '648', '3 PLACE RICHEBE', '', 'North Jamesonside', '', 3.062313, 50.632366),
+(3, 'Bhutan', '153', 'FACE AU 8 RUE ANATOLE FRANCE', '50459', 'Bergnaumport', '', 3.065902, 50.637486),
+(4, 'Bhutan', '144', '12, RUE DE NORMANDIE', '742645610', 'Port Guillermofort', '', 3.118579, 50.643883),
+(5, 'Chad', '651', 'RUE DE LA CHEVALERIE', '517625', 'East Anna', '', 3.130853, 50.636082),
+(6, 'Saint Helena', '123', 'FACE AU 1 BIS RUE DE LA STATION', '7826', 'North Franciscoville', '', 3.148620, 50.625801),
+(7, 'Nigeria', '285', '40 RUE ROYALE', '82738', 'East Elvis', '', 3.057740, 50.640308),
+(8, 'Vanuatu', '134', '80854 Danny Common', '76662', 'West Adrian', '', 3.062053, 50.640385),
+(9, 'United Kingdom', '153', 'ROUBAIX', '299999', 'Lake Berniebury', '', 3.172165, 50.694099),
+(10, 'Guinea', '113', '26624 Roberto Summit Apt. 880', '23', 'Klockoville', '', 3.110669, 50.632393),
+(11, 'Netherlands Antilles', '750', '243 Douglas Cliffs Apt. 661', '7', 'Batzborough', '', 3.161625, 50.738892),
+(12, 'FR', '178', 'Rue Sadi Carnot', '59320', 'Haubourdin', '', 2.994708, 50.611256),
 (13, 'FR', '178', 'Rue Sadi Carnot', '59320', 'Haubourdin', '', NULL, NULL);
 
 -- --------------------------------------------------------
@@ -79,7 +104,7 @@ INSERT INTO `adress` (`id`, `pays`, `num`, `rue`, `codeP`, `ville`, `supp`, `lat
 -- Table structure for table `article`
 --
 
-DROP TABLE IF EXISTS `article`;
+
 CREATE TABLE IF NOT EXISTS `article` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `prix` float NOT NULL,
@@ -95,7 +120,7 @@ CREATE TABLE IF NOT EXISTS `article` (
 -- Table structure for table `baseh`
 --
 
-DROP TABLE IF EXISTS `baseh`;
+
 CREATE TABLE IF NOT EXISTS `baseh` (
   `id_pro` int(11) NOT NULL,
   `jour` varchar(45) NOT NULL,
@@ -114,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `baseh` (
 -- Table structure for table `client`
 --
 
-DROP TABLE IF EXISTS `client`;
+
 CREATE TABLE IF NOT EXISTS `client` (
   `nom` varchar(45) NOT NULL,
   `prenom` varchar(45) NOT NULL,
@@ -134,17 +159,18 @@ CREATE TABLE IF NOT EXISTS `client` (
 --
 
 INSERT INTO `client` (`nom`, `prenom`, `id_login`, `tel`, `birth`, `id_adress`, `id`, `status`) VALUES
-('Mertz', 'Jazmyne', 1, '(382)364-9059x234', '1991-04-21', 1, 1, b'1'),
-('Cummings', 'Grayson', 2, '909-385-3665', '1979-12-25', 2, 2, b'1'),
-('Jacobs', 'Danika', 3, '229.324.2125', '2013-12-25', 3, 3, b'0'),
-('McGlynn', 'Louie', 4, '739.007.5965x2690', '2018-01-31', 4, 4, b'1'),
-('Kassulke', 'Hope', 5, '917-667-1062x24335', '1998-07-28', 5, 5, b'1'),
-('Eichmann', 'Jade', 6, '05699253768', '1977-12-22', 6, 6, b'1'),
-('Zemlak', 'Alivia', 7, '1-609-835-6841x71802', '2011-02-17', 7, 7, b'0'),
-('Abernathy', 'Clifton', 8, '452.423.1136', '2002-02-22', 8, 8, b'1'),
-('Paucek', 'Zoe', 9, '(563)363-8524x80298', '2013-02-10', 9, 9, b'1'),
-('Kovacek', 'Kaylie', 10, '436-960-0072', '2004-04-22', 10, 10, b'1'),
-('Nate', 'Glover', 13, '+33753161734', '1997-08-13', 13, 11, b'1');
+("","",1,"","",1,1,b'1'),
+('Mertz', 'Jazmyne', 2, '(382)364-9059x234', '1991-04-21', 2, 2, b'1'),
+('Cummings', 'Grayson', 3, '909-385-3665', '1979-12-25', 3, 3, b'1'),
+('Jacobs', 'Danika', 4, '229.324.2125', '2013-12-25', 4, 4, b'0'),
+('McGlynn', 'Louie', 5, '739.007.5965x2690', '2018-01-31', 5, 5, b'1'),
+('Kassulke', 'Hope', 6, '917-667-1062x24335', '1998-07-28', 6, 6, b'1'),
+('Eichmann', 'Jade', 7, '05699253768', '1977-12-22', 7, 7, b'1'),
+('Zemlak', 'Alivia', 8, '1-609-835-6841x71802', '2011-02-17', 8, 8, b'0'),
+('Abernathy', 'Clifton', 9, '452.423.1136', '2002-02-22', 9, 9, b'1'),
+('Paucek', 'Zoe', 10, '(563)363-8524x80298', '2013-02-10', 10, 10, b'1'),
+('Kovacek', 'Kaylie', 11, '436-960-0072', '2004-04-22', 11, 11, b'1'),
+('Nate', 'Glover', 13, '+33753161734', '1997-08-13', 13, 12, b'1');
 
 -- --------------------------------------------------------
 
@@ -152,7 +178,7 @@ INSERT INTO `client` (`nom`, `prenom`, `id_login`, `tel`, `birth`, `id_adress`, 
 -- Table structure for table `cmd-article`
 --
 
-DROP TABLE IF EXISTS `cmd-article`;
+
 CREATE TABLE IF NOT EXISTS `cmd-article` (
   `id_article` int(11) NOT NULL,
   `id_commande` int(11) NOT NULL,
@@ -168,7 +194,7 @@ CREATE TABLE IF NOT EXISTS `cmd-article` (
 -- Table structure for table `commande`
 --
 
-DROP TABLE IF EXISTS `commande`;
+
 CREATE TABLE IF NOT EXISTS `commande` (
   `id_adress` int(11) NOT NULL,
   `id_client` int(11) NOT NULL,
@@ -184,7 +210,7 @@ CREATE TABLE IF NOT EXISTS `commande` (
 -- Table structure for table `login`
 --
 
-DROP TABLE IF EXISTS `login`;
+
 CREATE TABLE IF NOT EXISTS `login` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `mail` varchar(45) NOT NULL,
@@ -197,17 +223,18 @@ CREATE TABLE IF NOT EXISTS `login` (
 --
 
 INSERT INTO `login` (`id`, `mail`, `mdp`) VALUES
-(1, 'luna.swift@example.com', 'omnis'),
-(2, 'javier.predovic@example.com', 'non'),
-(3, 'keyon.braun@example.net', 'et'),
-(4, 'hipolito97@example.net', 'impedit'),
-(5, 'lilliana.bauch@example.com', 'et'),
-(6, 'stephon.aufderhar@example.com', 'eum'),
-(7, 'benedict.labadie@example.org', 'iusto'),
-(8, 'crawford.donnelly@example.com', 'impedit'),
-(9, 'ledner.shakira@example.com', 'consectetur'),
-(10, 'destini.mraz@example.com', 'qui'),
-(11, 'kwakuaaddo473@gmail.com', '$2b$10$QVzeuhwSaMojq6Buj87Qne66GzkBw3cyR.LPJCraGs8GlfwDxn8vK'),
+(1,"block",""),
+(2, 'luna.swift@example.com', 'omnis'),
+(3, 'javier.predovic@example.com', 'non'),
+(4, 'keyon.braun@example.net', 'et'),
+(5, 'hipolito97@example.net', 'impedit'),
+(6, 'lilliana.bauch@example.com', 'et'),
+(7, 'stephon.aufderhar@example.com', 'eum'),
+(8, 'benedict.labadie@example.org', 'iusto'),
+(9, 'crawford.donnelly@example.com', 'impedit'),
+(10, 'ledner.shakira@example.com', 'consectetur'),
+(11, 'destini.mraz@example.com', 'qui'),
+(12, 'kwakuaaddo473@gmail.com', '$2b$10$QVzeuhwSaMojq6Buj87Qne66GzkBw3cyR.LPJCraGs8GlfwDxn8vK'),
 (13, 'natenate473@gmail.com', '$2b$10$BX/cSMWwvDIJEPMVEn1nueGv.MiEnwedrIJ2GaRVde9gEhQNPNM3C');
 
 -- --------------------------------------------------------
@@ -216,7 +243,7 @@ INSERT INTO `login` (`id`, `mail`, `mdp`) VALUES
 -- Table structure for table `medicine_pro`
 --
 
-DROP TABLE IF EXISTS `medicine_pro`;
+
 CREATE TABLE IF NOT EXISTS `medicine_pro` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_pro` int(11) NOT NULL,
@@ -232,7 +259,7 @@ CREATE TABLE IF NOT EXISTS `medicine_pro` (
 -- Table structure for table `page-topic`
 --
 
-DROP TABLE IF EXISTS `page-topic`;
+
 CREATE TABLE IF NOT EXISTS `page-topic` (
   `id_page` int(11) NOT NULL,
   `id_topic` int(11) NOT NULL,
@@ -248,7 +275,7 @@ CREATE TABLE IF NOT EXISTS `page-topic` (
 -- Table structure for table `practice_rdv_type`
 --
 
-DROP TABLE IF EXISTS `practice_rdv_type`;
+
 CREATE TABLE IF NOT EXISTS `practice_rdv_type` (
   `id_rdv_type` int(11) NOT NULL,
   `id_practice` int(11) NOT NULL,
@@ -274,7 +301,7 @@ INSERT INTO `practice_rdv_type` (`id_rdv_type`, `id_practice`, `id`) VALUES
 -- Table structure for table `pro`
 --
 
-DROP TABLE IF EXISTS `pro`;
+
 CREATE TABLE IF NOT EXISTS `pro` (
   `nom` varchar(45) NOT NULL,
   `prenom` varchar(45) NOT NULL,
@@ -301,7 +328,7 @@ CREATE TABLE IF NOT EXISTS `pro` (
 --
 
 INSERT INTO `pro` (`nom`, `prenom`, `id_login`, `id_type_medicine`, `tel`, `birth`, `img`, `cv`, `diplome`, `etat`, `id_adress`, `id`, `status`, `availability`) VALUES
-('Homenick', 'Isaiah', 1, 1, 706911, '1970-06-03', 'https://res.cloudinary.com/inspire84/image/upload/v1641861331/joseph-gonzalez-iFgRcqHznqg-unsplash_nbqqci.jpg', 'http://res.cloudinary.com/inspire84/image/upload/v1641685814/cv/wmso8rp6tcbfuhkrcx6t.pdf', 'http://res.cloudinary.com/inspire84/image/upload/v1641685814/diplome/exmebpau7hfxv9vlz7r3.pdf', b'1', 1, 1, b'1', '[{\"id\":\"sunday\",\"availability\":[]},{\"id\":\"monday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"tuesday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":14,\"end\":17}]},{\"id\":\"wednesday\",\"availability\":[{\"start\":9,\"end\":13}]},{\"id\":\"thursday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"friday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"saturday\",\"availability\":[]}]'),
+("","",1,1,"","","","","",1, 1,1,1,""),
 ('Sanford', 'Arnaldo', 2, 1, 1, '1999-02-10', 'https://res.cloudinary.com/inspire84/image/upload/v1641861327/ian-dooley-d1UPkiFd04A-unsplash_hxo9im.jpg', 'http://res.cloudinary.com/inspire84/image/upload/v1641685814/cv/wmso8rp6tcbfuhkrcx6t.pdf', 'http://res.cloudinary.com/inspire84/image/upload/v1641685814/diplome/exmebpau7hfxv9vlz7r3.pdf', b'1', 2, 2, b'1', '[{\"id\":\"sunday\",\"availability\":[]},{\"id\":\"monday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"tuesday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":14,\"end\":17}]},{\"id\":\"wednesday\",\"availability\":[{\"start\":9,\"end\":13}]},{\"id\":\"thursday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"friday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"saturday\",\"availability\":[]}]'),
 ('Witting', 'Enid', 3, 3, 0, '2005-07-27', 'https://res.cloudinary.com/inspire84/image/upload/v1641861753/rafaella-mendes-diniz-et_78QkMMQs-unsplash_sxuvvy.jpg', 'http://res.cloudinary.com/inspire84/image/upload/v1641685814/cv/wmso8rp6tcbfuhkrcx6t.pdf', 'http://res.cloudinary.com/inspire84/image/upload/v1641685814/diplome/exmebpau7hfxv9vlz7r3.pdf', b'1', 3, 3, b'0', '[{\"id\":\"sunday\",\"availability\":[]},{\"id\":\"monday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"tuesday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":14,\"end\":17}]},{\"id\":\"wednesday\",\"availability\":[{\"start\":9,\"end\":13}]},{\"id\":\"thursday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"friday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"saturday\",\"availability\":[]}]'),
 ('Green', 'Meagan', 4, 2, 374897497, '2005-04-20', 'https://res.cloudinary.com/inspire84/image/upload/v1641861363/pexels-gustavo-fring-4173251_zbdfot.jpg', 'http://res.cloudinary.com/inspire84/image/upload/v1641685814/cv/wmso8rp6tcbfuhkrcx6t.pdf', 'http://res.cloudinary.com/inspire84/image/upload/v1641685814/diplome/exmebpau7hfxv9vlz7r3.pdf', b'1', 4, 4, b'1', '[{\"id\":\"sunday\",\"availability\":[]},{\"id\":\"monday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"tuesday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":14,\"end\":17}]},{\"id\":\"wednesday\",\"availability\":[{\"start\":9,\"end\":13}]},{\"id\":\"thursday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"friday\",\"availability\":[{\"start\":9,\"end\":12},{\"start\":15,\"end\":17}]},{\"id\":\"saturday\",\"availability\":[]}]'),
@@ -319,7 +346,7 @@ INSERT INTO `pro` (`nom`, `prenom`, `id_login`, `id_type_medicine`, `tel`, `birt
 -- Table structure for table `pro_page`
 --
 
-DROP TABLE IF EXISTS `pro_page`;
+
 CREATE TABLE IF NOT EXISTS `pro_page` (
   `id_pro` int(11) NOT NULL,
   `text1` text NOT NULL,
@@ -334,7 +361,7 @@ CREATE TABLE IF NOT EXISTS `pro_page` (
 -- Table structure for table `rdv`
 --
 
-DROP TABLE IF EXISTS `rdv`;
+
 CREATE TABLE IF NOT EXISTS `rdv` (
   `id_client` int(11) NOT NULL,
   `id_pro` int(11) NOT NULL,
@@ -381,7 +408,7 @@ INSERT INTO `rdv` (`id_client`, `id_pro`, `id_type`, `appt_dateStart`, `appt_dat
 -- Table structure for table `topic`
 --
 
-DROP TABLE IF EXISTS `topic`;
+
 CREATE TABLE IF NOT EXISTS `topic` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `text1` text NOT NULL,
@@ -404,7 +431,7 @@ INSERT INTO `topic` (`id`, `text1`) VALUES
 -- Table structure for table `type_medicine`
 --
 
-DROP TABLE IF EXISTS `type_medicine`;
+
 CREATE TABLE IF NOT EXISTS `type_medicine` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom_medicine` varchar(45) NOT NULL,
@@ -431,7 +458,7 @@ INSERT INTO `type_medicine` (`id`, `nom_medicine`, `text1`, `text2`, `text3`, `i
 -- Table structure for table `type_rdv`
 --
 
-DROP TABLE IF EXISTS `type_rdv`;
+
 CREATE TABLE IF NOT EXISTS `type_rdv` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nom` varchar(45) NOT NULL,
@@ -450,11 +477,12 @@ CREATE TABLE IF NOT EXISTS `type_rdv` (
 --
 
 INSERT INTO `type_rdv` (`id`, `nom`, `duration`, `price`, `startDate`, `endDate`, `public`, `id_pro`) VALUES
-(1, 'Consultation de sophrologie', 60, 45, '0000-00-00', '0000-00-00', b'1', 1),
-(2, 'Consultation de Kinésithérapie', 60, 45, '0000-00-00', '0000-00-00', b'1', 1),
-(3, 'Consultation de ostéapathie', 30, 40, '0000-00-00', '0000-00-00', b'1', 11),
-(4, 'Consultation de acupuncture', 60, 45, '2022-01-12', '0000-00-00', b'1', 1),
-(5, 'Ostéapathie du Sport', 60, 50, '2022-01-01', '2023-12-08', b'0', 11);
+(1,"Blocked",30,0,"","",false,1),
+(2, 'Consultation de sophrologie', 60, 45, '0000-00-00', '0000-00-00', b'1', 1),
+(3, 'Consultation de Kinésithérapie', 60, 45, '0000-00-00', '0000-00-00', b'1', 1),
+(4, 'Consultation de ostéapathie', 30, 40, '0000-00-00', '0000-00-00', b'1', 11),
+(5, 'Consultation de acupuncture', 60, 45, '2022-01-12', '0000-00-00', b'1', 1),
+(6, 'Ostéapathie du Sport', 60, 50, '2022-01-01', '2023-12-08', b'0', 11);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
