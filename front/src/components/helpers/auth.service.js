@@ -1,4 +1,5 @@
 import axios from 'axios';
+import jwt_decode from 'jwt-decode';
 
 const API_URL = 'http://localhost:2021/';
 
@@ -8,12 +9,20 @@ class AuthService {
       .post(API_URL + 'login/post', loginData)
       .then(response => {
         if (response.data.token) {
-          console.log(response.data);
           localStorage.setItem('user', JSON.stringify(response.data));
         }
 
         return response.data;
       });
+  }
+
+  decodeToken(){
+    if (localStorage.getItem('user')) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return jwt_decode(user.token);
+    }
+
+    return null;
   }
 
   logout() {
@@ -29,7 +38,12 @@ class AuthService {
   }
 
   getCurrentUser() {
-    return JSON.parse(localStorage.getItem('user'));
+    const decoded = this.decodeToken();
+    if(decoded){
+      return decoded.infos;
+
+    }
+    return null;
   }
 
   isLogin(){
