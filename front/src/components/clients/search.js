@@ -57,7 +57,6 @@ const Search = () => {
   const [loading, setloading] = useState(true);
 
   useEffect(() => {
-    console.log(filterParams);
     handleSearch(getPractice, getLocation, getLabel);
   }, [data]);
 
@@ -77,7 +76,6 @@ const Search = () => {
         }
       })
         .then(response => {
-          console.log(response.data);
           setsearchData(response.data);
           setloading(false);
         })
@@ -98,11 +96,10 @@ const Search = () => {
       date: date,
       time: time
     });
-    console.log(data);
   };
 
   const goToProPage = (id) => {
-    navigate(`/pro-profile/${id}`,      { state: {
+    navigate(`/practician/${id}`,      { state: {
       success: true,
     }});
   };

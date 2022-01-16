@@ -1,13 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 // import 'leaflet/dist/leaflet.css';
 
 const Map = ({address}) => {
-
-  useEffect(() => {
-    console.log(address);
-  }, []);
   return (
     <div>
       { address && <MapContainer

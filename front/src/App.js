@@ -1,9 +1,7 @@
-import { React, useState, useEffect } from 'react';
+import { React, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
-import axios from 'axios';
 import Home from './components/Home/home';
 import LoginUsers from './components/login/login-users';
-import LoginProfessionals from './components/login/login-pros';
 import UserRegistration from './components/register/register-users';
 import MyClients from './components/pros/MyClients';
 import Clients from './components/clients/clients';
@@ -26,7 +24,7 @@ import MyAppointments from './components/clients/ClientsAppointment/MyAppointmen
 import CreatePracticeType from './components/admin/CreatePracticeType';
 import authService from './components/helpers/auth.service';
 import NotFound from './components/shared/404';
-// import PrivateRoute from './components/helpers/PrivateRoutes';
+import LinksManual from './components/shared/LinksManual';
 
 const baseTheme = createTheme({
   typography: {
@@ -74,7 +72,6 @@ const Div = styled('div')(() => ({
 }));
 
 const App = () => {
-  const [data, setData] = useState(null);
   const isAdmin = false;
   const [isDarkMode, setisDarkMode] = useState(false);
   const navlist = [
@@ -106,14 +103,6 @@ const App = () => {
       link: <Link to="all-clients">All Clients</Link>
     }
   ];
-  useEffect(() => {
-    axios.get('/api')
-      .then((res) => {
-        setData(res.data.message);
-        console.log(data);
-      })
-      .catch(err => console.log(err));
-  }, []);
 
   const logout = () => {
     authService.logout();
@@ -122,9 +111,6 @@ const App = () => {
   return (
     <ThemeProvider  theme={isDarkMode ? DarkMode : LightMode}>
       <Div className="App" sx={{backgroundColor: 'secondary.light'}}>
-        {/* <header className="App-header">
-          <Navbar></Navbar>
-        </header> */}
         <GeneralNvabar
           list={isAdmin ? adminNavList : navlist}
           setisDarkMode={setisDarkMode}
@@ -135,13 +121,13 @@ const App = () => {
             <Route exact path="/" element={<Home />}/>
             <Route path="/home" element={<Home />}/>
             <Route path="*" element={<NotFound/>} />
+            <Route path="/manual" element={<LinksManual />} />
             <Route path="/login" element={<LoginUsers />}/>
-            <Route path="/login-pro" element={<LoginProfessionals />}/>
             <Route path="/register" element={<UserRegistration />} />
             <Route path="/register-pro" element={<ProfessionalRegistration />} />
             <Route path="/search" element={<Search />} />
 
-            <Route path="/pro-profile" element={<ProProfile />} >
+            <Route exact path="/pro-profile" element={<ProProfile />} >
               <Route exact path="/pro-profile"
                 element={<Appointments className="u-expanded-width u-image u-image-default u-image-2"/>}
               />
@@ -158,11 +144,11 @@ const App = () => {
                 element={<ProfileSettings className="u-expanded-width u-image u-image-default u-image-2"/>}
               />
             </Route>
-            <Route path="pro-profile/:id"
+            <Route path="practician/:id"
               element={<PublicProProfile />}
             />
 
-            <Route path="pro-profile/:id/booking"
+            <Route path="practician/:id/booking"
               element={<ClientAppointment />}
             />
 

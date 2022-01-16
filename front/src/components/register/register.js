@@ -40,11 +40,9 @@ const Register = () => {
         }
       }
     };
-    console.log(registerData);
 
     authService.register(registerData)
-      .then(response => {
-        console.log(response);
+      .then(() => {
         setsuccess(true);
         navigate('/',      { state: {
           success: success,
@@ -60,11 +58,8 @@ const Register = () => {
   };
 
   const autoComplete = () => {
-    console.log('auto');
-
     axios.get('https://api-adresse.data.gouv.fr/search/?q=Lille&type=housenumber&autocomplete=0')
       .then(response => {
-        console.log(response.data);
         setautoCompleteData(response.data);
       })
       .catch(err => {
@@ -103,6 +98,7 @@ const Register = () => {
               type="text"
               placeholder="Enter Nom"
               name="nom"
+              className='form-control'
               {...register('lastname', { required: true, maxLength: 30, minLength: 2 })}
             />
 
@@ -113,6 +109,7 @@ const Register = () => {
               type="text"
               placeholder="Enter Prenom"
               name="prenom"
+              className='form-control'
               {...register('firstname', { required: true, maxLength: 30, minLength: 2 })}
             />
 
@@ -123,6 +120,7 @@ const Register = () => {
               type="date"
               placeholder="Enter Date of Birth"
               name="dateofBirth"
+              className='form-control'
               {...register('dateofBirth', { })}
             />
           </div>
@@ -132,6 +130,7 @@ const Register = () => {
               type="text"
               placeholder="Enter Phone Number"
               name="phone"
+              className='form-control'
               {...register('phone', { required: true, maxLength: 12, minLength: 10 })}
             />
           </div>
@@ -141,6 +140,7 @@ const Register = () => {
               type="email"
               placeholder="Enter Email"
               name="email"
+              className='form-control'
               {...register('email', {
                 required: true,
                 // eslint-disable-next-line max-len
@@ -155,6 +155,7 @@ const Register = () => {
               type="password"
               placeholder="Enter Password"
               name="password"
+              className='form-control'
               {...register('password', {
                 required: true,
                 pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/
@@ -168,6 +169,7 @@ const Register = () => {
               type="password"
               placeholder="Confirm Password"
               name="confirm-password"
+              className='form-control'
               {...register('confirm_password', {
                 required: true,
                 pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/
@@ -181,6 +183,7 @@ const Register = () => {
               type="text"
               placeholder="City..."
               name="city"
+              className='form-control'
               {...register('city', { required: true, maxLength: 40, minLength: 2 })}
             />
           </div>
@@ -191,6 +194,7 @@ const Register = () => {
               type="text"
               placeholder="Postal adresse..."
               name="postal"
+              className='form-control'
               {...register('postal', { required: true, maxLength: 40, minLength: 2 })}
             />
           </div>
@@ -201,6 +205,7 @@ const Register = () => {
               type="number"
               placeholder="Apartment No..."
               name="number"
+              className='form-control'
               {...register('number', { required: true, maxLength: 40, minLength: 2 })}
             />
           </div>
@@ -211,6 +216,7 @@ const Register = () => {
               type="text"
               placeholder="Street..."
               name="street"
+              className='form-control'
               {...register('street', { required: true, maxLength: 30, minLength: 2 })}
             />
           </div>
@@ -221,6 +227,7 @@ const Register = () => {
               type="text"
               placeholder="Additional Info..."
               name="add"
+              className='form-control'
               onKeyUp={autoComplete}
               {...register('add', { required: false, maxLength: 40, minLength: 2 })}
             />

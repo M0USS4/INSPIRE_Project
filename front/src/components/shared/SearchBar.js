@@ -48,7 +48,6 @@ const SearchBar = ({ handleSearch, type }) => {
     axios.get('http://localhost:2021/getAllMedicine')
       .then(response => {
         if (response.data) {
-          console.log(response.data);
           setallMedicine(response.data);
         }
       })
@@ -61,10 +60,6 @@ const SearchBar = ({ handleSearch, type }) => {
     const location = JSON.stringify(selectedLocation.geometry.coordinates);
     const label = JSON.stringify(selectedLocation.properties.label);
     const practice = data.practice;
-    console.log(location);
-    console.log(practice);
-    console.log(selectedLocation);
-    console.log(selectedPractice);
     navigate( {
       pathname: '/search',
       search: `?practice=${practice}&location=${location}&label=${label}`,
@@ -78,7 +73,6 @@ const SearchBar = ({ handleSearch, type }) => {
     const query = e.target.value;
     axios.get(`https://api-adresse.data.gouv.fr/search/?q=${query}&type=street&autocomplete=1`)
       .then(response => {
-        console.log(response.data.features);
         setautoCompleteData(response.data.features);
       })
       .catch(err => {
@@ -88,93 +82,68 @@ const SearchBar = ({ handleSearch, type }) => {
 
   return (
     <div>
-      <form action="">
-        <Paper
-          component="form"
-          sx={{  display: 'flex', alignItems: 'center',  }}
-        >
-          {/* <InputBase
-            sx={{ ml: 1, flex: 1 }}
-            placeholder="Practique, Therapeute, ..."
-            startAdornment={
-              <InputAdornment position="start">
-                <PersonSearchIcon color='primary' className={`${errors.practice ? classes.invalid : ''}`}/>
-              </InputAdornment>
-            }
-            className={`${errors.practice ? classes.inputbase : ''}`}
-            {...register('practice', { required: true,  minLength: 2 })}
-          /> */}
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            options={allMedicine.map(medicine => medicine.name)}
-            sx={{ flex: 1}}
-            value={selectedPractice}
-            onChange={(e, value) => setselectedPractice(value)}
-            renderInput={(params) =>
-              <TextField
-                {...params}
-                InputProps={{
-                  ...params.InputProps,
-                  classes:{notchedOutline:classes.noBorder},
-                  startAdornment: (
-                    <>
-                      <InputAdornment position="start">
-                        <PersonSearchIcon color='primary' className={`${errors.practice ? classes.invalid : ''}`}/>
-                      </InputAdornment>
-                      {params.InputProps.startAdornment}
-                    </>
-                  ),
-                  disableUnderline: true,
-                }}
-                sx={{width: '100%', border: 'none'}}
-                // label="Practique..."
-                {...register('practice', { required: true,  minLength: 2 })}
-              />
-            }
-          />
-          <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            options={autoCompleteData}
-            getOptionLabel={option => option.properties.label}
-            sx={{  ml: 1, flex: 1 }}
-            value={selectedLocation}
-            onChange={(e, value) => setselectedLocation(value)}
-            renderInput={(params) =>
-              <TextField
-                {...params}
-                InputProps={{
-                  ...params.InputProps,
-                  classes:{notchedOutline:classes.noBorder},
-                  startAdornment: (
-                    <>
-                      <InputAdornment position="start">
-                        <LocationOnIcon color='primary' className={`${errors.location ? classes.invalid : ''}`}/>
-                      </InputAdornment>
-                      {params.InputProps.startAdornment}
-                    </>
-                  )
-                }}
-                // label="Location..."
-                onKeyDown={(e) => autoComplete(e)}
-                {...register('location', { required: true,  minLength: 2 })}
-              />
-            }
-          />
-          {/* <InputBase
-            sx={{ ml: 1, flex: 1 }}
-            placeholder="Ville"
-            startAdornment={
-              <InputAdornment position="start">
-                <LocationOnIcon color='primary' className={`${errors.location ? classes.invalid : ''}`}/>
-              </InputAdornment>
-            }
-            className={`${errors.location ? classes.inputbase : ''}`}
-            {...register('location', { required: true,  minLength: 2 })}
-          /> */}
-          {mobile &&
+      <Paper
+        component="form"
+        sx={{  display: 'flex', alignItems: 'center',  }}
+      >
+        <Autocomplete
+          disablePortal
+          id="combo-box-demo"
+          options={allMedicine.map(medicine => medicine.name)}
+          sx={{ flex: 1}}
+          value={selectedPractice}
+          onChange={(e, value) => setselectedPractice(value)}
+          renderInput={(params) =>
+            <TextField
+              {...params}
+              InputProps={{
+                ...params.InputProps,
+                classes:{notchedOutline:classes.noBorder},
+                startAdornment: (
+                  <>
+                    <InputAdornment position="start">
+                      <PersonSearchIcon color='primary' className={`${errors.practice ? classes.invalid : ''}`}/>
+                    </InputAdornment>
+                    {params.InputProps.startAdornment}
+                  </>
+                ),
+              }}
+              sx={{width: '100%', border: 'none'}}
+              {...register('practice', { required: true,  minLength: 2 })}
+            />
+          }
+        />
+        <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+        <Autocomplete
+          disablePortal
+          id="combo-box-demo"
+          options={autoCompleteData}
+          getOptionLabel={option => option.properties.label}
+          sx={{  ml: 1, flex: 1 }}
+          value={selectedLocation}
+          onChange={(e, value) => setselectedLocation(value)}
+          renderInput={(params) =>
+            <TextField
+              {...params}
+              InputProps={{
+                ...params.InputProps,
+                classes:{notchedOutline:classes.noBorder},
+                startAdornment: (
+                  <>
+                    <InputAdornment position="start">
+                      <LocationOnIcon color='primary' className={`${errors.location ? classes.invalid : ''}`}/>
+                    </InputAdornment>
+                    {params.InputProps.startAdornment}
+                  </>
+                )
+              }}
+              // label="Location..."
+              onKeyDown={(e) => autoComplete(e)}
+              {...register('location', { required: true,  minLength: 2 })}
+            />
+          }
+        />
+        {mobile &&
           <>
             <Divider sx={{ height: 30, m: 0.5 }} orientation="vertical" />
 
@@ -182,16 +151,15 @@ const SearchBar = ({ handleSearch, type }) => {
               <SearchIcon color='primary'/>
             </IconButton>
           </>
-          }
-          {!mobile &&
+        }
+        {!mobile &&
           <Button
             variant="contained"
             sx={{ height: 56, ml: 1, flex: 0.3}}
             onClick={handleSubmit(onSubmit)}
           >Trouvez</Button>
-          }
-        </Paper>
-      </form>
+        }
+      </Paper>
     </div>
   );
 };
@@ -199,7 +167,7 @@ const SearchBar = ({ handleSearch, type }) => {
 SearchBar.propTypes = {
   handleSearch: PropTypes.func,
   setfilterParams: PropTypes.func,
-  type: PropTypes.oneOf(['home, search']),
+  type: PropTypes.oneOf(['home', 'search']),
 };
 
 export default SearchBar;

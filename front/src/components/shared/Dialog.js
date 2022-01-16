@@ -9,13 +9,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import { ClickType } from './types';
 
-// import { useForm } from 'react-hook-form';
-
 const DialogAlert = ({ handleClose, handleBlock,handleManage,type, open}) => {
-//   const { register, handleSubmit, formState: { errors } } = useForm();
-//   const onSubmit = (data) =>{
-//     console.log(data);
-//   };
   return (
     <Dialog
       open={open}
@@ -30,15 +24,6 @@ const DialogAlert = ({ handleClose, handleBlock,handleManage,type, open}) => {
         <DialogContentText id="alert-dialog-description">
           {type.subtitle}
         </DialogContentText>
-        {/* <div className={`field-container ${errors.title ? 'invalid' : ''}`}>
-          <label htmlFor="nom"><b>Nom</b></label>
-          <input
-            type="text"
-            placeholder="Enter title"
-            name="title"
-            {...register('title', { required: true, maxLength: 30, minLength: 2 })}
-          />
-        </div> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Close</Button>

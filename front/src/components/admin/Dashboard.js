@@ -69,7 +69,6 @@ const Dashboard = () => {
             number_verified : verified,
             number_unverified : unverified
           };
-          console.log(res);
           setclientStats(res);
         }
       })
@@ -87,7 +86,6 @@ const Dashboard = () => {
             number_verified : verified,
             number_unverified : unverified
           };
-          console.log(res);
           setproStats(res);
         }
       })

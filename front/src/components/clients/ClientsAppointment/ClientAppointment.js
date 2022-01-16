@@ -53,62 +53,63 @@ const ClientAppointment = ({selectedType}) => {
   const params = useParams();
 
   useEffect(() => {
-    // const practician = professonals.find(pro => pro.id === Number(params.id) );
-    // setpracticianData(practician);
     axios.get('http://localhost:2021/getProDetailed',{
       params: {
         pro_id: params.id
       }
     })
       .then(response => {
-        console.log(response.data);
         setpracticianData(response.data);
       })
       .catch(error => {
         console.log(error);
       });
-
-    axios.get('http://localhost:2021/getAppointmentTypes',{
-      params: {
-        pro_id: params.id
-      }
-    })
-      .then(response => {
-        console.log(response.data);
-        setappointmentTypes(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-
-    axios.get('http://localhost:2021/pro/appt/all/v2',{
-      params: {
-        pro_id: params.id
-      }
-    })
-      .then(response => {
-        console.log(response.data);
-        const data = response.data.map(event => {
-          return {
-            start: new Date(event.date_start),
-            end: new Date(event.date_end),
-            title: 'Testing',
-            status: event.status.data[0] === 0 ? false : true
-          };
-        });
-        console.log(data);
-        seteventList(data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-    const paramsToObject = Object.fromEntries(new URLSearchParams(searchParams));
-    const paramsFiltered = Object.keys(paramsToObject)
-      .filter(key => key !== 'active')
-      .reduce((cur, key) => { return Object.assign(cur, { [key]: paramsToObject[key] });}, {});
-    setappointmentData(paramsFiltered);
-
   }, []);
+
+  useEffect(() => {
+    if(practicianData){
+      axios.get('http://localhost:2021/getAppointmentTypes',{
+        params: {
+          pro_id: params.id,
+          nom_medicine: practicianData.nom_medicine
+        }
+      })
+        .then(response => {
+          setappointmentTypes(response.data);
+          if(response.data.length){
+            setappointmentType(response.data[0].nom);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
+      axios.get('http://localhost:2021/pro/appt/all/v2',{
+        params: {
+          pro_id: params.id
+        }
+      })
+        .then(response => {
+          const data = response.data.map(event => {
+            return {
+              start: new Date(event.date_start),
+              end: new Date(event.date_end),
+              title: 'Testing',
+              status: event.status.data[0] === 0 ? false : true
+            };
+          });
+          seteventList(data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      const paramsToObject = Object.fromEntries(new URLSearchParams(searchParams));
+      const paramsFiltered = Object.keys(paramsToObject)
+        .filter(key => key !== 'active')
+        .reduce((cur, key) => { return Object.assign(cur, { [key]: paramsToObject[key] });}, {});
+      setappointmentData(paramsFiltered);
+    }
+  }, [practicianData]);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -139,7 +140,7 @@ const ClientAppointment = ({selectedType}) => {
     setappointmentData(appointmentDataTemp);
     console.log(appointmentData);
     navigate({
-      pathname: `/pro-profile/${params.id}/booking`,
+      pathname: `/practician/${params.id}/booking`,
       search: `?active=1&${queryString}`,
     });
     handleNext();

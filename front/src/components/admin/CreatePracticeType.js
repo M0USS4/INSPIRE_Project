@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { experimentalStyled as styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
-// import Grid from '@mui/material/Grid';
 import { useForm } from 'react-hook-form';
 import { Button } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import axios from 'axios';
+import CollapsableAlert from '../shared/CollapsableAlert';
 
 const Input = styled('input')({
   display: 'none',
@@ -36,6 +36,9 @@ const FormDiv = styled('div')(() => ({
 const CreatePracticeType = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [file, setfile] = useState({});
+  const [open, setopen] = useState(false);
+  const [success, setsuccess] = useState(false);
+  const [message, setmessage] = useState('');
   const uploadSingleFile = (e) => {
     setfile( {
       preview: URL.createObjectURL(e.target.files[0]),
@@ -44,24 +47,33 @@ const CreatePracticeType = () => {
   };
 
   const onSubmit = (data) =>{
-    console.log(data);
     const formData = new FormData();
-    console.log(file);
     formData.append('data', JSON.stringify(data));
     formData.append('files', file.data, 'medicine_image');
     axios.post('http://localhost:2021/admin/medicine/create', formData)
       .then(response => {
         if (response.data) {
-          console.log(response.data);
+          setsuccess(false);
+          setmessage('Practice Created' || response.data);
+          setopen(true);
         }
       })
       .catch(error => {
         console.log(error);
+        setsuccess(false);
+        setmessage('Could not create Practice');
+        setopen(true);
       });
   };
   return (
     <Root sx={{ flexGrow: 1 }}>
       <Item>
+        <CollapsableAlert
+          open={open}
+          setopen={setopen}
+          message={message}
+          severity={success? 'success' : 'error'}
+        />
         <FormDiv sx={{textAlign: 'center'}}>Creation of Medicine</FormDiv>
         <FormDiv className={`${errors.name ? 'invalid' : ''}`}>
           <label htmlFor="name"><b>Name of Medicine</b></label>

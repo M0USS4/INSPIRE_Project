@@ -115,7 +115,6 @@ export default function ClientsTable() {
     axios.get('http://localhost:2021/getAllClients')
       .then(response => {
         if (response.data) {
-          console.log(response.data);
           setallClients(response.data);
         }
       })

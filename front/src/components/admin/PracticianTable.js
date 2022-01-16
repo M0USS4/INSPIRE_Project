@@ -127,7 +127,6 @@ export default function PracticianTable() {
     axios.get('http://localhost:2021/getAllPros')
       .then(response => {
         if (response.data) {
-          console.log(response.data);
           setallPracticians(response.data);
         }
       })
