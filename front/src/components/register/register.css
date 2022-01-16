@@ -14,7 +14,7 @@
   padding: 2px 15px;
 }
 
-.register-fields input {
+/* .register-fields input {
   width: 100%;
   padding: 10px 20px;
   margin: 8px 0;
@@ -22,7 +22,7 @@
   border: 1px solid #ccc;
   box-sizing: border-box;
   border-radius: 3px;
-}
+} */
 
 @media (min-width: 544px) {
   .register {

@@ -15,7 +15,6 @@ const Register3 = ({data, setdata, setActiveStep, handleBack}) => {
     const query = `${data.number} ${data.street} ${data.postal} ${data.city}`;
     axios.get(`https://api-adresse.data.gouv.fr/search/?q=${query}&type=housenumber&autocomplete=0`)
       .then(response => {
-        console.log(response.data);
         setautoCompleteData(response.data.features);
         if(response.data.features){
           setopenList(true);
@@ -32,8 +31,6 @@ const Register3 = ({data, setdata, setActiveStep, handleBack}) => {
   };
 
   const handleNext = () => {
-    console.log(data);
-    console.log(selectedAddress);
     const registerData = {
       type: 1,
       login: {
@@ -70,6 +67,7 @@ const Register3 = ({data, setdata, setActiveStep, handleBack}) => {
             type="text"
             placeholder="City..."
             name="city"
+            className='form-control'
             {...register('city', { required: true, maxLength: 40, minLength: 2 })}
           />
         </div>
@@ -80,6 +78,7 @@ const Register3 = ({data, setdata, setActiveStep, handleBack}) => {
             type="text"
             placeholder="Postal adresse..."
             name="postal"
+            className='form-control'
             {...register('postal', { required: true, maxLength: 40, minLength: 2 })}
           />
         </div>
@@ -90,6 +89,7 @@ const Register3 = ({data, setdata, setActiveStep, handleBack}) => {
             type="number"
             placeholder="Apartment No..."
             name="number"
+            className='form-control'
             {...register('number', { required: true, maxLength: 40, minLength: 2 })}
           />
         </div>
@@ -100,6 +100,7 @@ const Register3 = ({data, setdata, setActiveStep, handleBack}) => {
             type="text"
             placeholder="Street..."
             name="street"
+            className='form-control'
             {...register('street', { required: true, maxLength: 30, minLength: 2 })}
           />
         </div>
@@ -108,7 +109,7 @@ const Register3 = ({data, setdata, setActiveStep, handleBack}) => {
       </div>
       <Paper
         component="form"
-        sx={{  display: 'flex', alignItems: 'center', height: 50, border: 'none', boxShadow: 'none' }}
+        sx={{  display: 'flex', alignItems: 'center', height: 50, border: 'none', boxShadow: 'none', ml: '10px' }}
       >
         <Select
           open={openList}

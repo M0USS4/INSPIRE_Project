@@ -26,12 +26,11 @@ const Register2 = ({data, setmessage, setopen, setsuccess, handleBack}) => {
         formData.append('files', file.data, `${file.name}`);
       }
       authService.registerPro(formData)
-        .then(response => {
-          console.log(response);
+        .then(() => {
           setopen(true);
           setmessage('Registered');
           setsuccess(true);
-          navigate('/pro-profile/customization');
+          navigate('/login');
         })
         .catch(err => {
           console.log(err);

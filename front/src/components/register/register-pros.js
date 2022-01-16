@@ -42,19 +42,16 @@ const ProfessionalRegistration = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [data, setdata] = useState({});
   const [allMedicineTypes, setallMedicineTypes] = useState([]);
-  // const [selectedMedicine, setselectedMedicine] = useState({});
 
   const [success, setsuccess] = useState(null);
   const [message, setmessage] = useState('');
   const [open, setopen] = useState(false);
-  // const [autoCompleteData, setautoCompleteData] = useState([]);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(() => {
     axios.get('http://localhost:2021/getAllMedicine')
       .then(response => {
         if (response.data) {
-          console.log(response.data);
           setallMedicineTypes(response.data);
         }
       })
@@ -86,7 +83,6 @@ const ProfessionalRegistration = () => {
             <Stepper activeStep={activeStep} alternativeLabel sx={{paddingTop: '25px'}}>
               {steps.map((label) => {
                 const stepProps = {};
-                // const labelProps = {};
                 return (
                   <Step key={label} {...stepProps}>
                     <StepLabel  sx={{fontSize: '1rem'}}>{label}</StepLabel>
@@ -109,6 +105,7 @@ const ProfessionalRegistration = () => {
                           type="text"
                           placeholder="Enter Nom"
                           name="nom"
+                          className='form-control'
                           {...register('lastname', { required: true, maxLength: 30, minLength: 2 })}
                         />
 
@@ -119,6 +116,7 @@ const ProfessionalRegistration = () => {
                           type="text"
                           placeholder="Enter Prenom"
                           name="prenom"
+                          className='form-control'
                           {...register('firstname', { required: true, maxLength: 30, minLength: 2 })}
                         />
 
@@ -129,6 +127,7 @@ const ProfessionalRegistration = () => {
                           type="date"
                           placeholder="Enter Date of Birth"
                           name="dateofBirth"
+                          className='form-control'
                           {...register('dateofBirth', { })}
                         />
                       </div>
@@ -137,6 +136,7 @@ const ProfessionalRegistration = () => {
                         <input
                           type="text"
                           placeholder="Enter Phone Number"
+                          className='form-control'
                           name="phone"
                           {...register('phone', { required: true, maxLength: 12, minLength: 10 })}
                         />
@@ -147,6 +147,7 @@ const ProfessionalRegistration = () => {
                           type="email"
                           placeholder="Enter Email"
                           name="email"
+                          className='form-control'
                           {...register('email', {
                             required: true,
                             // eslint-disable-next-line max-len
@@ -173,9 +174,9 @@ const ProfessionalRegistration = () => {
                           type="password"
                           placeholder="Enter Password"
                           name="password"
+                          className='form-control'
                           {...register('password', {
                             required: true,
-                            pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/
                           })}
                         />
                       </div>
@@ -186,9 +187,9 @@ const ProfessionalRegistration = () => {
                           type="password"
                           placeholder="Confirm Password"
                           name="confirm-password"
+                          className='form-control'
                           {...register('confirm_password', {
                             required: true,
-                            pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/
                           })}
                         />
                       </div>
