@@ -126,6 +126,13 @@
   color: white;
 }
 
+.k-timeslots .skeleton {
+  width: 100%;
+  height: 30px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
 .k-timeslots .blocked {
   font-weight: 700;
   width: 100%;

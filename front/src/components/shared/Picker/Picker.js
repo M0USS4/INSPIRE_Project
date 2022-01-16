@@ -4,7 +4,7 @@ import moment from 'moment';
 import './Picker.css';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { Box, Button, CircularProgress, IconButton, Typography } from '@mui/material';
+import { Button, IconButton, Skeleton, Typography } from '@mui/material';
 
 const Picker = ({ practicianData, columns, handleRdv, selectedType, eventList}) => {
   const [dates, setdates] = useState([]);
@@ -46,7 +46,6 @@ const Picker = ({ practicianData, columns, handleRdv, selectedType, eventList}) 
     const day   = current.format('D');
     const dayOfweek = current.format('dddd').toLowerCase();
     const year  = current.format('YYYY');
-    console.log(dayOfweek);
     const practicianAvailability = JSON.parse(practicianData.availability);
     practicianAvailability.find(available => available.id === dayOfweek).availability.map(available => {
       for(let k = available.start; k <= available.end; k++){
@@ -114,7 +113,7 @@ const Picker = ({ practicianData, columns, handleRdv, selectedType, eventList}) 
           <ArrowBackIosIcon fontSize="inherit"/>
         </IconButton>
         {(selectedType) && dates.map(day => (
-          <div key={day.format} className="k-picker-content">
+          <div key={'d' + day.format} className="k-picker-content">
             <Typography variant="subtitle1" >
               {day.day.slice(0, 3)}
             </Typography>
@@ -125,7 +124,7 @@ const Picker = ({ practicianData, columns, handleRdv, selectedType, eventList}) 
               {
                 day.timeslots.slice(0,filter).map(time => (
                   !time.disabled &&
-                  <button key={time.raw}
+                  <button key={'t' +time.raw}
                     disabled={time.disabled}
                     onClick={() => handleRdv(practicianData, day.day, day.format, time.raw, time.formatted, day.full)}>
                     {time.formatted}
@@ -135,28 +134,38 @@ const Picker = ({ practicianData, columns, handleRdv, selectedType, eventList}) 
               {
                 (day.timeslots.length < filter) &&
                   Array(filter - day.timeslots.length ).fill().map((item, index) =>
-                    (<span className="blocked" key={index}> - </span>))
+                    (<span className="blocked" key={'b' +index}> - </span>))
               }
             </div>
           </div>
         ))}
         {!selectedType && dates.map(day => (
-          <div key={day.format} className="k-picker-content">
+          <div key={'ds' + day.format} className="k-picker-content">
             <Typography variant="subtitle1" >
               {day.day.slice(0, 3)}
             </Typography>
             <Typography variant="subtitle2" >
               {day.format}
             </Typography>
+            <div className="k-timeslots">
+              {
+                day.timeslots.slice(0,filter).map((time, index)=> (
+                  !time.disabled &&
+                  <Skeleton key={'s' + index}  className='skeleton'/>
+                ))
+              }
+              {
+                (day.timeslots.length < filter) &&
+                  Array(filter - day.timeslots.length ).fill().map((item, index) =>
+                    (<Skeleton key={'sb' + index} className='skeleton'/>))
+              }
+            </div>
           </div>
         ))}
         <IconButton onClick={nextDate} size="large" className="k-picker-button">
           <ArrowForwardIosIcon fontSize="inherit"/>
         </IconButton>
       </div>
-      <Box sx={{ display: selectedType? 'none' : 'flex', justifyContent: 'center' }}>
-        <CircularProgress />
-      </Box>
       <div  style={{ display: selectedType? 'block' : 'none' }} className="picker-more">
         {filter <= 4 &&
         <Button
@@ -179,7 +188,7 @@ Picker.propTypes = {
   handleRdv: PropTypes.func,
   practicianData: PropTypes.object,
   columns: PropTypes.number.isRequired,
-  selectedType: PropTypes.string.isRequired,
+  selectedType: PropTypes.string,
   eventList: PropTypes.array
 };
 
