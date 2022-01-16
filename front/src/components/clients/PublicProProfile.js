@@ -66,29 +66,42 @@ const PublicProProfile = () => {
   const matches = useMediaQuery(theme.breakpoints.up('md'));
 
   useEffect(() => {
-    // const practician = professionals.find(pro => pro.id === Number(params.id) );
-    // setpracticianData(practician);
     axios.get('http://localhost:2021/getProDetailed',{
       params: {
         pro_id: params.id
       }
     })
       .then(response => {
-        console.log(response.data);
-        setpracticianData(response.data);
+        if(response.data.found === false){
+          navigate('/home');
+        }
+        else{
+          setpracticianData(response.data);
+        }
       })
       .catch(error => {
         console.log(error);
       });
+  }, []);
 
+  useEffect(() => {
+    if(practicianData){
+      init();
+    }
+  }, [practicianData]);
+
+  const init = () => {
     axios.get('http://localhost:2021/getAppointmentTypes',{
       params: {
-        pro_id: params.id
+        pro_id: params.id,
+        nom_medicine: practicianData.nom_medicine
       }
     })
       .then(response => {
-        console.log(response.data);
         setappointmentTypes(response.data);
+        if(response.data.length){
+          setselectedType(response.data[0].nom);
+        }
       })
       .catch(error => {
         console.log(error);
@@ -100,7 +113,6 @@ const PublicProProfile = () => {
       }
     })
       .then(response => {
-        console.log(response.data);
         const data = response.data.map(event => {
           return {
             start: new Date(event.date_start),
@@ -109,13 +121,12 @@ const PublicProProfile = () => {
             status: event.status.data[0] === 0 ? false : true
           };
         });
-        console.log(data);
         seteventList(data);
       })
       .catch(error => {
         console.log(error);
       });
-  }, []);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -139,9 +150,8 @@ const PublicProProfile = () => {
     };
     const queryString = Object.keys(appointmentDataTemp).map(key => key + '=' + appointmentDataTemp[key]).join('&');
     setappointmentData(appointmentDataTemp);
-    console.log(appointmentData);
     navigate({
-      pathname: `/pro-profile/${params.id}/booking`,
+      pathname: `/practician/${params.id}/booking`,
       search: `?active=1&${queryString}`,
     });
   };
@@ -150,7 +160,7 @@ const PublicProProfile = () => {
 
   return (
     <Root className="pro-profile-client">
-
+      {matches}
       {(matches && practicianData && appointmentTypes) ?
         <div>
           <Item >
@@ -203,12 +213,7 @@ const PublicProProfile = () => {
                         <div className="basic-info-container">
                           <h3>Description</h3>
                           <p>
-                        Cras mattis tortor nec risus ultricies, vitae interdum odio sodales.
-                        Nulla dignissim viverra vulputate. Phasellus vel leo elit.
-                        Class aptent taciti sociosqu ad litora torquent per conubia nostra,
-                        per inceptos himenaeos. Curabitur at ligula eu leo tincidunt ullamcorper vitae et purus.
-                        Pellentesque at scelerisque purus, sit amet mattis risus.
-                        Nam risus diam, hendrerit in lorem quis, ullamcorper mollis ligula.
+                            {practicianData.desc ? practicianData.desc : 'Hello Client'}
                           </p>
 
                         </div>
@@ -242,7 +247,7 @@ const PublicProProfile = () => {
                               <TableBody>
                                 {appointmentTypes.map((type) => (
                                   <TableRow
-                                    key={type.type}
+                                    key={'r1' + type.type}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                   >
                                     <TableCell component="th" scope="row">
@@ -300,7 +305,12 @@ const PublicProProfile = () => {
           </div>
         </div>
         :
-        <ClientAppointment selectedType={selectedType} setselectedType={setselectedType}/>
+        <ClientAppointment
+          selectedType={selectedType}
+          setselectedType={setselectedType}
+          appointmentData={appointmentData}
+          setappointmentData={setappointmentData}
+        />
       }
 
     </Root>

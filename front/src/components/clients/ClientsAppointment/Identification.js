@@ -45,7 +45,6 @@ const Identification = ({practicianData, handleNext}) => {
       .reduce((cur, key) => { return Object.assign(cur, { [key]: paramsToObject[key] });}, {});
     setappointmentData(paramsFiltered);
     const user = authService.getCurrentUser();
-    console.log(user);
     setcurrentUser(user);
   }, []);
 
@@ -70,7 +69,6 @@ const Identification = ({practicianData, handleNext}) => {
     event.preventDefault();
     const queryString = Object.keys(appointmentData).map(key => key + '=' + appointmentData[key]).join('&');
     setappointmentData(appointmentData);
-    console.log(appointmentData);
     handleNext();
     navigate({
       search: `?active=2&${queryString}`,
@@ -105,7 +103,7 @@ const Identification = ({practicianData, handleNext}) => {
                         <Radio
                           checked={true}
                         />
-                        <p>{`${currentUser.name} ${currentUser.surname}`}</p>
+                        <p>{`${currentUser.user.name} ${currentUser.user.surname}`}</p>
                       </div>
                       <Div sx={{display: {sm: 'flex'}, gap: '10px'}}>
                         <Button
@@ -130,7 +128,7 @@ const Identification = ({practicianData, handleNext}) => {
               }
               {
                 (AnotherAccount || !currentUser) &&
-                  <Login/>
+                  <Login toDo='refresh'/>
               }
             </Collapse>
           </Item>

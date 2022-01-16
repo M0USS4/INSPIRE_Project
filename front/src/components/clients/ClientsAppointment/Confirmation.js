@@ -38,32 +38,38 @@ const Confirmation = ({practicianData}) => {
   }, []);
 
   const handleConfirm = () => {
-    const startTime = Number(appointmentData.time_raw);
-    const endTime = Number(appointmentData.time_raw) + 1;
-    const startDate = `${appointmentData.fulldate} ${startTime + ':00'}`;
-    const endDate = `${appointmentData.fulldate} ${endTime + ':00'}`;
-    axios.post('http://localhost:2021/pro/appt/create', {
-      appointmentType: appointmentData.type_id,
-      clientId: currentUser.idUser,
-      proId: practicianData.pro_id,
-      proMail: practicianData.mail,
-      start: startDate,
-      end: endDate,
-    })
-      .then(response => {
-        if (response.data) {
-          console.log(response.data);
-          navigate( {
-            pathname: `/clients/${currentUser.idUser}/my-appoinments`,
-          });
-        }
+    if(currentUser.type === 1){
+      setsuccess(false);
+      setmessage('You cannot create an appointment with a pro account');
+      setopen(true);
+    }
+    else{
+      const startTime = Number(appointmentData.time_raw);
+      const endTime = Number(appointmentData.time_raw) + 1;
+      const startDate = `${appointmentData.fulldate} ${startTime + ':00'}`;
+      const endDate = `${appointmentData.fulldate} ${endTime + ':00'}`;
+      axios.post('http://localhost:2021/pro/appt/create', {
+        appointmentType: appointmentData.type_id,
+        clientId: currentUser.user.idUser,
+        proId: practicianData.pro_id,
+        proMail: practicianData.mail,
+        start: startDate,
+        end: endDate,
       })
-      .catch(error => {
-        console.log(error);
-        setsuccess(false);
-        setmessage('Could not create Appointment');
-        setopen(true);
-      });
+        .then(response => {
+          if (response.data) {
+            navigate( {
+              pathname: `/clients/${currentUser.user.idUser}/my-appoinments`,
+            });
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          setsuccess(false);
+          setmessage('Could not create Appointment');
+          setopen(true);
+        });
+    }
   };
 
   return (

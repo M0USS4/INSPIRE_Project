@@ -35,7 +35,6 @@ const MyAppointments = () => {
       }
     })
       .then(response => {
-        console.log(response.data);
         setclientAppointments(response.data);
         setselectedAppointment(response.data[0]);
       })
@@ -45,7 +44,6 @@ const MyAppointments = () => {
   }, []);
 
   const handleUpdate = (data) => {
-    console.log(data);
     axios.post('http://localhost:2021/client/appt/update', {
       'idClient':selectedAppointment.id_client,
       'idPro':selectedAppointment.id_pro,
@@ -54,7 +52,6 @@ const MyAppointments = () => {
     })
       .then(response => {
         if (response.data) {
-          console.log(response.data);
           setedit(false);
         }
       })
