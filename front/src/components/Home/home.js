@@ -84,6 +84,7 @@ const Home = () => {
   const handleClose = () => setopen(false);
 
   useEffect(() => {
+    authService.decodeToken();
     const user = authService.getCurrentUser();
     if(!user){
       setopen(true);
