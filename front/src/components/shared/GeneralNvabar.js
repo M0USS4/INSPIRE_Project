@@ -17,7 +17,6 @@ import Toolbar from '@mui/material/Toolbar';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-// import Typography from '@mui/material/Typography';
 import { Link } from '@mui/material';
 import logo from '../../images/logo-inverse.png';
 import Tooltip from '@mui/material/Tooltip';
@@ -26,14 +25,21 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { styled } from '@mui/material/styles';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import authService from '../helpers/auth.service';
 
 const drawerWidth = 240;
 const Div = styled('div')(() => ({
+}));
+
+const CustomLink = styled('a')(() => ({
+  textDecoration: 'none',
+  color: 'white'
 }));
 function GeneralNvabar({list, setisDarkMode, isDarkMode, logout, ...props}) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [navlist, setnavlist] = useState([]);
+  const user = authService.getCurrentUser();
 
   const [anchorEl, setAnchorEl] = useState(null);
   //   const loggedIn = true;
@@ -104,6 +110,7 @@ function GeneralNvabar({list, setisDarkMode, isDarkMode, logout, ...props}) {
 
             <div>
               <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
+                <CustomLink href='/manual' color="inherit" sx={{ mr: {xs: 1, md: 2} }}>Manual Page</CustomLink>
                 <IconButton
                   color="inherit"
                   aria-label="open drawer"
@@ -114,7 +121,7 @@ function GeneralNvabar({list, setisDarkMode, isDarkMode, logout, ...props}) {
                   {isDarkMode ? <LightModeIcon/> : <DarkModeIcon/>}
                 </IconButton>
                 <Tooltip title="Account settings">
-                  <IconButton onClick={handleClick} size="small" sx={{ ml: 2 , display: { xs: 'none', sm: 'flex' }}}>
+                  <IconButton onClick={handleClick} size="small" sx={{ mr: 2 , display: { xs: 'none', sm: 'flex' }}}>
                     <AccountCircleIcon sx={{ width: 32, height: 32, color: 'white' }} fontSize="large"/>
                   </IconButton>
                 </Tooltip>
@@ -153,19 +160,40 @@ function GeneralNvabar({list, setisDarkMode, isDarkMode, logout, ...props}) {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-                <MenuItem>
-                  <Avatar /> Personnel
-                </MenuItem>
-                <MenuItem>
-                  <Avatar /> Practicien
-                </MenuItem>
+                {user && user.type === 1 &&
+                <div>
+                  <MenuItem>
+                    <Avatar /> My Appointments
+                  </MenuItem>
+                  <MenuItem>
+                    <Avatar /> Customization
+                  </MenuItem>
+                </div>
+                }
+                {user && user.type === 0 &&
+                <div>
+                  <MenuItem>
+                    <Avatar /> My Appointments
+                  </MenuItem>
+                </div>
+                }
                 <Divider />
-                <MenuItem onClick={logout}>
-                  <ListItemIcon>
-                    <Logout fontSize="small" />
-                  </ListItemIcon>
+                { user ?
+                  <MenuItem onClick={logout}>
+                    <ListItemIcon>
+                      <Logout fontSize="small" />
+                    </ListItemIcon>
                   Logout
-                </MenuItem>
+                  </MenuItem>
+                  :
+                  <MenuItem onClick={logout}>
+                    <ListItemIcon>
+                      <Logout fontSize="small" />
+                    </ListItemIcon>
+                    <CustomLink href='http://localhost:3000/login' sx={{color: 'text.primary'}} >Login</CustomLink>
+                  </MenuItem>
+                }
+
               </Menu>
             </div>
 
