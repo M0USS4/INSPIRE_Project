@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-escape */
 import {React, useState, useEffect } from 'react';
 import { experimentalStyled as styled } from '@mui/material/styles';
-// import { Controller, useForm } from 'react-hook-form';
 import { Button, TextareaAutosize } from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -14,10 +13,6 @@ const Item = styled('div')(({ theme }) => ({
   marginBottom: theme.spacing(3),
 }));
 
-// const ListItem = styled('li')(({ theme }) => ({
-//   margin: theme.spacing(0.5),
-// }));
-
 const Customization = () => {
   const params = useParams();
 
@@ -25,7 +20,6 @@ const Customization = () => {
   const [appointmentTypes, setappointmentTypes] = useState([]);
   const [scheduleDays, setscheduleDays] = useState([]);
   const [description, setdescription] = useState('');
-  // const { register, handleSubmit, formState: { errors }, control } = useForm();
 
   useEffect(() => {
     axios.get('http://localhost:2021/getProDetailed',{
@@ -86,21 +80,8 @@ const Customization = () => {
     <div className="profile-settings">
       <Item>
                   About
-        {/* <div className={`basic-info-container ${errors.desc ? 'invalid' : ''}`}>
-          <label htmlFor="desc"><b>Description</b></label>
-          <textarea
-            name="desc"
-            placeholder="Enter Description"
-
-            rows="7"
-            {...register('desc', { required: true })}
-          >
-          </textarea>
-
-        </div> */}
         {practicianData &&
             <TextareaAutosize
-              // value={description ? description : practicianData.description}
               defaultValue={practicianData.description}
               onChange={(e) => setdescription(e.target.value)}
               minRows={3}
@@ -118,7 +99,7 @@ const Customization = () => {
       {scheduleDays.length &&
       <Availability scheduleDays={scheduleDays} setscheduleDays={setscheduleDays}/>
       }
-      <Button onClick={onSubmit} variant='contained'>Update</Button>
+      <Button onClick={onSubmit} variant='contained' sx={{margin: '10px'}}>Update</Button>
 
     </div>
   );

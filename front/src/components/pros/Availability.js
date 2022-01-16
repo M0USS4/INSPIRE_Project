@@ -182,6 +182,9 @@ const Availability = ({scheduleDays, setscheduleDays}) => {
             </Grid>
 
           ))}
+          {!availableTimes.length &&
+          <p>You do not work on this day, you can edit</p>
+          }
         </Grid>
         {availableTimes &&
         <div>
