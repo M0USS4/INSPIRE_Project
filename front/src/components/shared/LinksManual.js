@@ -35,7 +35,7 @@ const LinksManual = () => {
               </ul>
             </li>
             <li>
-              <CustomLink href='http://localhost:3000/admin'>Register</CustomLink>
+              <CustomLink href='http://localhost:3000/register'>Register</CustomLink>
               <ul className="pro-profile-menu-list">
                 <li>
                   <CustomLink href='http://localhost:3000/register'>Register Clients</CustomLink>
@@ -44,6 +44,9 @@ const LinksManual = () => {
                   <CustomLink href='http://localhost:3000/register-pro'>Register Pro</CustomLink>
                 </li>
               </ul>
+            </li>
+            <li>
+              <CustomLink href='http://localhost:3000/login'>Login</CustomLink>
             </li>
             <li>
               <CustomLink href='http://localhost:3000/home'>Home</CustomLink>
