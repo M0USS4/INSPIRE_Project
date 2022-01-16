@@ -316,6 +316,7 @@ CREATE TABLE IF NOT EXISTS `pro` (
   `id_adress` int(11) NOT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `status` bit(1) NOT NULL,
+  `description` text NULL,
   `availability` varchar(10000) DEFAULT '[{"id":"sunday","availability":[]},{"id":"monday","availability":[{"start":9,"end":12},{"start":15,"end":17}]},{"id":"tuesday","availability":[{"start":9,"end":12},{"start":14,"end":17}]},{"id":"wednesday","availability":[{"start":9,"end":13}]},{"id":"thursday","availability":[{"start":9,"end":12},{"start":15,"end":17}]},{"id":"friday","availability":[{"start":9,"end":12},{"start":15,"end":17}]},{"id":"saturday","availability":[]}]',
   PRIMARY KEY (`id`),
   KEY `FK_203` (`id_login`),
