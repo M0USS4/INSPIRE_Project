@@ -1,20 +1,20 @@
 /* eslint-disable no-useless-escape */
 import {React, useState} from 'react';
 import './login.css';
+import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
-// import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import authService from '../helpers/auth.service';
 import CollapsableAlert from '../shared/CollapsableAlert';
 
-const Login = () => {
-  // let navigate = useNavigate();
+const Login = ({toDo}) => {
+  let navigate = useNavigate();
   const [success, setsuccess] = useState(null);
   const [message, setmessage] = useState('');
   const [open, setopen] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm();
   const onSubmit = (data) =>{
-    console.log(data);
     const loginData = {
       login: {
         mail: data.email,
@@ -22,16 +22,20 @@ const Login = () => {
       }
     };
     authService.login(loginData)
-      .then(response => {
-        console.log(response);
-        console.log(success);
+      .then(() => {
         setsuccess(true);
-        localStorage.setItem('userInfo', JSON.stringify(response.data));
-        window.location.reload();
-
-        // navigate('/',      { state: {
-        //   success: success,
-        // }});
+        const user = authService.getCurrentUser();
+        if(user.type === 1){
+          navigate(`/pro-profile/customization/${user.user.idUser}`);
+        }
+        else if(user.type === 0){
+          if(toDo === 'refresh'){
+            window.location.reload();
+          }
+          else{
+            navigate('/home');
+          }
+        }
 
       })
       .catch(err => {
@@ -43,12 +47,6 @@ const Login = () => {
   };
   return (
     <div>
-      {/* <div className="login-content"> */}
-      {/* <div className="welcome">
-          <h1 className="welcome-title">
-                        Welcome
-          </h1>
-        </div> */}
       <CollapsableAlert
         open={open}
         setopen={setopen}
@@ -79,13 +77,12 @@ const Login = () => {
               name="password"
               {...register('password', {
                 required: true,
-              // pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,15}$/
               })}
             />
           </div>
 
           <div className="buttons">
-            <button onClick={handleSubmit(onSubmit)} className="button1">Se Connecter</button>
+            <button onClick={handleSubmit(onSubmit)} type="button" className="button1">Se Connecter</button>
             <a href="" className="forgotten-password">Mot de passe oublie?</a>
           </div>
         </form>
@@ -95,4 +92,8 @@ const Login = () => {
   );
 };
 
+Login.propTypes = {
+  toDo: PropTypes.string,
+
+};
 export default Login;
