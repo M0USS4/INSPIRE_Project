@@ -213,7 +213,7 @@ const PublicProProfile = () => {
                         <div className="basic-info-container">
                           <h3>Description</h3>
                           <p>
-                            {practicianData.desc ? practicianData.desc : 'Hello Client'}
+                            {practicianData.description ? practicianData.description : 'Hello Client'}
                           </p>
 
                         </div>
