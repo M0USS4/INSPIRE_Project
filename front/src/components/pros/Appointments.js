@@ -218,18 +218,14 @@ const Appointments = () => {
             id="combo-box-demo"
             options={['appointment', 'block']}
             sx={{ flex: 1}}
-            // value={selectedPractice}
-            // onChange={(e, value) => setselectedPractice(value)}
+
             renderInput={(params) =>
               <TextField
                 {...params}
                 InputProps={{
                   ...params.InputProps,
-                  // classes:{notchedOutline:classes.noBorder},
-                  disableUnderline: true,
                 }}
                 sx={{width: '100%', border: 'none'}}
-                // label="Practique..."
                 {...register('type', { required: true,  minLength: 2 })}
               />
             }
@@ -238,21 +234,14 @@ const Appointments = () => {
             {...params}
             InputProps={{
               ...params.InputProps,
-              // classes:{notchedOutline:classes.noBorder},
-              disableUnderline: true,
             }}
             sx={{width: '100%', border: 'none'}}
-            // label="Practique..."
             {...register('title', { required: true,  minLength: 2 })}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Close</Button>
           <Button onClick={handleSubmit}>Close</Button>
-
-          {/* <Button onClick={type === ClickType.block ? handleBlock : handleManage} autoFocus>
-            {type.type}
-          </Button> */}
         </DialogActions>
       </Dialog>
       <Calendar

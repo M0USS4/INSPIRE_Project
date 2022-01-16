@@ -11,11 +11,16 @@ import ShareIcon from '@mui/icons-material/Share';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AppSettingsAltIcon from '@mui/icons-material/AppSettingsAlt';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useNavigate } from 'react-router';
+import authService from '../helpers/auth.service';
+
 import {
   Outlet,
   Link,
+  useParams,
 } from 'react-router-dom';
 import axios from 'axios';
+
 const Item = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
   textAlign: 'center',
@@ -23,21 +28,29 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const ProProfile = () => {
+  const params = useParams();
+  let navigate = useNavigate();
 
   const [practicianData, setpracticianData] = useState({});
   useEffect(() => {
-    axios.get('http://localhost:2021/getProDetailed',{
-      params: {
-        pro_id: 11
-      }
-    })
-      .then(response => {
-        console.log(response.data);
-        setpracticianData(response.data);
+    const user = authService.getCurrentUser();
+    if(user.type !== 1){
+      navigate('/login');
+    }
+    else{
+      axios.get('http://localhost:2021/getProDetailed',{
+        params: {
+          pro_id: params.id
+        }
       })
-      .catch(error => {
-        console.log(error);
-      });
+        .then(response => {
+          console.log(response.data);
+          setpracticianData(response.data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
   }, []);
   return (
     <section className="pro-profile">

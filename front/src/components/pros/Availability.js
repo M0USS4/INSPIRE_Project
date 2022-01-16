@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Grid from '@mui/material/Grid';
-import { Button, Chip, ListItem, styled } from '@mui/material';
+import { Button, Chip, styled } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,7 +19,11 @@ const Item = styled('div')(({ theme }) => ({
   marginBottom: theme.spacing(3),
 }));
 
-const Availability = ({scheduleDays}) => {
+const ListItem = styled('li')(({ theme }) => ({
+  margin: theme.spacing(0.5),
+}));
+
+const Availability = ({scheduleDays, setscheduleDays}) => {
 
   const [openRangeErrorAlert, setopenRangeErrorAlert] = useState(false);
   const [message, setmessage] = useState('');
@@ -125,11 +129,19 @@ const Availability = ({scheduleDays}) => {
   const handleClose = () => {
     setopen(false);
   };
+
+  const handleSave = () => {
+    let tempDaySchedule = scheduleDays;
+    let index = scheduleDays.findIndex(day => day.id === currentDay);
+    tempDaySchedule[index].availability = availableTimes;
+    setscheduleDays(tempDaySchedule);
+  };
+
   return (
     <div>
       <Item>
           Schedule
-        <Grid container spacing={{ xs: 1, md: 2 }} columns={{ xs: 4, sm: 8, md: 12 }} >
+        <Grid container spacing={{ xs: 1, md: 1 }} columns={{ xs: 4, sm: 8, md: 12 }} >
           { scheduleDays && scheduleDays.map((schedule, index) => (
             <Grid item  className="schedule_days" key={'d'+index}>
               <Button
@@ -154,7 +166,7 @@ const Availability = ({scheduleDays}) => {
         </div>
         {}
         <Grid
-          className="timeslot-contents tags"  spacing={{ xs: 1, md: 1 }} columns={{ xs: 4, sm: 8, md: 12 }} >
+          className="timeslot-contents tags" container    >
           {availableTimes && availableTimes.map((timeslot, index) => (
             <Grid item  key={'t'+index} className="schedule_days" >
               <ListItem >
@@ -182,7 +194,7 @@ const Availability = ({scheduleDays}) => {
               {`Edit Timeslots for ${currentDay}`}
               <IconButton
                 aria-label="close"
-                onClick={() => setopen(false)}
+                onClick={handleClose}
                 sx={{
                   position: 'absolute',
                   right: 8,
@@ -259,7 +271,7 @@ const Availability = ({scheduleDays}) => {
               </LoadingButton>
             </DialogContent>
             <DialogActions>
-              <Button autoFocus onClick={handleClose}>
+              <Button autoFocus onClick={handleSave}>
                 Save Changes
               </Button>
             </DialogActions>
@@ -274,6 +286,7 @@ const Availability = ({scheduleDays}) => {
 Availability.propTypes = {
   availableTimes: PropTypes.array,
   scheduleDays: PropTypes.array,
+  setscheduleDays: PropTypes.func,
   timeslotStatus: PropTypes.array,
   setopenTimeslotEdit: PropTypes.func,
   id: PropTypes.number
