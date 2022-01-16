@@ -65,7 +65,8 @@ const db = mysql.createPool({
    user: DB_USER,
    password: DB_PASSWORD,
    database: DB_DATABASE,
-   port: DB_PORT
+   port: DB_PORT,
+   multipleStatements: true
 })
 
 db.getConnection( (err, connection)=> {   if (err) throw (err)
@@ -229,8 +230,9 @@ app.get("/getProDetailed", async (req, res) => {
 })
 
 app.get("/getAppointmentTypes", async (req, res) => {
-  let pro_id = req.query.pro_id;
-  dbHelper.getAppointmentTypes( pro_id, db,function(err, result){
+  let params = req.query;
+  console.log(params)
+  dbHelper.getAppointmentTypes( params, db,function(err, result){
     if(!err){
       if(result){
         return res.status(200).send(result)
@@ -312,6 +314,42 @@ app.get("/getAllMedicine", async (req, res) => {
     }
   })
 })
+
+app.post("/pro/customization", async (req, res) => {
+  let params = req.body;
+  dbHelper.proCustomization( params, db, function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send(result)
+      }else{
+        return res.status(500).json("Could not update")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+
+})
+
+app.post("/pro/apptType/create", async (req, res) => {
+  let apptType = req.body;
+  console.log(apptType);
+  dbHelper.addApptType( apptType, db, function(err, result){
+    if(!err){
+      if(result){
+        return res.status(200).send('created')
+      }else{
+        return res.status(500).json("Could not update")
+      }
+    }else{
+      console.log(err)
+      return res.status(500).json("Error server")
+    }
+  })
+
+})
+
 app.post("/admin/medicine/create",upload.array("files"), async (req,res) => {
   const files = req.files;
   const data = JSON.parse(req.body.data);
@@ -1129,7 +1167,7 @@ app.post("/login/post", (req, res)=> {
                           });
 
                           res.header('Authorization', 'Bearer ' + token);
-                          return res.status(200).json('auth_ok');
+                          return res.status(200).send({token});
                       }else{
                         console.log("error getting the mail")
                         return res.status(500).json("error server")

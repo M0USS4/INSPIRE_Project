@@ -201,7 +201,7 @@ module.exports = {
               const sqlSearch = `SELECT *, pro.id as pro_id FROM pro INNER JOIN adress ON pro.id_adress=adress.id 
               INNER JOIN type_medicine ON pro.id_type_medicine=type_medicine.id
               INNER JOIN login ON pro.id_login=login.id
-               where id_login = ?`
+               where pro.id = ?`
               const search_query = mysql.format(sqlSearch,[idPro])
       
               connection.query (search_query, (err, result) => {  
@@ -305,14 +305,18 @@ module.exports = {
         })
     },
 
-    getAppointmentTypes:function (idPro, db, callback){
+    getAppointmentTypes:function (params, db, callback){
+        let idPro = params.pro_id;
+        let nom_medicine = params.nom_medicine;
+        console.log(nom_medicine)
         db.getConnection( (err, connection) => { 
             if (err) {
               return callback(err, null);
             }
               console.log("Searching for appointment types of id: "+idPro)
-              const sqlSearch = `SELECT * FROM type_rdv where id_pro = ?`
-              const search_query = mysql.format(sqlSearch,[idPro])
+              const sqlSearch = `SELECT * FROM type_rdv where id_pro = ? AND public = ?;
+              SELECT * FROM type_rdv where nom LIKE '%${nom_medicine}%' AND public = ?`
+              const search_query = mysql.format(sqlSearch,[idPro, false, true])
       
               connection.query (search_query, (err, result) => {  
                 if (err) {
@@ -321,7 +325,8 @@ module.exports = {
                 }
                 console.log(result);
                 if (result.length != 0) {
-                    return callback(null, result);
+                    const mergeResult = result[0].concat(result[1]);
+                    return callback(null, mergeResult);
                 }
                 else{
                     if(result.length===0){
@@ -710,9 +715,31 @@ module.exports = {
             }
               console.log("Adding appt type: "+apptType)
               const sqlInsert = "INSERT INTO type_rdv (nom, duration, price, startDate, endDate, public, id_pro) VALUES (?,?,?,?,?,?,?)"
-              const insert_query = mysql.format(sqlInsert,[apptType.name, apptType.duration, apptType.price, apptType.startDate, apptType.endDate, apptType.public, apptType.idPro])
+              const insert_query = mysql.format(sqlInsert,[apptType.nom, apptType.duration, apptType.price, apptType.startDate, apptType.endDate, apptType.public, apptType.id_pro])
       
               connection.query (insert_query,  (err, result) => {  
+                if (err) {
+                console.log(err)
+
+                    return callback(err, null);
+                }else{
+                    return callback(null, result)
+                }
+            })
+        })
+    },
+    proCustomization:function (params, db, callback){
+        db.getConnection(  (err, connection) => { 
+            if (err) {
+                return callback(err, null);
+            }
+              console.log("Updating customizing type: "+params)
+              const sqlInsert = `
+              UPDATE pro SET description = '${params.description}', availability = '${params.availability}'  WHERE pro.id = ${params.id_pro}
+              `
+            //   const insert_query = mysql.format(sqlInsert,[params.a.name, apptType.duration, apptType.price, apptType.startDate, apptType.endDate, apptType.public, apptType.idPro])
+      
+              connection.query (sqlInsert,  (err, result) => {  
                 if (err) {
                     return callback(err, null);
                 }else{
@@ -747,8 +774,19 @@ module.exports = {
               console.log("Adding medicine: "+medicine)
             //   const sql = `IF NOT EXISTS (SELECT 1 FROM type_medicine WHERE nom_medicine = ?) BEGIN INSERT INTO type_medicine (nom_medicine, text1, text2, text3, img_medicine) VALUES (?, ?,?,?,?,?)
             //   END`
-              const sqlInsert = "INSERT INTO `type_medicine` (`nom_medicine`, `text1`, `text2`, `text3`, `img_medicine`) VALUES (?,?,?,?,?)"
-              const insert_query = mysql.format(sqlInsert,[medicine.nom_medicine, medicine.nom_medicine, medicine.text1, medicine.text2, medicine.text3, medicine.img_medicine])
+              const sqlInsert = "INSERT INTO `type_medicine` (`nom_medicine`, `text1`, `text2`, `text3`, `img_medicine`) VALUES (?,?,?,?,?)";
+              const sql = `
+              INSERT INTO type_medicine (nom_medicine, text1, text2, text3, img_medicine) 
+              SELECT nom_medicine, text1, text2, text3, img_medicine FROM (SELECT ? as nom_medicine , ? as text1, ? as text2, ? as text3, ? as img_medicine) AS tmp 
+              WHERE NOT EXISTS (SELECT * FROM type_medicine 
+                WHERE nom_medicine = '${medicine.nom_medicine}') LIMIT 1;
+
+              INSERT INTO type_rdv (nom, duration, price, startDate, endDate, public, id_pro)
+              SELECT nom, duration, price, startDate, endDate, public, id_pro FROM (SELECT 'General ${medicine.nom_medicine}' as nom, 60 as duration, 45 as price, '0000-00-00' as startDate, '0000-00-00' as endDate, b'1' as public, 1 as id_pro) AS tmp2
+              WHERE NOT EXISTS (SELECT * FROM type_rdv 
+                WHERE nom = 'General ${medicine.nom_medicine}') LIMIT 1;
+              `
+              const insert_query = mysql.format(sql,[medicine.nom_medicine, medicine.nom_medicine, medicine.text1, medicine.text2, medicine.text3, medicine.img_medicine])
       
               connection.query (insert_query,  (err, result) => {  
                 if (err) {
